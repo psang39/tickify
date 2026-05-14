@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Trong v4, bạn nên định nghĩa alias trực tiếp như thế này */
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* Nếu dùng biến HSL thuần của shadcn, hãy dùng cú pháp này */
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+@layer base {
+  :root {
+    /* Biến của shadcn (Dạng HSL) */
+    --background: #ffffff;
+    --foreground: #020817;
+    --card: #ffffff;
+    --card-foreground: #020817;
+    --popover: #ffffff;
+    --popover-foreground: #020817;
+    --primary: #0f172a;
+    --primary-foreground: #f8fafc;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
+    --destructive: #ef4444;
+    --destructive-foreground: #f8fafc;
+    --border: #e2e8f0;
+    /* Class border-border sẽ lấy màu này */
+    --input: #e2e8f0;
+    --ring: #020817;
+    --radius: 0.5rem;
+
+    /* Biến tùy chỉnh riêng của dự án Tickify (Đổi tên để tránh trùng) */
+    --tickify-text: #6b6375;
+    --tickify-text-h: #08060d;
+    --tickify-accent: #aa3bff;
+    --code-bg: #f4f3ec;
+
+    font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 145%;
+    color: var(--tickify-text);
+    background: var(--bg);
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    /* ... thêm các biến dark mode của shadcn vào đây nếu cần */
+    --tickify-text: #9ca3af;
+    --tickify-text-h: #f3f4f6;
+  }
+}
+
+/* Các style cố định của bạn */
+#root {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-inline: 1px solid var(--border);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2 {
+  color: var(--tickify-text-h);
+  font-weight: 500;
+}
+
+@utility border-border {
+  border-color: var(--border);
+}
