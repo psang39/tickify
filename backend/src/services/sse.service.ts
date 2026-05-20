@@ -19,19 +19,20 @@ subscriber.subscribe('SEAT_UPDATES', (message) => {
     // Phát loa thông báo cho toàn bộ các user đó
     showClients.forEach(res => {
         // Chuẩn format của SSE: bắt đầu bằng "data: ", kết thúc bằng "\n\n"
+        res.write(`event: SEAT_UPDATES\n`);
         res.write(`data: ${JSON.stringify({ seat_id, status })}\n\n`);
     });
 });
 
 subscriber.subscribe('ZONE_SUMMARY_UPDATES', (message) => {
     try {
-        const { show_id, zone_id, valid_quantities } = JSON.parse(message);
+        const { show_id, zone_id, summary } = JSON.parse(message);
         const showClients = clients.get(show_id) || [];
 
         showClients.forEach(res => {
             // DÙNG NAMED EVENT: Khai báo tên sự kiện là 'ZONE_SUMMARY_UPDATE'
-            res.write(`event: ZONE_SUMMARY_UPDATE\n`);
-            res.write(`data: ${JSON.stringify({ zone_id, valid_quantities })}\n\n`);
+            res.write(`event: ZONE_SUMMARY_UPDATES\n`);
+            res.write(`data: ${JSON.stringify({ zone_id, summary })}\n\n`);
         });
     } catch (err) {
         console.error("Lỗi parse ZONE_SUMMARY_UPDATES message:", err);

@@ -131,7 +131,6 @@ export const WaitingRoomPage = () => {
         ? Math.max(5, 100 - (currentPosition / initialPosition) * 100)
         : 5;
 
-    // ... (Giữ nguyên toàn bộ phần return JSX của bạn) ...
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans">
             <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden p-8 text-center border border-slate-100">
