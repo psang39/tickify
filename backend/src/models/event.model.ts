@@ -8,6 +8,7 @@ const EventSchema = new Mongoose.Schema<IEvent>({
     genre: { type: String },
     poster_url: { type: String }, // Ảnh dọc (Thumbnail)
     banner_url: { type: String }, // Ảnh ngang to (Cover)
+    banner_offset_y: { type: Number, default: 50 },
     artists: [{ type: String }], // ["HIEUTHUHAI", "Rhyder", ...]
     start_date: { type: Date, required: true },
     end_date: { type: Date, required: true },

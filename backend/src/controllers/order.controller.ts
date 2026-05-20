@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import redisClient from '../utils/redisClient'; // Đảm bảo bạn đã export redisClient
-import Order from '../models/order.model'; // Đảm bảo bạn đã tạo model Order với các trường cần thiết
+import redisClient from '../utils/redisClient';
+import Order from '../models/order.model';
 import Seat from '../models/seat.model';
 import Zone from '../models/zone.model';
+import User from '../models/user.model';
 import TicketType from '../models/ticket-type.model';
 import Show from '../models/show.model';
 import Ticket from '../models/ticket.model';
@@ -10,7 +11,9 @@ import { orderExpirationQueue } from '../queues/orderExpiration.queue';
 import { validateOrphanSeats } from '../utils/seatValidation';
 import { calculateValidQuantities } from '../utils/validQuantities';
 import { formatHashToJSON } from '../utils/hashToJson';
-// Thời gian giữ ghế: 10 phút = 600 giây
+import { ITicketType } from '../types/ticket-type.types';
+
+
 const HOLD_DURATION_SECONDS = 600;
 
 const holdSeatsLuaScript = `
@@ -74,7 +77,7 @@ const holdSeatsLuaScript = `
 
     return "OK"
 `;
-// 0. Khai báo script Lua ở ngoài để tái sử dụng
+
 const rollbackLuaScript = `
     local userCountKey = KEYS[1]
     local userId = ARGV[1]
@@ -83,32 +86,74 @@ const rollbackLuaScript = `
     -- 1. GIẢI PHÓNG GHẾ ĐÃ KHÓA
     -- Lặp qua các key ghế. Vẫn giữ logic cực tốt của bạn: Chỉ xóa nếu đúng là của user này.
     for i = 1, numSeats do
-        local lockKey = KEYS[i]
-        if redis.call("GET", lockKey) == userId then
-            redis.call("DEL", lockKey)
-        end
+    local lockKey = KEYS[i + 1] 
+    if redis.call("GET", lockKey) == userId then
+        redis.call("DEL", lockKey)
     end
+end
     
 
     -- 2. KHÔI PHỤC LẠI CHUỖI CÁC HÀNG (ROW)
     -- Lấy tổng số KEYS trừ đi số ghế sẽ ra số lượng hàng cần khôi phục
-    local numRows = #KEYS - numSeats
-    for i = 1, numRows do
-        local rowKey = KEYS[numSeats + i]
-        local prevString = ARGV[2 + i]
-        
-        -- Ghi đè lại trạng thái cũ
-        redis.call("SET", rowKey, prevString)
-    end
-    if redis.call("GET", userCountKey>0) then
-        redis.call("DECRBY", userCountKey, numSeats)
-    end
+  local numRows = #KEYS - (numSeats + 1)
+for i = 1, numRows do
+    local rowKey = KEYS[numSeats + 1 + i]
+    local prevString = ARGV[2 + i]
     
-    return "OK"
+    -- Ghi đè lại trạng thái cũ
+    redis.call("SET", rowKey, prevString)
+end
+
+  local currentCount = tonumber(redis.call("GET", userCountKey) or "0")
+
+if currentCount > 0 then
+    -- Thêm 1 lớp bảo vệ: Tránh trường hợp trừ lố thành số âm
+    if currentCount >= numSeats then
+        redis.call("DECRBY", userCountKey, numSeats)
+    else
+        redis.call("SET", userCountKey, 0)
+    end
+end
+
+return "OK"
+`;
+const releaseSeatsLuaScript = `
+    local rowKey = KEYS[1]
+    local userCountKey = KEYS[2]
+    local rowStr = redis.call('GET', rowKey)
+    if not rowStr then return nil end
+
+    local chars = {}
+    for i = 1, #rowStr do
+        chars[i] = rowStr:sub(i, i)
+    end
+
+    local numSeatsToRelease = #ARGV
+    for i = 1, numSeatsToRelease do
+        local colIndex = tonumber(ARGV[i])
+        chars[colIndex] = 'O'
+    end
+
+    local newRowStr = table.concat(chars)
+    redis.call('SET', rowKey, newRowStr)
+
+    for i = 3, #KEYS do
+        redis.call('DEL', KEYS[i])
+    end
+
+    if numSeatsToRelease > 0 then
+        local currentCount = tonumber(redis.call('GET', userCountKey) or 0)
+        if currentCount >= numSeatsToRelease then
+            redis.call('DECRBY', userCountKey, numSeatsToRelease)
+        else
+            redis.call('SET', userCountKey, 0)
+        end
+    end
+
+    return newRowStr
 `;
 
 
-// Hàm helper để rollback an toàn
 interface ModifiedRow {
     rowLabel: string;
     prevString: string;
@@ -123,54 +168,56 @@ export const rollbackLocksAndRows = async (
     modifiedRows: ModifiedRow[]
 ): Promise<void> => {
 
-    // Nếu không có gì để rollback thì thoát luôn cho nhẹ máy
+
     if (locked_seat_ids.length === 0 && modifiedRows.length === 0) {
         return;
     }
 
     const keys: string[] = [];
 
-    // ARGS cơ bản: Truyền vào userId và "số lượng ghế" để Lua biết đường cắt mảng KEYS
+
     const args: string[] = [user_id, locked_seat_ids.length.toString()];
 
-    // 1. Nhét Key của ghế vào mảng KEYS
+
     for (const seat_id of locked_seat_ids) {
         keys.push(`event:${event_id}:show:${show_id}:seat:${seat_id}:lock`);
     }
 
-    // 2. Nhét Key của hàng vào KEYS, và dữ liệu prevString vào ARGS
+
     for (const row of modifiedRows) {
         keys.push(`event:${event_id}:show:${show_id}:zone:${zone_id}:row:${row.rowLabel}`);
-        args.push(row.prevString); // prevString sẽ nằm từ ARGV[3] trở đi
+        args.push(row.prevString);
     }
 
     try {
-        // Thực thi kịch bản dọn dẹp
+
         await redisClient.eval(rollbackLuaScript, {
             keys: keys,
             arguments: args
         });
 
-        // Bắn sự kiện (SSE) để Frontend biết mà bỏ tô màu xám của những ghế này đi
+
         for (const seat_id of locked_seat_ids) {
             await redisClient.publish('SEAT_UPDATES', JSON.stringify({
                 show_id: show_id,
                 seat_id: seat_id,
-                status: 'available' // Trả lại màu xanh
+                status: 'available'
             }));
         }
 
         console.log(`[Rollback Success] Đã nhả ${locked_seat_ids.length} ghế và khôi phục ${modifiedRows.length} hàng.`);
     } catch (error) {
-        // Lỗi ở bước này hiếm khi xảy ra trừ khi sập Redis
+
         console.error("[Rollback Error] Lỗi nghiêm trọng khi dọn dẹp Redis:", error);
     }
 };
 
 export const holdSeats = async (req: Request, res: Response): Promise<void> => {
-    const user_id = req.user?.id || 'user_demo_123';
+    const user_id = req.user!.id;
     const { items } = req.body;
     const { event_id, show_id } = req.checkoutData;
+    const currentUser = await User.findById(user_id);
+    if (!currentUser) throw new Error('Không tìm thấy thông tin người dùng hợp lệ.');
 
     if (!event_id || !show_id || !Array.isArray(items) || items.length === 0) {
         res.status(400).json({ message: 'Dữ liệu đầu vào không hợp lệ.' });
@@ -178,22 +225,20 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
     }
 
     const seat_ids = items.map(item => item.seat_id);
+    const ticket_type_ids = items.map(item => item.ticket_type_id);
     const successfullyLockedSeats: string[] = [];
     const modifiedRowsForRollback: { rowLabel: string, prevString: string }[] = [];
-    let zone_id = ''; // Khai báo ở đây để dùng cho catch block
+    let zone_id = '';
 
     try {
-        // 1. CHỈ QUERY ĐÚNG NHỮNG GHẾ ĐƯỢC CHỌN
         const targetSeats = await Seat.find({ _id: { $in: seat_ids } });
         if (targetSeats.length !== seat_ids.length) {
             res.status(400).json({ message: 'Một số ghế không tồn tại.' });
             return;
         }
 
-        // Fix bug nhỏ: Lấy zone_id từ targetSeats thay vì seat_ids
         zone_id = targetSeats[0].zone_id.toString();
 
-        // 2. GOM NHÓM GHẾ THEO TỪNG HÀNG (ROW)
         const seatsByRow: { [key: string]: typeof targetSeats } = {};
         const lockedByTier: Record<string, number> = {};
         targetSeats.forEach(seat => {
@@ -202,14 +247,13 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
             seatsByRow[seat.row].push(seat);
         });
 
-        // 3. THỰC THI LUA SCRIPT CHO TỪNG HÀNG
         for (const rowLabel in seatsByRow) {
             const seatsInRow = seatsByRow[rowLabel];
             const rowKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:row:${rowLabel}`;
 
             const prevRowString = await redisClient.get(rowKey);
             const keys = [rowKey, `event:${event_id}:show:${show_id}:user:${user_id}:held_count`];
-            const args = [String(HOLD_DURATION_SECONDS), user_id];
+            const args = [String(HOLD_DURATION_SECONDS), user_id!];
 
             seatsInRow.forEach(seat => {
                 keys.push(`event:${event_id}:show:${show_id}:seat:${seat._id}:lock`);
@@ -225,7 +269,6 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
                 }
             } catch (error: any) {
                 const errMsg = error.message;
-
                 await rollbackLocksAndRows(event_id, show_id, zone_id, user_id, successfullyLockedSeats, modifiedRowsForRollback);
 
                 if (errMsg.includes("SEAT_UNAVAILABLE")) {
@@ -235,70 +278,60 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
                     res.status(400).json({ message: `Lỗi để trống ghế lẻ tại hàng ${rowLabel}. Vui lòng chọn lại!` }); return;
                 }
                 if (errMsg.includes("ROW_NOT_FOUND")) {
-                    res.status(500).json({ message: 'Dữ liệu sơ đồ ghế chưa được khởi tạo trên hệ thống.' }); return;
+                    res.status(500).json({ message: 'Dữ liệu sơ đồ ghế chưa được khởi tạo.' }); return;
                 }
-
+                console.error("Lỗi giữ ghế:", error);
                 res.status(500).json({ message: 'Lỗi hệ thống khi giữ ghế.' }); return;
             }
         }
 
-        // 4. QUA CỬA THÀNH CÔNG -> BẮN SSE MÀU GHẾ
+
+        const statusHashKey = `show:${show_id}:seat_status`;
+
         for (const seat_id of successfullyLockedSeats) {
+            const stringShowId = show_id.toString();
+
+
+            await redisClient.hSet(statusHashKey, seat_id.toString(), 'holding');
+
+            console.log(`📢 [Trạm 1] Đang publish cho ghế ${seat_id} của Show ${stringShowId}`);
             await redisClient.publish('SEAT_UPDATES', JSON.stringify({
-                show_id: show_id,
-                seat_id: seat_id,
+                show_id: stringShowId,
+                seat_id: seat_id.toString(),
                 status: 'holding'
             }));
         }
 
 
-
-        // ==========================================
-        // 6. LOGIC DATABASE: VALIDATE ZONE & TIER (GIỮ NGUYÊN 100%)
-        // ==========================================
         const seatsFromDb = await Seat.find({ _id: { $in: seat_ids } });
-        if (seatsFromDb.length !== seat_ids.length) {
-            throw new Error('Có ghế không tồn tại trong hệ thống.');
-        }
+        const ticketTypesFromDb = await TicketType.find({ _id: { $in: ticket_type_ids } }) as any[];
 
-        const uniqueZones = new Set(seatsFromDb.map(s => s.zone_id.toString()));
-        if (uniqueZones.size > 1) {
-            throw new Error('Chỉ được phép mua vé trong cùng 1 khu vực (Zone) cho mỗi đơn hàng.');
+        if (seatsFromDb.length !== seat_ids.length || ticketTypesFromDb.length !== ticket_type_ids.length) {
+            throw new Error('Có ghế hoặc loại vé không tồn tại trong hệ thống.');
         }
-
-        const zone = await Zone.findById(zone_id).populate('ticket_type_ids');
-        if (!zone) throw new Error('Không tìm thấy khu vực này.');
 
         let totalPrice = 0;
         const orderTicketsData = [];
 
         for (const item of items) {
             const seat = seatsFromDb.find(s => s._id.toString() === item.seat_id);
-            const selectedTicketType = (zone.ticket_type_ids as any[]).find(
-                tt => tt._id.toString() === item.ticket_type_id
-            );
-
-            if (!selectedTicketType) throw new Error('Loại vé bạn chọn không tồn tại trong khu vực này.');
+            const selectedTicketType = ticketTypesFromDb.find(t => t._id.toString() === item.ticket_type_id);
+            if (!selectedTicketType) throw new Error('Loại vé bạn chọn không tồn tại.');
             if (seat!.tier !== selectedTicketType.target_tier) {
-                throw new Error(`Ghế hạng ${seat!.tier} không thể mua bằng loại vé ${selectedTicketType.name}.`);
+                throw new Error(`Ghế hạng ${seat!.tier} không khớp với vé.`);
             }
 
             totalPrice += selectedTicketType.price;
             orderTicketsData.push({
                 seat_id: seat!._id,
                 ticket_type_id: selectedTicketType._id,
-                price_paid: selectedTicketType.price
+                price: selectedTicketType.price
             });
         }
 
-        // ==========================================
-        // 7. TẠO ĐƠN HÀNG & THÊM VÀO QUEUE (GIỮ NGUYÊN 100%)
-        // ==========================================
-        // (Đã xóa dòng decrBy cũ ở đây)
-
         const cancellation_deadline = new Date(Date.now() + HOLD_DURATION_SECONDS * 1000);
-
         const newOrder = await Order.create({
+            order_number: `TKF-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`,
             user_id: user_id,
             event_id: event_id,
             show_id: show_id,
@@ -306,32 +339,24 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
             items: orderTicketsData,
             total_price: totalPrice,
             status: 'pending',
-            cancellation_deadline: cancellation_deadline
+            cancellation_deadline: cancellation_deadline,
+            purchaser_name: `${currentUser.first_name} ${currentUser.last_name}`,
+            purchaser_email: currentUser.email,
+            purchaser_phone: currentUser.phone
         });
 
         await orderExpirationQueue.add(
             `expire-${newOrder._id}`,
-            {
-                order_id: newOrder._id,
-                event_id: event_id,
-                show_id: show_id,
-                zone_id: zone_id,
-                seat_ids: seat_ids
-            },
+            { order_id: newOrder._id, event_id, show_id, zone_id, seat_ids },
             { delay: HOLD_DURATION_SECONDS * 1000 }
         );
 
         res.status(201).json({
-            message: 'Giữ chỗ thành công! Bạn có thời gian để hoàn tất thanh toán.',
-            data: {
-                order_id: newOrder._id,
-                total_price: newOrder.total_price,
-                cancellation_deadline: newOrder.cancellation_deadline,
-                lockedSeats: seat_ids
-            }
+            message: 'Giữ chỗ thành công!',
+            data: { order_id: newOrder._id, total_price: newOrder.total_price, lockedSeats: seat_ids }
         });
 
-        // 5. CẬP NHẬT SUMMARY NGẦM BẰNG REDIS HASH (Mới & Tối ưu nhất)
+
         setTimeout(async () => {
             try {
                 const holdingSetKey = `event:${event_id}:show:${show_id}:holding_seats`;
@@ -339,19 +364,15 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
                 const updatedRowStrings = await redisClient.mGet(modifiedRowsForRollback.map(r => `event:${event_id}:show:${show_id}:zone:${zone_id}:row:${r.rowLabel}`)) as string[];
 
                 const pipeline = redisClient.multi();
-
-                // Trừ số lượng trực tiếp (Atomic)
                 for (const [tierName, lockedCount] of Object.entries(lockedByTier)) {
                     pipeline.hIncrBy(summaryKey, `tier:${tierName}:count`, -lockedCount);
                 }
 
-                // Cập nhật lại valid_quantities
                 const updatedValidQuantities = calculateValidQuantities(updatedRowStrings);
                 pipeline.hSet(summaryKey, 'valid_quantities', JSON.stringify(updatedValidQuantities));
                 pipeline.sAdd(holdingSetKey, seat_ids);
                 await pipeline.exec();
 
-                // Lấy lại Hash mới nhất, format và bắn SSE
                 const updatedHash = await redisClient.hGetAll(summaryKey);
                 const summaryJSON = formatHashToJSON(updatedHash);
 
@@ -359,38 +380,34 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
                     zone_id: zone_id,
                     summary: summaryJSON
                 }));
-                const seatUpdates = seat_ids.map(id => ({ seat_id: id, status: 'holding' }));
-                redisClient.publish(`SHOW_${show_id}_SEATS_CHANNEL`, JSON.stringify(seatUpdates));
+
+
 
             } catch (err) {
                 console.error("Lỗi cập nhật Zone Summary:", err);
             }
         }, 0);
 
-
     } catch (error: any) {
-        console.error('[OrderController] Lỗi holdSeats:', error.message);
-
         if (successfullyLockedSeats.length > 0 && zone_id) {
             await rollbackLocksAndRows(event_id, show_id, zone_id, user_id, successfullyLockedSeats, modifiedRowsForRollback);
-            // Có thể xem xét Rollback HINCRBY của Summary ở đây nếu cần thiết và logic cho phép
-        }
 
-        res.status(400).json({ message: error.message || 'Lỗi hệ thống nội bộ. Đã hoàn tác.' });
+            await redisClient.hDel(`show:${show_id}:seat_status`, successfullyLockedSeats);
+        }
+        res.status(400).json({ message: error.message || 'Lỗi hệ thống nội bộ.' });
     }
 };
-
 export const releaseSeats = async (req: Request, res: Response): Promise<void> => {
-    const user_id = req.user?.id || 'user_demo_123';
-    const { order_id, event_id, seatIds } = req.body;
+    const user_id = req.user!.id;
+    const { order_id } = req.body;
 
-    if (!order_id || !event_id || !Array.isArray(seatIds) || seatIds.length === 0) {
-        res.status(400).json({ message: 'Dữ liệu đầu vào không hợp lệ. Cần order_id, event_id và mảng seatIds.' });
+    if (!order_id) {
+        res.status(400).json({ message: 'Vui lòng cung cấp mã đơn hàng.' });
         return;
     }
 
     try {
-        // 1. KIỂM TRA ĐƠN HÀNG HỢP LỆ
+
         const order = await Order.findOne({ _id: order_id, user_id: user_id });
         if (!order) {
             res.status(404).json({ message: 'Không tìm thấy đơn hàng của bạn.' });
@@ -398,56 +415,99 @@ export const releaseSeats = async (req: Request, res: Response): Promise<void> =
         }
 
         if (order.status !== 'pending') {
-            res.status(400).json({ message: 'Chỉ có thể hủy những đơn hàng đang chờ thanh toán.' });
+            res.status(400).json({ message: 'Đơn hàng này không ở trạng thái chờ xử lý.' });
             return;
         }
 
-        // 2. DỌN DẸP TRÊN REDIS (Xóa khóa an toàn bằng Lua Script)
-        // Vẫn dùng Lua Script để đảm bảo chỉ xóa đúng cái khóa do chính User này tạo ra
-        const releaseLockScript = `
-            if redis.call("get", KEYS[1]) == ARGV[1] then
-                return redis.call("del", KEYS[1])
-            else
-                return 0
-            end
-        `;
 
-        for (const seatId of seatIds) {
-            const lockKey = `event:${event_id}:seat:${seatId}:lock`;
-            await redisClient.eval(
-                releaseLockScript,
-                {
-                    keys: [lockKey],
-                    arguments: [user_id]
-                }
-            );
-        }
+        const seatIds = order.items.map(item => item.seat_id.toString());
+        const { event_id, show_id, zone_id } = order;
+        const strEventId = event_id.toString();
+        const strShowId = show_id.toString();
+        const strZoneId = zone_id.toString();
 
-        // 3. DỌN DẸP TRÊN MONGODB
 
-        // 3.1. Cập nhật trạng thái ghế về lại AVAILABLE (Màu xanh)
-        await Seat.updateMany(
-            { _id: { $in: seatIds } },
-            { $set: { status: 'AVAILABLE' } }
-        );
+        order.status = 'cancelled';
+        await order.save();
 
-        // 3.2. Cập nhật trạng thái đơn hàng thành CANCELLED
-        await Order.findByIdAndUpdate(order_id, {
-            $set: { status: 'CANCELLED' }
+
+        const seatsToRelease = await Seat.find({ _id: { $in: seatIds } });
+        const seatsByRow: Record<string, typeof seatsToRelease> = {};
+        const releaseByTier: Record<string, number> = {};
+
+        seatsToRelease.forEach(seat => {
+            if (!seatsByRow[seat.row]) seatsByRow[seat.row] = [];
+            seatsByRow[seat.row].push(seat);
+            releaseByTier[seat.tier] = (releaseByTier[seat.tier] || 0) + 1;
         });
 
-        // 4. TrẢ VỀ KẾT QUẢ
+        const updatedRowStrings: string[] = [];
+
+        for (const rowLabel in seatsByRow) {
+            const seatsInRow = seatsByRow[rowLabel];
+            const rowKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:row:${rowLabel}`;
+            const keys = [rowKey, `event:${event_id}:show:${show_id}:user:${user_id}:held_count`];
+            const args: string[] = [];
+
+            seatsInRow.forEach(seat => {
+                keys.push(`event:${event_id}:show:${show_id}:seat:${seat._id}:lock`);
+                args.push(String(seat.col_index));
+            });
+
+            const newString = await redisClient.eval(releaseSeatsLuaScript, {
+                keys: keys,
+                arguments: args
+            }) as string;
+
+            if (newString) updatedRowStrings.push(newString);
+        }
+
+
+        const summaryKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:summary`;
+        const statusHashKey = `show:${show_id}:seat_status`;
+        const holdingSetKey = `event:${event_id}:show:${show_id}:holding_seats`;
+
+        const pipeline = redisClient.multi();
+
+
+        pipeline.hDel(statusHashKey, seatIds);
+        pipeline.sRem(holdingSetKey, seatIds);
+
+
+        for (const [tierName, releasedCount] of Object.entries(releaseByTier)) {
+            pipeline.hIncrBy(summaryKey, `tier:${tierName}:count`, releasedCount);
+        }
+
+        if (updatedRowStrings.length > 0) {
+            const validQuantities = calculateValidQuantities(updatedRowStrings);
+            pipeline.hSet(summaryKey, 'valid_quantities', JSON.stringify(validQuantities));
+        }
+
+        await pipeline.exec();
+
+
+        for (const seatId of seatIds) {
+            await redisClient.publish('SEAT_UPDATES', JSON.stringify({
+                show_id: strShowId,
+                seat_id: seatId,
+                status: 'available'
+            }));
+        }
+
+        const updatedHash = await redisClient.hGetAll(summaryKey);
+        await redisClient.publish('ZONE_SUMMARY_UPDATES', JSON.stringify({
+            zone_id: strZoneId,
+            summary: formatHashToJSON(updatedHash)
+        }));
+
         res.status(200).json({
-            message: 'Đã hủy giữ chỗ thành công. Các ghế đã được nhả ra cho người khác.',
-            data: {
-                order_id: order_id,
-                releasedSeats: seatIds
-            }
+            message: 'Đã hủy giữ chỗ thành công.',
+            data: { order_id: order_id }
         });
 
     } catch (error) {
         console.error('[OrderController] Lỗi releaseSeats:', error);
-        res.status(500).json({ message: 'Lỗi máy chủ nội bộ trong quá trình nhả ghế.' });
+        res.status(500).json({ message: 'Lỗi máy chủ nội bộ khi nhả ghế.' });
     }
 };
 
@@ -461,33 +521,33 @@ export const getMyOrders = async (req: Request, res: Response): Promise<void> =>
     }
 };
 
-// export const cancelOrder = async (req: Request, res: Response): Promise<void> => {
-//     const user_id = req.user?.id;
-//     const { order_id } = req.params;
-//     try {
-//         const order = await Order.findById(order_id);
-//         if (!order || order.user_id.toString() !== user_id) {
-//             res.status(404).json({ message: 'Không tìm thấy đơn hàng hoặc bạn không có quyền hủy đơn hàng này.' });
-//             return;
-//         }
-//         if (order.status !== 'PENDING') {
-//             res.status(400).json({ message: 'Chỉ có thể hủy đơn hàng đang ở trạng thái PENDING.' });
-//             return;
-//         }
-//         order.status = 'CANCELED';
-//         await order.save();
-//         await Seat.updateMany(
-//             { _id: { $in: order.seat_ids } },
-//             { $set: { status: 'AVAILABLE' } }
-//         );
-//         for (const seatId of order.seat_ids) {
-//             await redisClient.del(`event:${order.event_id}:seat:${seatId}:lock`);
-//         }
-//         res.status(200).json({ message: 'Hủy đơn hàng thành công' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Lỗi máy chủ khi hủy đơn hàng', error });
-//     }
-// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const getOrderDetail = async (req: Request, res: Response): Promise<void> => {
     const user_id = req.user?.id;

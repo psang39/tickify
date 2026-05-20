@@ -10,5 +10,6 @@ export interface ISeat extends Document {
     status: 'available' | 'reserved' | 'sold' | 'blocked',
     row: string,
     col_index: number,
-    tier: string
+    tier: string,
+    ticket_type_id: Types.ObjectId
 }

@@ -11,8 +11,9 @@ import adminRoutes from "./admin.routes";
 import venueRoutes from "./venue.routes";
 import zoneRouter from "./zone.routes";
 import organizerRouter from "./organizer.routes";
+import paymentRouter from "./payment.routes";
+import webhookRouter from "./webhook.routes";
 const router = Express.Router();
-// home route with the get method and a handler
 router.get("/", (req, res) => {
     try {
         res.status(200).json({
@@ -27,27 +28,17 @@ router.get("/", (req, res) => {
         });
     }
 })
-// Use the authentication routes
 router.use('/auth', authRoutes);
-
-// Use the event routes
 router.use('/events', eventRouter);
-
-// Use the show routes
 router.use('/shows', showRouter);
-
 router.use('/organizer', Verify, verifyRoles(['admin', 'organizer']), organizerRouter);
 router.get('/admin', Verify, verifyRoles(['admin']), adminRoutes);
-
 router.get('/user', Verify, verifyRoles(['user']), (req, res) => {
     res.status(200).json({
         status: "success",
         message: "Welcome to the your Dashboard!",
     })
 });
-
-
-
 router.use('/orders', orderRoutes);
 router.use('/tickets', ticketRoutes);
 router.use('/ticket-types', ticketTypeRoutes);
@@ -55,6 +46,6 @@ router.use('/waiting-room', waitingRoomRouter);
 router.use('/admin', adminRoutes);
 router.use('/venues', venueRoutes);
 router.use('/zones', zoneRouter);
-
+router.use('/payments', paymentRouter);
+router.use('/webhooks', webhookRouter);
 export default router;
-

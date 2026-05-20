@@ -4,14 +4,8 @@ import { Verify, verifyRoles } from '../middleware/verify';
 import express from 'express';
 const ticketRouter = express.Router();
 
-// Lấy danh sách vé của người dùng đã đăng nhập
 ticketRouter.get('/me', Validate, getMyTickets);
-
-
-
-// Lấy chi tiết vé
-ticketRouter.get('/:ticketId', Verify, getTicketDetail);
-
-ticketRouter.post('/tickets/:ticketId/sync-checkin', verifyRoles(['staff']), syncCheckIn);
+ticketRouter.get('/:ticket_id', Verify, getTicketDetail);
+ticketRouter.post('/tickets/:ticket_id/sync-checkin', verifyRoles(['staff']), syncCheckIn);
 
 export default ticketRouter;

@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Ticket, DollarSign, Users, Radio } from 'lucide-react';
+import { Activity, DollarSign, Radio, CalendarDays, BarChart3, LayoutDashboard } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 export default function OrganizerDashboard() {
-    // 1. State lưu dữ liệu tĩnh (từ admin.controller.ts)
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // 1. State lưu dữ liệu tĩnh (Đã bỏ users và pending events)
     const [stats, setStats] = useState({
-        totalUsers: 0,
         totalActiveEvents: 0,
-        totalPendingEvents: 0,
         totalSystemRevenue: 0
     });
 
-    // 2. State lưu dữ liệu thời gian thực (từ adminSseController.ts - Redis)
+    // 2. State lưu dữ liệu thời gian thực
     const [liveData, setLiveData] = useState({
         activeUsers: 0,
         ticketsSoldLastMinute: 0,
@@ -23,7 +25,6 @@ export default function OrganizerDashboard() {
         // ---- PHẦN 1: GỌI API REST LẤY DỮ LIỆU TỔNG QUAN ----
         const fetchDashboardData = async () => {
             try {
-                // Lưu ý: Đảm bảo bạn đã bọc axios interceptor để gửi kèm token
                 const res = await axios.get('http://localhost:3000/api/admin/dashboard');
                 if (res.data && res.data.data) {
                     setStats(res.data.data);
@@ -35,18 +36,14 @@ export default function OrganizerDashboard() {
         fetchDashboardData();
 
         // ---- PHẦN 2: KẾT NỐI SSE (SERVER-SENT EVENTS) LẤY DATA TỪ REDIS ----
-        // Giả sử bạn đang muốn theo dõi Show có ID là "SHOW_123"
         const showIdToTrack = "SHOW_123";
-
-        // Khởi tạo luồng kết nối liên tục với Backend
         const eventSource = new EventSource(`http://localhost:3000/api/admin/sse/dashboard/${showIdToTrack}`);
 
-        // Lắng nghe dữ liệu đẩy về từ Redis
         eventSource.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
                 setLiveData({
-                    activeUsers: data.active_viewers || 0, // Tùy vào schema dữ liệu bạn push vào Redis
+                    activeUsers: data.active_viewers || 0,
                     ticketsSoldLastMinute: data.tickets_sold || 0,
                     status: 'Live 🔴'
                 });
@@ -59,100 +56,78 @@ export default function OrganizerDashboard() {
             setLiveData(prev => ({ ...prev, status: 'Mất kết nối ⚪' }));
         };
 
-        // Dọn dẹp kết nối khi người dùng rời khỏi trang Dashboard (Rất quan trọng để tránh tràn RAM)
         return () => {
             eventSource.close();
         };
     }, []);
 
-    // Format tiền tệ
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
     };
 
+    // Cấu hình menu cho Side Panel
+    const menuItems = [
+        { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/organizer/dashboard' },
+        { title: 'Sự kiện của tôi', icon: <CalendarDays size={20} />, path: '/organizer/events' },
+        { title: 'Doanh thu', icon: <BarChart3 size={20} />, path: '/organizer/revenue' }, // Bạn có thể tạo route này sau
+    ];
+
     return (
-        <div className="p-8 max-w-7xl mx-auto space-y-8 bg-background min-h-screen text-foreground">
+        <div className="max-w-5xl mx-auto space-y-8">
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-3xl font-bold text-secondary">Dashboard Quản Trị</h1>
-                    <p className="text-gray-500 mt-1">Dữ liệu tổng quan và theo dõi thời gian thực</p>
+                    <h1 className="text-3xl font-bold text-slate-800">Tổng quan hoạt động</h1>
+                    <p className="text-slate-500 mt-1 font-medium">Theo dõi hiệu suất và doanh thu sự kiện của bạn</p>
                 </div>
-
-                {/* Chỉ báo trạng thái Real-time */}
-                <div className="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-full border border-pink-100">
-                    <Radio size={16} className={liveData.status.includes('Live') ? "text-primary animate-pulse" : "text-gray-400"} />
-                    <span className="text-sm font-bold text-primary">{liveData.status}</span>
+                <div className="flex items-center gap-2 bg-pink-50 px-4 py-2 rounded-full border border-pink-100 shadow-sm">
+                    <Radio size={16} className={liveData.status.includes('Live') ? "text-pink-600 animate-pulse" : "text-slate-400"} />
+                    <span className="text-sm font-bold text-pink-600">{liveData.status}</span>
                 </div>
             </div>
 
-            {/* KHU VỰC 1: DỮ LIỆU TĨNH TỪ MONGODB */}
-            <h2 className="text-xl font-bold border-b pb-2">Tổng quan Hệ thống</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Tổng doanh thu</CardTitle>
-                        <DollarSign className="h-4 w-4 text-gray-500" />
+                        <CardTitle className="text-sm font-bold text-slate-500 uppercase tracking-wider">Doanh thu của tôi</CardTitle>
+                        <div className="p-2 bg-emerald-50 rounded-lg"><DollarSign className="h-5 w-5 text-emerald-600" /></div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-primary">{formatCurrency(stats.totalSystemRevenue)}</div>
+                        <div className="text-3xl font-bold text-slate-800">{formatCurrency(stats.totalSystemRevenue)}</div>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Người dùng (Users)</CardTitle>
-                        <Users className="h-4 w-4 text-gray-500" />
+                        <CardTitle className="text-sm font-bold text-slate-500 uppercase tracking-wider">Sự kiện Đang chạy</CardTitle>
+                        <div className="p-2 bg-blue-50 rounded-lg"><Activity className="h-5 w-5 text-blue-600" /></div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Sự kiện Đang chạy</CardTitle>
-                        <Activity className="h-4 w-4 text-gray-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-green-600">{stats.totalActiveEvents}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Sự kiện Chờ duyệt</CardTitle>
-                        <Ticket className="h-4 w-4 text-gray-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-orange-500">{stats.totalPendingEvents}</div>
+                        <div className="text-3xl font-bold text-slate-800">{stats.totalActiveEvents}</div>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* KHU VỰC 2: DỮ LIỆU THỜI GIAN THỰC TỪ REDIS (SSE) */}
-            <h2 className="text-xl font-bold border-b pb-2 mt-10">Live Monitor (Show ID: 123)</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="bg-secondary text-white border-none">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium opacity-80">Người dùng đang chọn ghế</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-5xl font-mono font-bold tracking-tight">
-                            {liveData.activeUsers}
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="pt-6">
+                <h2 className="text-xl font-bold text-slate-800 border-b border-slate-200 pb-3 mb-6">Live Monitor (Show ID: 123)</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card className="bg-slate-800 text-white border-none shadow-lg">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-slate-300">Người dùng đang truy cập</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-5xl font-mono font-bold tracking-tight">{liveData.activeUsers}</div>
+                        </CardContent>
+                    </Card>
 
-                <Card className="border-primary/20 bg-pink-50">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-primary">Vé bán được / Phút</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-5xl font-mono font-bold tracking-tight text-primary">
-                            +{liveData.ticketsSoldLastMinute}
-                        </div>
-                    </CardContent>
-                </Card>
+                    <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white shadow-sm">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-bold text-pink-600">Vé bán được / Phút</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-5xl font-mono font-bold tracking-tight text-pink-600">+{liveData.ticketsSoldLastMinute}</div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     );

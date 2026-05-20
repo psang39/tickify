@@ -82,8 +82,6 @@ export const initializeTicketInventory = async (req: Request, res: Response) => 
     try {
         const { event_id, zone_id, show_id } = req.body;
         const totalSeats = parseInt(req.body.totalSeats); // VD: 500
-
-        // 1. Lưu cấu hình vào MongoDB để làm gốc (Backup)
         await TicketType.findOneAndUpdate(
             { event_id: event_id, zone_id: zone_id, show_id: show_id },
             { total_seats: totalSeats },
@@ -92,7 +90,6 @@ export const initializeTicketInventory = async (req: Request, res: Response) => 
 
         const inventoryKey = `show:${show_id}:zone:${zone_id}:available`;
 
-        // SET số lượng 500 vào Redis
         await redisClient.set(inventoryKey, totalSeats);
 
 

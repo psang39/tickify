@@ -12,5 +12,6 @@ export interface ISeat extends Document {
     row: string,
     col_index: number,
     tier: string,
-    price: number
+    price: number,
+    ticket_type_id: string
 }

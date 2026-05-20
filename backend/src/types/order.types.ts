@@ -1,7 +1,7 @@
 import { Document, Types } from "mongoose";
 export interface IOrder extends Document {
-    _id: Types.ObjectId,
     order_number: string,
+    _id: Types.ObjectId,
     user_id: Types.ObjectId,
     event_id: Types.ObjectId,
     show_id: Types.ObjectId,
@@ -11,9 +11,9 @@ export interface IOrder extends Document {
         ticket_type_id: Types.ObjectId,
         price: number
     }[],
-    billing_name: string,
-    billing_email: string,
-    billing_phone: string,
+    purchaser_name: string,
+    purchaser_email: string,
+    purchaser_phone: string,
     status: 'pending' | 'confirmed' | 'cancelled',
     total_price: number,
     created_at: Date,

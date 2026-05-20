@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'; // Nên import type chuẩn thay vì dùng 'any'
+import { Request, Response } from 'express';
 import User from '../models/user.model';
 import Organizer from '../models/organizer.model';
 import Attendee from '../models/attendee.model';
@@ -13,10 +13,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
         if (!username || !email || !password || !role || !phone) {
             res.status(400).json({ error: 'All fields are required' });
-            return; // Bắt buộc phải có return để ngắt luồng chạy
+            return;
         }
 
-        // Lưu ý: Nếu bạn dùng Mongoose Discriminator, phân biệt hoa/thường rất quan trọng ('Admin' khác 'admin')
+
         if (!['admin', 'attendee', 'organizer', 'Admin', 'Attendee', 'Organizer'].includes(role)) {
             res.status(400).json({ error: 'Invalid role' });
             return;
@@ -34,7 +34,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         let newUser: IUser;
 
         if (role === 'Organizer' || role === 'organizer') {
-            // Nếu là Organizer, yêu cầu Frontend phải gửi thêm company_name
+
             const { company_name, tax_id } = req.body;
 
             if (!company_name) {
@@ -42,19 +42,19 @@ export const register = async (req: Request, res: Response): Promise<void> => {
                 return;
             }
 
-            // Dùng model Organizer để tạo
+
             newUser = new Organizer({
                 email, password, first_name, last_name, phone,
                 company_name,
                 tax_id,
-                is_verified: false // Mặc định chưa duyệt
+                is_verified: false
             });
 
         } else if (role === 'Attendee' || role === 'attendee') {
-            // Nếu là Khán giả bình thường
+
             newUser = new Attendee({
                 email, password, first_name, last_name, phone
-                // Không cần trường gì thêm
+
             });
 
         } else {
@@ -62,8 +62,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        // 4. LƯU XUỐNG DB VÀ TRẢ KẾT QUẢ
-        await newUser.save(); // Hook pre('save') băm password vẫn sẽ chạy bình thường!
+
+        await newUser.save();
 
         res.status(201).json({
             message: 'Đăng ký tài khoản thành công',
@@ -104,17 +104,17 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         const options = {
-            maxAge: 20 * 60 * 1000, // 20 minutes
+            maxAge: 20 * 60 * 1000,
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Mẹo: Khi code local ở http thì để false, lên server https mới để true
-            sameSite: "none" as const, // Cần ép kiểu as const trong TypeScript
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: "none" as const,
         };
 
         const token = user.generateAccessJWT();
 
         res.cookie("SessionID", token, options);
 
-        // CHỈ GỌI res.json 1 LẦN DUY NHẤT
+
         res.status(200).json({
             status: "success",
             message: "You have successfully logged in.",
@@ -127,7 +127,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
                 role: user.role
             }
         });
-        // ĐÃ XÓA dòng res.json thứ 2 và res.end()
+
     } catch (error) {
         console.error('[Login Error]', error);
         res.status(500).json({ error: 'Server error' });
@@ -138,13 +138,13 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     try {
         const authHeader = req.headers["cookie"];
 
-        // XỬ LÝ AN TOÀN TRÁNH TYPE ERROR
+
         if (!authHeader) {
-            res.status(204).end(); // Không có cookie thì xem như đã đăng xuất
+            res.status(204).end();
             return;
         }
 
-        // Cách parse cookie thủ công (Nên cân nhắc dùng thư viện cookie-parser để code nhàn hơn)
+
         const cookies = authHeader.split(";").map(c => c.trim());
         const sessionCookie = cookies.find(c => c.startsWith("SessionID="));
 

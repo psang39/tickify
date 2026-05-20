@@ -5,11 +5,7 @@ export default function Footer() {
     return (
         <footer className="w-full bg-[#27272A] text-white py-16 px-8 font-sans">
             <div className="max-w-7xl mx-auto">
-
-                {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-6 mb-12">
-
-                    {/* Cột 1: Newsletter & App Download (Chiếm 2 cột trên Desktop) */}
                     <div className="lg:col-span-2 space-y-6">
                         <div>
                             <h3 className="font-bold text-xl mb-2">Let's keep in touch</h3>
@@ -51,7 +47,6 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Cột 2: Concert Hub */}
                     <div>
                         <h4 className="font-semibold text-lg mb-6 text-gray-100">Tickify Hub</h4>
                         <ul className="space-y-4 text-sm text-gray-400">
@@ -65,7 +60,6 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Cột 3: Looking For Help */}
                     <div>
                         <h4 className="font-semibold text-lg mb-6 text-gray-100">Looking For Help</h4>
                         <ul className="space-y-4 text-sm text-gray-400">
@@ -76,7 +70,6 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Cột 4: Looking For More */}
                     <div>
                         <h4 className="font-semibold text-lg mb-6 text-gray-100">Looking For More</h4>
                         <ul className="space-y-4 text-sm text-gray-400">
@@ -97,7 +90,6 @@ export default function Footer() {
 
                 </div>
 
-                {/* Bottom Copyright Row */}
                 <div className="pt-8 border-t border-gray-700/50 flex flex-col md:flex-row items-center justify-center gap-2 text-sm text-gray-400">
                     <span className="border border-gray-400 rounded-full w-4 h-4 flex items-center justify-center text-[10px]">C</span>
                     <span>Tickify All Rights Reserved</span>

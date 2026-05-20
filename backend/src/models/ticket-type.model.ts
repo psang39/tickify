@@ -1,6 +1,8 @@
 import Mongoose from 'mongoose';
-const TicketTypeSchema: Mongoose.Schema = new Mongoose.Schema({
+import { ITicketType } from '../types/ticket-type.types';
+const TicketTypeSchema: Mongoose.Schema = new Mongoose.Schema<ITicketType>({
     event_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
+    show_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Show', required: true },
     name: { type: String, required: true, min: 0 },
     target_tier: { type: String, required: true },
     description: { type: String },

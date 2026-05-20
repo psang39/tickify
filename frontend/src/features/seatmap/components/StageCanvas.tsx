@@ -12,16 +12,26 @@ interface StageCanvasProps {
 }
 
 // 🚀 BƯỚC 1: TẠO HÀM CACHE O(1) NGAY TRONG FILE ĐỂ KHỚP VỚI ZUSTAND
-const buildSeatMapCache = (allSeats: any[]) => {
+export const buildSeatMapCache = (allSeats: any[]) => { // Thay any[] bằng ISeat[] nếu bạn dùng interface
     const rowMap = new Map<string, any[]>();
+
     allSeats.forEach(s => {
-        if (!s.row || s.col_index === undefined) return;
-        if (!rowMap.has(s.row)) rowMap.set(s.row, []);
-        rowMap.get(s.row)!.push(s);
+        // Cần đảm bảo có đủ cả row, col_index và zone_id
+        if (!s.row || s.col_index === undefined || !s.zone_id) return;
+
+        // 🔥 BƯỚC QUAN TRỌNG: Tạo Composite Key
+        // Ví dụ: "65f1a..._A" thay vì chỉ là "A"
+        const rowKey = `${s.zone_id}_${s.row}`;
+
+        if (!rowMap.has(rowKey)) rowMap.set(rowKey, []);
+        rowMap.get(rowKey)!.push(s);
     });
+
+    // Sắp xếp 1 lần duy nhất theo cột cho từng hàng của từng khu riêng biệt
     for (const [_, seatsInRow] of rowMap.entries()) {
         seatsInRow.sort((a, b) => Number(a.col_index) - Number(b.col_index));
     }
+
     return rowMap;
 };
 
@@ -42,8 +52,14 @@ const SeatNode = React.memo(({
         if (isHovered && hoverStatus === 'error') seatColor = "#fca5a5";
     }
     if (isSelected) {
-        seatColor = "#ec4899";
-        strokeColor = "#be185d";
+        if (!isAvailable) {
+            seatColor = "#ef4444"; // Cảnh báo ĐỎ bầm cho biết đã mất ghế
+            strokeColor = "#7f1d1d";
+        } else {
+            // Trường hợp: Bình thường
+            seatColor = "#ec4899"; // Hồng
+            strokeColor = "#be185d";
+        }
     }
 
     return (
@@ -92,7 +108,6 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     const [stageConfig, setStageConfig] = useState({ scale: 1, x: 0, y: 0 });
     const ZOOM_THRESHOLD = 1.2;
     const isZoomedIn = stageConfig.scale >= ZOOM_THRESHOLD;
-
     const normalizedSeatsData = useMemo(() => {
         return seatsData.map((s, index) => {
             // Tạo một ID duy nhất tuyệt đối cho Frontend bằng cách ghép các chuỗi lại với nhau
@@ -229,8 +244,8 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         const stage = e.target.getStage();
         const pos = stage.getPointerPosition();
 
-        const seatIdentifier = seat._id || seat.seat_number || seat.id;
-        const normalizedSeat = { ...seat, id: seatIdentifier };
+        // 🔥 SỬA Ở ĐÂY: Dùng trực tiếp ID đã được chuẩn hóa, không cần gán đè nữa
+        const seatIdentifier = seat.id;
 
         if (!isAvailable) {
             setHoveredIds([seatIdentifier]);
@@ -244,14 +259,13 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             return;
         }
 
-        // 🔥 TÌM CỤM BẰNG rowMapCache
-        const cluster = findCluster(normalizedSeat, comboCount, rowMapCache);
+        // 🔥 TRUYỀN THẲNG seat VÀO, KHÔNG CẦN DÙNG normalizedSeat NỮA
+        const cluster = findCluster(seat, comboCount, rowMapCache);
 
         if (cluster.length > 0) {
             const currentSelectedIds = selectedSeats.map(s => s.id);
             const pendingIds = Array.from(new Set([...currentSelectedIds, ...cluster.map(s => s.id)]));
 
-            // 🔥 CHECK MỒ CÔI BẰNG rowMapCache
             if (hasOrphanSeat(pendingIds, rowMapCache)) {
                 setHoveredIds(cluster.map(s => s.id));
                 setHoverStatus('error');
@@ -310,11 +324,9 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
 
     const handleSeatClick = useCallback((seat: any) => {
         if (seat.status !== 'available' && seat.status !== 1) return;
-        const seatIdentifier = seat._id || seat.seat_number || seat.id;
-        const normalizedSeat = { ...seat, id: seatIdentifier };
 
-        // 🔥 TRUYỀN rowMapCache THAY VÌ MẢNG ARRAY
-        toggleSeat(normalizedSeat, rowMapCache);
+        // 🔥 SỬA Ở ĐÂY: Xóa logic tính toán ID cũ đi, truyền thẳng ghế vào Zustand Store
+        toggleSeat(seat, rowMapCache);
     }, [rowMapCache, toggleSeat]);
 
     const handleZoneClick = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {

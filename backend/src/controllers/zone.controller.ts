@@ -35,7 +35,6 @@ export const createZone = async (req: Request, res: Response) => {
     }
 };
 
-// Nhớ import các model Zone, Seat, Show, Event và redisClient, calculateValidQuantities của bạn vào đây
 
 
 export const getZonesByEvent = async (req: Request, res: Response) => {

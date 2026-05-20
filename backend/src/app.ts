@@ -41,7 +41,11 @@ app.use(compression({
     threshold: 1024,
     // Tùy chọn lọc: chỉ nén JSON, HTML, Text...
     filter: (req, res) => {
-        if (req.headers['x-no-compression']) {
+        const contentTypeHeader = res.getHeader('Content-Type');
+        const contentType = Array.isArray(contentTypeHeader)
+            ? contentTypeHeader.join(';')
+            : String(contentTypeHeader || '');
+        if (req.headers['x-no-compression'] || contentType.includes('text/event-stream')) {
             return false;
         }
         return compression.filter(req, res);

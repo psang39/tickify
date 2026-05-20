@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 
 export const createEvent = async (req: Request, res: Response) => {
     try {
-        const { name, description, genre, start_date, end_date, poster_url, banner_url, artists, status } = req.body;
+        const { name, description, genre, start_date, end_date, poster_url, banner_url, artists, status, banner_offset_y } = req.body;
         const organizer_id = req.user!.id;
         if (!name || !description || !genre || !start_date || !end_date || !organizer_id) {
             return res.status(400).json({ message: "All fields are required" });
@@ -11,7 +11,7 @@ export const createEvent = async (req: Request, res: Response) => {
         if (start_date > end_date) {
             return res.status(400).json({ message: "End date must be later than start date" })
         }
-        const event = new Event({ name, description, genre, start_date, end_date, organizer_id, poster_url, banner_url, artists, status });
+        const event = new Event({ name, description, genre, start_date, end_date, organizer_id, poster_url, banner_url, artists, status, banner_offset_y });
         await event.save();
         res.status(201).json(event);
     } catch (error) {
@@ -70,10 +70,10 @@ export const getEventById = async (req: Request, res: Response) => {
 
 export const updateEvent = async (req: Request, res: Response) => {
     try {
-        const { name, description, date, venue, genre, start_date, end_date, organizer_id } = req.body;
+        const { name, description, date, venue, genre, start_date, end_date, organizer_id, banner_offset_y } = req.body;
         const event = await Event.findByIdAndUpdate(
             req.params.id,
-            { name, description, date, venue, genre, start_date, end_date, organizer_id },
+            { name, description, date, venue, genre, start_date, end_date, organizer_id, banner_offset_y },
             { new: true }
         );
         if (!event) {

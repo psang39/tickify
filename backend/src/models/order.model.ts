@@ -12,9 +12,9 @@ const OrderSchema = new Mongoose.Schema<IOrder>({
         ticket_type_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'TicketType', required: true },
         price: { type: Number, required: true }
     }],
-    billing_name: { type: String, required: true },
-    billing_email: { type: String, required: true },
-    billing_phone: { type: String, required: true },
+    purchaser_name: { type: String, required: true },
+    purchaser_email: { type: String, required: true },
+    purchaser_phone: { type: String, required: true },
     status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
     total_price: { type: Number, required: true },
     created_at: { type: Date, default: Date.now },

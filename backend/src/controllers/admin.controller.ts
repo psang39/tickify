@@ -1,19 +1,18 @@
-// file: src/controllers/admin.controller.ts
 import { Request, Response } from 'express';
 import User from '../models/user.model';
 import Event from '../models/event.model';
 import Order from '../models/order.model';
 
-// 1. LẤY THỐNG KÊ TỔNG QUAN HỆ THỐNG
+
 export const getSystemDashboard = async (req: Request, res: Response) => {
     try {
-        // Chạy song song các query để tối ưu tốc độ bằng Promise.all
+
         const [totalUsers, totalEvents, pendingEvents, revenueData] = await Promise.all([
             User.countDocuments(),
             Event.countDocuments({ status: 'active' }),
-            Event.countDocuments({ status: 'pending' }), // Các event chờ duyệt
+            Event.countDocuments({ status: 'pending' }),
 
-            // Tính tổng tiền toàn hệ thống từ các đơn hàng đã PAID
+
             Order.aggregate([
                 { $match: { status: 'PAID' } },
                 { $group: { _id: null, totalRevenue: { $sum: '$total_price' } } }
@@ -35,7 +34,7 @@ export const getSystemDashboard = async (req: Request, res: Response) => {
     }
 };
 
-// 2. LẤY DANH SÁCH NGƯỜI DÙNG (KÈM PHÂN TRANG)
+
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const page = parseInt(req.query.page as string) || 0;
@@ -43,7 +42,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
         const skip = page * limit;
 
         const users = await User.find()
-            .select('-password') // Bắt buộc giấu mật khẩu
+            .select('-password')
             .sort({ created_at: -1 })
             .skip(skip)
             .limit(limit);
@@ -60,7 +59,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     }
 };
 
-// 3. XÁC THỰC BAN TỔ CHỨC (Verify Organizer)
+
 export const verifyOrganizer = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;

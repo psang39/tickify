@@ -9,24 +9,33 @@ interface CartState {
     toggleSeat: (seat: ISeat, rowMap: Map<string, ISeat[]>) => void;
     clearCart: () => void;
 }
-export const buildSeatMapCache = (allSeats: ISeat[]) => {
-    const rowMap = new Map<string, ISeat[]>();
+export const buildSeatMapCache = (allSeats: ISeat[]) => { // Thay any[] bằng ISeat[] nếu bạn dùng interface
+    const rowMap = new Map<string, any[]>();
+
     allSeats.forEach(s => {
-        if (!s.row || s.col_index === undefined) return;
-        if (!rowMap.has(s.row)) rowMap.set(s.row, []);
-        rowMap.get(s.row)!.push(s);
+        if (!s.row || s.col_index === undefined || !s.zone_id) return;
+
+        const rowKey = `${s.zone_id}_${s.row}`;
+        console.log(rowKey);
+        if (!rowMap.has(rowKey)) rowMap.set(rowKey, []);
+        rowMap.get(rowKey)!.push(s);
     });
-    // Sắp xếp 1 lần duy nhất
+
+    // Sắp xếp 1 lần duy nhất theo cột cho từng hàng của từng khu riêng biệt
     for (const [_, seatsInRow] of rowMap.entries()) {
         seatsInRow.sort((a, b) => Number(a.col_index) - Number(b.col_index));
     }
+
     return rowMap;
 };
-export const findCluster = (startSeat: ISeat, count: number, rowMap: Map<string, ISeat[]>): ISeat[] => {
+export const findCluster = (startSeat: any, count: number, rowMap: Map<string, any[]>): any[] => {
     if (count === 1) return [startSeat];
 
-    // Bốc thẳng row chứa ghế này ra, KHÔNG CẦN FILTER HAY SORT LẠI!
-    const rowSeats = rowMap.get(startSeat.row)?.filter(s => s.status === 1 || s.status === 'available') || [];
+    // 🔥 SỬA Ở ĐÂY: Dùng Composite Key (zone_id + row) thay vì chỉ dùng row
+    const rowKey = `${startSeat.zone_id}_${startSeat.row}`;
+
+    // Bốc thẳng row chứa ghế này ra (giờ đây chắc chắn không bị lẫn lộn giữa các Zone)
+    const rowSeats = rowMap.get(rowKey)?.filter(s => s.status === 1 || s.status === 'available') || [];
 
     const startIndex = rowSeats.findIndex(s => s.id === startSeat.id);
     if (startIndex === -1) return [];
@@ -45,22 +54,32 @@ export const findCluster = (startSeat: ISeat, count: number, rowMap: Map<string,
     }
     return [];
 };
-
 // 3. CẬP NHẬT MÁY QUÉT MỒ CÔI (Truyền rowMap vào)
-export const hasOrphanSeat = (pendingSelectedIds: string[], rowMap: Map<string, ISeat[]>): boolean => {
+export const hasOrphanSeat = (pendingSelectedIds: string[], rowMap: Map<string, any[]>): boolean => {
+    // Duyệt qua từng hàng của từng khu vực (đã được cô lập hoàn hảo trong rowMap)
     for (const [_, seatsInRow] of rowMap.entries()) {
         let rowString = "X";
+
         for (let i = 0; i < seatsInRow.length; i++) {
             const s = seatsInRow[i];
+
+            // Nhận diện lối đi (khoảng trống giữa các cột) để chèn "X" chắn lại
             if (i > 0 && Number(s.col_index) > Number(seatsInRow[i - 1].col_index) + 1) {
                 rowString += "X";
             }
+
+            // Trạng thái ghế: Đã bán/Đang hold (không rảnh) HOẶC Nằm trong danh sách chuẩn bị mua -> Tính là chữ "X" (bị chiếm)
             const isOccupied = (s.status !== 1 && s.status !== 'available') || pendingSelectedIds.includes(s.id);
-            rowString += isOccupied ? "X" : "O";
+
+            rowString += isOccupied ? "X" : "O"; // "O" là ghế còn trống hoàn toàn
         }
+
         rowString += "X";
+
+        // Nếu chuỗi tồn tại dạng XOX (1 ghế trống bị kẹp giữa 2 ghế đã mua/lối đi/rìa) -> Phạt mồ côi
         if (rowString.includes("XOX")) return true;
     }
+
     return false;
 };
 

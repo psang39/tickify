@@ -10,6 +10,7 @@ const SeatSchema = new Mongoose.Schema<ISeat>({
     status: { type: String, enum: ['available', 'reserved', 'sold', 'blocked'], default: 'available' },
     row: { type: String },
     col_index: { type: Number },
-    tier: { type: String }
+    tier: { type: String },
+    ticket_type_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'TicketType' }
 });
 export default Mongoose.model('Seat', SeatSchema);

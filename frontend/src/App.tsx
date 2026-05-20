@@ -12,8 +12,12 @@ import OrganizerDashboard from './pages/OrganizerDashboard'
 import EventManagement from './pages/EventManagement'
 import { useAuthStore } from "@/store/useAuthStore";
 import LoginPage from "@/pages/LoginPage";
+import MockGatewayPage from './pages/MockGatewayPage';
+import TicketDetailPage from './pages/TicketDetailPage';
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { WaitingRoomPage } from './pages/WaitingRoomPage';
+import OrganizerLayout from './components/layout/OrganizerLayout';
+import ShowDetail from './pages/ShowDetail';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './App.css'
 const queryClient = new QueryClient({
@@ -43,17 +47,23 @@ function App() {
           {/* Đường dẫn tới trang đặt vé */}
           <Route element={<MainLayout />}>
             <Route path="/login" element={<LoginPage />} />
-            <Route
-              element={<ProtectedRoute allowedRoles={['Organizer', 'Admin', 'organizer', 'admin']} />}
-            >
-              <Route path="/shows/:showId/booking" element={<TicketBookingPage />} />
-              <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
-              <Route path="/organizer/events" element={<EventManagement />} />
-              <Route path="/organizer/events/create" element={<CreateEvent />} />
-              <Route path="/queue/:showId" element={<WaitingRoomPage />} />
-              <Route path="/organizer/events/:eventId" element={<EventDetail />} /> {/* Nơi chứa nút tạo Show */}
+            <Route element={<OrganizerLayout />}>
+              <Route
+                element={<ProtectedRoute allowedRoles={['Organizer', 'Admin', 'organizer', 'admin']} />}
+              >
+                <Route path="/shows/:showId/booking" element={<TicketBookingPage />} />
+                <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
+                <Route path="/organizer/events" element={<EventManagement />} />
+                <Route path="/organizer/events/create" element={<CreateEvent />} />
+
+                <Route path="/organizer/events/:eventId" element={<EventDetail />} /> {/* Nơi chứa nút tạo Show */}
+                <Route path="/organizer/events/:eventId/shows/:showId" element={<ShowDetail />} />
+              </Route>
             </Route>
           </Route>
+          <Route path="/tickets/:ticketId" element={<TicketDetailPage />} />
+          <Route path="/queue/:showId" element={<WaitingRoomPage />} />
+          <Route path="/mock-gateway" element={<MockGatewayPage />} />
           {/* Đường dẫn 404 nếu nhập sai URL */}
           <Route path="*" element={<div className="p-10 text-center">404 - Không tìm thấy trang</div>} />
         </Routes>

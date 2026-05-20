@@ -7,7 +7,12 @@ const PaymentSchema = new mongoose.Schema<IPayment>({
     payment_method: { type: String, required: true },
     status: { type: String, enum: ['pending', 'confirmed', 'failed'], default: 'pending' },
     transaction_id: { type: String },
-    processed_at: { type: Date, default: Date.now }
+    processed_at: { type: Date, default: Date.now },
+    billing_info: {
+        billing_name: { type: String },
+        billing_email: { type: String },
+        billing_phone: { type: String },
+    }
 }, { timestamps: true });
 
 export default mongoose.model<IPayment>('Payment', PaymentSchema);

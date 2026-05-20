@@ -1,13 +1,13 @@
-import { Document, Types } from "mongoose";
+
 export interface ITicketType extends Document {
-    _id: Types.ObjectId,
+    _id: string,
     name: string,
     price: number,
     total_quantity: number,
     sold_quantity: number,
-    event_id: Types.ObjectId,
-    show_id: Types.ObjectId,
-    zone_id: Types.ObjectId,
+    event_id: string,
+    show_id: string,
+    zone_id: string,
     sale_start: Date,
     sale_end: Date,
 }

@@ -10,6 +10,7 @@ export interface IEvent extends Document {
     artists: string[],
     poster_url: string,
     banner_url: string,
+    banner_offset_y: number,
     sale_start: Date,
     sale_end: Date,
     start_date: Date,
