@@ -32,36 +32,24 @@ export default function MockGatewayPage() {
     const handlePayment = async (status: 'SUCCESS' | 'FAILED') => {
         setIsLoading(true);
         try {
-            const transactionId = `MOCK_${Date.now()}`;
-            const rawData = `order_id=${orderId}&amount=${amount}&status=${status}&transactionId=${transactionId}`;
-
-            // ⚠️ QUAN TRỌNG: Sửa lại chuỗi này cho giống y hệt MOCK_PAYMENT_SECRET trong file .env của Backend!
-            // (Trong thực tế, trang Gateway là của bên thứ 3 nên họ tự giữ Secret này)
-            const secret = 'bacf52a3ec1d9d69372195cffac11ec50ec0874338c38505013cf8d541fde0fe';
-
-            const signature = await generateSignature(rawData, secret);
-
-            // Đóng vai Cổng thanh toán, gọi về Webhook của hệ thống Dề Dê
-            await api.post('/webhooks/payment-result', {
-                order_id: orderId,
+            const response = await api.post('/payments/mock/generate-return-url', {
+                orderId: orderId,
                 amount: amount,
-                status: status,
-                transaction_id: transactionId,
-                signature: signature
+                status: status
             });
 
-            if (status === 'SUCCESS') {
-                alert("Giao dịch thành công! Đang quay lại trang chủ...");
-                // Giao dịch xong thì điều hướng user về trang xem vé hoặc trang thành công
-                navigate(`/`);
+            const returnUrl = response.data?.data?.returnUrl;
+
+            if (returnUrl) {
+                window.location.href = returnUrl;
             } else {
-                alert("Giao dịch thất bại / Đã hủy.");
-                navigate(`/`);
+                throw new Error("Không nhận được Return URL từ máy chủ.");
             }
 
         } catch (error) {
-            console.error("Lỗi khi gửi Webhook:", error);
+            console.error("Lỗi khi xử lý giả lập thanh toán:", error);
             alert("Có lỗi hệ thống xảy ra khi giả lập thanh toán.");
+            navigate(`/`);
         } finally {
             setIsLoading(false);
         }
@@ -100,7 +88,6 @@ export default function MockGatewayPage() {
                         </div>
                     </div>
 
-                    {/* Nút thao tác */}
                     <div className="flex flex-col gap-3">
                         <button
                             onClick={() => handlePayment('SUCCESS')}
