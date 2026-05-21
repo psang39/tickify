@@ -1,6 +1,6 @@
 import { getOrganizerEvents, createEvent, getOrganizerEventById } from "../controllers/event.controller";
 import { createTicketType } from "../controllers/ticket-type.controller";
-import { getOrganizerShowsByEvent } from "../controllers/show.controller";
+import { getOrganizerShowsByEvent, publishShow } from "../controllers/show.controller";
 import { getShowById } from "../controllers/show.controller";
 import express from 'express';
 const organizerRouter = express.Router();
@@ -11,4 +11,6 @@ organizerRouter.get('/events/:event_id', getOrganizerEventById)
 organizerRouter.get('/events/:event_id/shows', getOrganizerShowsByEvent);
 organizerRouter.post('/events/:event_id/ticket-types', createTicketType);
 organizerRouter.get('/shows/:show_id', getShowById);
+organizerRouter.post('/shows/:show_id/publish', publishShow);
+
 export default organizerRouter;

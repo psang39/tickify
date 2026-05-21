@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { useQuery, useMutation } from '@tanstack/react-query';
 // Đảm bảo đường dẫn này khớp với project của bạn
-import { api } from '../lib/axiosClient';
+import { api } from '../../lib/axiosClient';
 
 
 

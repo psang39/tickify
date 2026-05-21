@@ -2,15 +2,16 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "@/lib/axiosClient";
-import { BookingStepper } from "../components/booking/BookingStepper";
+import { BookingStepper } from "../../components/booking/BookingStepper";
 import { StageCanvas } from "@/features/seatmap/components/StageCanvas";
-import { Button } from "../components/ui/button";
+import { Button } from "../../components/ui/button";
 import { CheckoutCountdown } from "@/features/seatmap/components/CheckoutCountdown";
 import { useCartStore } from "@/store/useCartStore";
 import { Trash2, Filter, User, Phone, MapPin, Mail, Edit2, CreditCard, RefreshCw, ArrowLeft } from 'lucide-react';
 import { Slider } from "@/components/ui/slider";
 import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
 import { ErrorModal } from "@/components/shared/ErrorModal";
+import { EventInfoHeader } from "@/features/seatmap/components/EventInfoHeader";
 export default function TicketBookingPage() {
     const navigate = useNavigate();
     const { showId } = useParams();
@@ -151,11 +152,23 @@ export default function TicketBookingPage() {
 
     const showInfo = showDataPayload?.show_info;
     const zonesData = showDataPayload?.zones || [];
+    useEffect(() => {
+        if (showDataPayload?.zone_summaries) {
+            console.log("Dữ liệu tóm tắt khu vực mới nhận được:", showDataPayload.zone_summaries);
+            setZoneSummaries(showDataPayload.zone_summaries);
+        }
+    }, [showDataPayload?.zone_summaries]);
     const mapAssets = showInfo?.map_assets || [];
 
-    // ==========================================
-    // LOGIC LỌC HẠNG VÉ (TICKET TYPES)
-    // ==========================================
+    const zoneDictionary = useMemo(() => {
+        const dict: Record<string, any> = {};
+        zonesData.forEach((zone: any) => {
+            dict[zone._id] = zone;
+            if (zone.id && zone.id !== zone._id) dict[zone.id] = zone;
+        });
+        return dict;
+    }, [zonesData]);
+
     const ticketTypeDictionary = useMemo(() => {
         const dict: Record<string, any> = {};
         (ticketTypesData || []).forEach((t: any) => {
@@ -433,6 +446,7 @@ export default function TicketBookingPage() {
                                         seatsData={filteredLiveSeatsData}
                                         zoneSummaries={zoneSummaries}
                                         ticketTypeDictionary={ticketTypeDictionary}
+                                        zoneDictionary={zoneDictionary}
                                     />
                                 </div>
 
@@ -559,7 +573,7 @@ export default function TicketBookingPage() {
                                                 {seat.seat_number || seat.id}
                                             </div>
                                             <div>
-                                                <p className="text-sm text-slate-500">Hàng: {seat.row} • Cột: {seat.col_index}</p>
+                                                <p className="text-sm text-slate-500">Khu: {zoneDictionary[seat.zone_id]?.name || 'Unknown'}, Hàng: {seat.row}, Cột: {seat.col_index}</p>
                                             </div>
                                         </div>
                                         <span className="font-mono font-bold text-slate-700">
@@ -764,25 +778,18 @@ export default function TicketBookingPage() {
 
             <main className="max-w-[1440px] mx-auto px-8 py-6">
                 {/* Header Tiêu đề sự kiện */}
-                <div className="flex justify-between items-end mt-8 mb-6 bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-                    <div>
-                        <h1 className="text-3xl font-bold text-foreground">
-                            {isLoadingShow ? "Đang tải sự kiện..." : showInfo?.name}
-                        </h1>
-                        <p className="text-gray-500 font-medium mt-1">
-                            {showInfo?.start_time ? new Date(showInfo.start_time).toLocaleString('vi-VN') : "..."} • {showInfo?.venue_id?.name || "Đang cập nhật địa điểm"}
-                        </p>
-                    </div>
 
-                    {currentStep < 5 && (
-                        <div className="text-right">
-                            <CheckoutCountdown
-                                showId={showId as string}
-                                cancellationDeadline={currentStep >= 3 ? orderData?.cancellation_deadline : undefined}
-                            />
-                        </div>
-                    )}
-                </div>
+                <EventInfoHeader
+                    showInfo={showInfo}
+                    isLoadingShow={isLoadingShow}
+                    currentStep={currentStep}
+                    showId={showId as string}
+                    orderData={orderData}
+                    onBack={handleBack}
+                />
+
+
+
 
                 <BookingStepper currentStep={currentStep} />
 

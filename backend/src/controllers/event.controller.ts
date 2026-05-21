@@ -1,6 +1,10 @@
 import Event from "../models/event.model";
 import { Request, Response } from "express";
-
+import mongoose from "mongoose";
+import Show from "../models/show.model";
+import Order from "../models/order.model";
+import Zone from "../models/zone.model";
+import redisClient from "../utils/redisClient";
 export const createEvent = async (req: Request, res: Response) => {
     try {
         const { name, description, genre, start_date, end_date, poster_url, banner_url, artists, status, banner_offset_y } = req.body;
@@ -11,23 +15,20 @@ export const createEvent = async (req: Request, res: Response) => {
         if (start_date > end_date) {
             return res.status(400).json({ message: "End date must be later than start date" })
         }
-        const event = new Event({ name, description, genre, start_date, end_date, organizer_id, poster_url, banner_url, artists, status, banner_offset_y });
+        const event = new Event({
+            name, description, genre,
+            start_date: new Date(start_date),
+            end_date: new Date(end_date),
+            organizer_id, poster_url, banner_url, artists,
+            status: 'draft',
+            banner_offset_y
+        });
         await event.save();
         res.status(201).json(event);
     } catch (error) {
         res.status(500).json({ message: "Error creating event", error });
     }
 };
-
-// export const getEvents = async (req: Request, res: Response) => {
-//     try {
-//         const events = await Event.find();
-//         res.status(200).json(events);
-//     } catch (error) {
-//         res.status(500).json({ message: "Error fetching events", error });
-//     }
-// };
-
 export const getEvents = async (req: Request, res: Response) => {
     try {
         const { status, genre, page } = req.query;
@@ -55,7 +56,6 @@ export const getEvents = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Error fetching events", error });
     }
 };
-
 export const getEventById = async (req: Request, res: Response) => {
     try {
         const event = await Event.findById(req.params.id);
@@ -67,145 +67,144 @@ export const getEventById = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Error fetching event", error });
     }
 };
-
 export const updateEvent = async (req: Request, res: Response) => {
     try {
-        const { name, description, date, venue, genre, start_date, end_date, organizer_id, banner_offset_y } = req.body;
-        const event = await Event.findByIdAndUpdate(
-            req.params.id,
-            { name, description, date, venue, genre, start_date, end_date, organizer_id, banner_offset_y },
-            { new: true }
-        );
-        if (!event) {
-            return res.status(404).json({ message: "Event not found" });
+        const { event_id } = req.params;
+        const organizer_id = req.user!.id;
+        const { name, description, genre, start_date, end_date, poster_url, banner_url, artists, banner_offset_y } = req.body;
+        const event = await Event.findOne({ _id: event_id, organizer_id });
+        if (!event) return res.status(404).json({ message: "Sự kiện không tồn tại hoặc bạn không có quyền chỉnh sửa" });
+        if (event.status === 'published') {
+            return res.status(400).json({
+                message: "Sự kiện đang công khai trên sàn bán vé. Vui lòng 'Tạm dừng sự kiện' trước khi thay đổi thông tin cấu hình."
+            });
         }
-        res.status(200).json(event);
+        if (start_date && end_date && new Date(start_date) > new Date(end_date)) {
+            return res.status(400).json({ message: "End date must be later than start date" });
+        }
+        event.name = name ?? event.name;
+        event.description = description ?? event.description;
+        event.genre = genre ?? event.genre;
+        event.start_date = start_date ? new Date(start_date) : event.start_date;
+        event.end_date = end_date ? new Date(end_date) : event.end_date;
+        event.poster_url = poster_url ?? event.poster_url;
+        event.banner_url = banner_url ?? event.banner_url;
+        event.artists = artists ?? event.artists;
+        event.banner_offset_y = banner_offset_y ?? event.banner_offset_y;
+        const updatedEvent = await event.save();
+        res.status(200).json({ message: "Cập nhật thông tin Sự kiện thành công", data: updatedEvent });
     } catch (error) {
         res.status(500).json({ message: "Error updating event", error });
     }
 };
-
+export const publishEvent = async (req: Request, res: Response) => {
+    try {
+        const { event_id } = req.params;
+        const organizer_id = req.user!.id;
+        const event = await Event.findOne({ _id: event_id, organizer_id });
+        if (!event) return res.status(404).json({ message: "Sự kiện không tồn tại" });
+        if (event.status === 'published') {
+            return res.status(400).json({ message: "Sự kiện này vốn đã được công khai trước đó." });
+        }
+        event.status = 'published';
+        await event.save();
+        res.status(200).json({
+            message: "Công khai Sự kiện thành công. Bạn đã có thể kích hoạt mở bán các Show diễn bên trong."
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi hệ thống khi công khai Sự kiện", error });
+    }
+};
+export const unpublishEvent = async (req: Request, res: Response) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        const { event_id } = req.params;
+        const organizer_id = req.user!.id;
+        const event = await Event.findOne({ _id: event_id, organizer_id });
+        if (!event) return res.status(404).json({ message: "Sự kiện không tồn tại" });
+        if (event.status !== 'published') {
+            return res.status(400).json({ message: "Chỉ có thể tạm dừng khi sự kiện đang hiển thị Công khai." });
+        }
+        const hasSoldTickets = await Order.exists({
+            event_id,
+            status: { $in: ['completed', 'reserved'] }
+        });
+        if (hasSoldTickets) {
+            return res.status(400).json({
+                message: "Không thể hạ trạng thái Sự kiện! Một hoặc nhiều đêm diễn bên trong đã phát sinh giao dịch đặt vé thực tế."
+            });
+        }
+        event.status = 'draft';
+        await event.save({ session });
+        const publishedShows = await Show.find({ event_id, status: 'published' }).select('_id');
+        if (publishedShows.length > 0) {
+            const showIds = publishedShows.map(s => s._id);
+            await Show.updateMany({ _id: { $in: showIds } }, { status: 'draft' }, { session });
+            const pipeline = redisClient.multi();
+            for (const showId of showIds) {
+                const zones = await Zone.find({ show_id: showId }).select('_id');
+                zones.forEach(zone => {
+                    const summaryKey = `event:${event_id}:show:${showId}:zone:${zone._id}:summary`;
+                    pipeline.del(summaryKey);
+                });
+                pipeline.del(`show:${showId}:ticket_types`);
+                pipeline.del(`show:${showId}:seats_static_layout`);
+            }
+            await pipeline.exec();
+        }
+        await session.commitTransaction();
+        session.endSession();
+        res.status(200).json({ message: "Đã tạm dừng sự kiện và hạ toàn bộ các đêm diễn liên quan về dạng bản nháp." });
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error("Lỗi khi unpublish event:", error);
+        res.status(500).json({ message: "Lỗi hệ thống khi tạm dừng Sự kiện", error });
+    }
+};
 export const deleteEvent = async (req: Request, res: Response) => {
     try {
-        const event = await Event.findByIdAndDelete(req.params.id);
+        const event = await Event.findById(req.params.id);
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
+        if (event.organizer_id.toString() !== req.user!.id) {
+            return res.status(403).json({ message: "You do not have permission to delete this event" });
+        }
+        if (event.status === 'published') {
+            return res.status(400).json({ message: "Cannot delete an event that is currently published. Please unpublish it first." });
+        }
+        const ordersExist = await Order.exists({ event_id: event._id });
+        if (ordersExist) {
+            return res.status(400).json({ message: "Cannot delete event with existing orders. Please contact support." });
+        }
+        await Event.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: "Event deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: "Error deleting event", error });
     };
 };
-
-
-// export const publishEvent = async (req: Request, res: Response) => {
-//     try {
-//         const event_id = req.params.event_id as string;
-
-//         // 1. Tìm Show
-//         const event = Event.findById(event_id);
-//         if (!event) return res.status(404).json({ message: "Event không tồn tại" });
-
-
-//         // 2. Validate: Chống Publish 2 lần
-//         if (event.status === 'published') {
-//             return res.status(400).json({ message: "Show này đã được publish rồi!" });
-//         }
-
-//         const seatCount = await Seat.countDocuments({ show_id });
-//         if (seatCount === 0) {
-//             return res.status(400).json({
-//                 message: "Không thể Publish! Vui lòng generate ghế cho các Zone trước."
-//             });
-//         }
-
-//         // 4. Cập nhật trạng thái trong Database
-//         show.status = 'published';
-//         await show.save();
-
-
-//         try {
-//             await warmUpSeatmapCache(show_id);
-//         } catch (cacheError) {
-//             show.status = 'draft';
-//             await show.save();
-//             throw new Error("Lỗi nạp Cache Redis, đã hạ Show về lại bản Draft.");
-//         }
-
-//         res.status(200).json({
-//             message: "Publish Show thành công! Hệ thống đã sẵn sàng đón tải.",
-//             seat_cached: seatCount
-//         });
-
-//     } catch (error) {
-//         console.error("Lỗi khi publish show:", error);
-//         res.status(500).json({ message: "Lỗi Server", error: error.message });
-//     }
-// };
-
-// export const getOrganizerEvents = async (req: Request, res: Response) => {
-//     try {
-//         const organizerId = (req as any).user.id;
-
-//         const page = parseInt(req.query.page as string) || 1;
-//         const limit = parseInt(req.query.limit as string) || 10;
-//         const skip = (page - 1) * limit;
-//         const events = await Event.find({ organizer_id: organizerId })
-//             .sort({ createdAt: -1 })
-//             .skip(skip)
-//             .limit(limit);
-//         const total = await Event.countDocuments({ organizer_id: organizerId });
-
-//         res.status(200).json({
-//             status: "success",
-//             data: events,
-//             pagination: {
-//                 totalElements: total,
-//                 totalPages: Math.ceil(total / limit),
-//                 currentPage: page,
-//                 limit: limit
-//             }
-//         });
-//     } catch (error) {
-//         console.error("Lỗi lấy danh sách sự kiện Organizer:", error);
-//         res.status(500).json({ message: "Lỗi hệ thống khi lấy dữ liệu" });
-//     }
-// };
-
 export const getOrganizerEvents = async (req: Request, res: Response) => {
     try {
-        // 1. Lấy organizer_id từ token (đã qua middleware Verify)
         const organizerId = (req as any).user.id;
-
-        // 2. Lấy các params lọc và phân trang từ query
         const { page, limit, status, search } = req.query;
-
-        // 3. Xây dựng filter
         let filter: any = { organizer_id: organizerId };
-
-        // Lọc theo trạng thái (draft, published, etc.) nếu có
         if (status) {
             filter.status = status;
         }
-
         if (search) {
             filter.name = { $regex: search, $options: 'i' };
         }
-
         const options = {
             page: parseInt(page as string) || 1,
             limit: parseInt(limit as string) || 10,
             sort: { createdAt: -1 },
-            // customLabels: giúp bạn đổi tên field trả về cho đẹp nếu muốn
         };
-
-        // 4. Thực hiện query phân trang
         const result = await Event.paginate(filter, options);
-
-        // 5. Trả về data kèm thông tin phân trang chuẩn của mongoose-paginate
         res.status(200).json({
             status: "success",
-            data: result.docs, // Danh sách events
+            data: result.docs,
             pagination: {
                 totalElements: result.totalDocs,
                 totalPages: result.totalPages,
@@ -222,21 +221,16 @@ export const getOrganizerEvents = async (req: Request, res: Response) => {
         });
     }
 };
-
 export const getOrganizerEventById = async (req: Request, res: Response) => {
     try {
         const { event_id } = req.params;
         const organizerId = (req as any).user.id;
-
-        // Tìm event thỏa mãn 2 điều kiện: Đúng ID và thuộc về đúng Organizer này
         const event = await Event.findOne({ _id: event_id, organizer_id: organizerId });
-
         if (!event) {
             return res.status(404).json({
                 message: "Không tìm thấy sự kiện hoặc bạn không có quyền truy cập."
             });
         }
-
         res.status(200).json(event);
     } catch (error) {
         res.status(500).json({ message: "Error fetching event detail", error });

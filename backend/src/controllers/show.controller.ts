@@ -3,12 +3,14 @@ import Event from '../models/event.model';
 import Zone from '../models/zone.model';
 import Seat from '../models/seat.model';
 import TicketType from '../models/ticket-type.model';
+import Order from '../models/order.model';
 import { warmUpSeatmapCache } from '../services/seatmapService';
 import * as cheerio from 'cheerio';
 import { Request, Response } from 'express';
 import redisClient from '../utils/redisClient';
 import { calculateValidQuantities } from '../utils/validQuantities';
 import mongoose from 'mongoose';
+import { formatHashToJSON } from '../utils/hashToJson';
 export const createShow = async (req: Request, res: Response) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -115,7 +117,7 @@ export const createShow = async (req: Request, res: Response) => {
                     const typeId = $(typeGroup).attr('id') || '';
                     const typeName = typeId.replace(/^Type-/, '').split(/[-_]/)[0].toUpperCase();
 
-                    if (!tiersData[typeName]) tiersData[typeName] = { count: 0 };
+                    if (!tiersData[tierToTicketTypeIdMap[typeName]]) tiersData[tierToTicketTypeIdMap[typeName]] = { count: 0 };
                     $(typeGroup).find('g[id*="row-" i], g[id*="Row-"]').each((_, rowGroup) => {
                         const rowIdAttr = $(rowGroup).attr('id') || '';
                         const matchRow = rowIdAttr.match(/row-([a-zA-Z0-9]+)/i);
@@ -136,7 +138,7 @@ export const createShow = async (req: Request, res: Response) => {
                                     y: parseFloat(circle.attr('cy') || '0'),
                                     tier: typeName
                                 });
-                                tiersData[typeName].count++;
+                                tiersData[tierToTicketTypeIdMap[typeName]].count++;
                             }
                         });
                     });
@@ -194,11 +196,11 @@ export const createShow = async (req: Request, res: Response) => {
                         const validQuantities = calculateValidQuantities(allRowStrings);
                         pipeline.hSet(summaryKey, 'valid_quantities', JSON.stringify(validQuantities));
                     }
-                    for (const [tierName, data] of Object.entries(tiersData)) {
+                    for (const [tierId, data] of Object.entries(tiersData)) {
                         if (data.count > 0) {
-                            pipeline.hSet(summaryKey, `tier:${tierName}:count`, String(data.count));
-                            const price = tier_pricing[tierName] ?? 0;
-                            pipeline.hSet(summaryKey, `tier:${tierName}:price`, String(price));
+                            pipeline.hSet(summaryKey, `tier:${tierId}:count`, String(data.count));
+                            const price = tier_pricing[tierId] ?? 0;
+                            pipeline.hSet(summaryKey, `tier:${tierId}:price`, String(price));
                         }
                     }
                 });
@@ -294,13 +296,43 @@ export const getShowById = async (req: Request, res: Response) => {
         if (!show) {
             return res.status(404).json({ message: "Show not found" });
         }
+
         const zones = await Zone.find({ show_id })
-            .select('name path_data overall_map_svg_id capacity')
+            .select('_id name path_data overall_map_svg_id capacity')
             .lean();
+        const zoneSummariesDict: Record<string, any> = {};
+        const ticketTypes = await TicketType.find({ show_id: show_id }).select('_id price').lean();
+
+
+        const summaryPromises = zones.map(zone => {
+            const summaryKey = `event:${show.event_id._id}:show:${show._id.toString()}:zone:${zone._id.toString()}:summary`; console.log("Đang tìm key:", summaryKey);
+            return redisClient.hGetAll(summaryKey);
+        });
+
+        const rawSummaries = await Promise.all(summaryPromises);
+
+        zones.forEach((zone, index) => {
+            const rawHash = rawSummaries[index];
+            console.log("Dữ liệu thô lấy từ Redis:", rawHash); // <--- XEM CÓ RỖNG KHÔNG
+            // Gọi hàm util để bóc tách, cực gọn!
+            if (rawHash && Object.keys(rawHash).length > 0) {
+                zoneSummariesDict[zone._id.toString()] = formatHashToJSON(rawHash);
+            } else {
+                zoneSummariesDict[zone._id.toString()] = {
+                    min_price: 0,
+                    valid_quantities: {},
+                    tiers: {}
+                };
+            }
+        });
         res.status(200).json({
             show_info: show,
-            zones: zones
+            zones: zones,
+            zone_summaries: zoneSummariesDict
         });
+
+
+
     } catch (error) {
         console.error("Lỗi khi fetch Show:", error);
         res.status(500).json({ message: "Error fetching show", error });
@@ -309,26 +341,102 @@ export const getShowById = async (req: Request, res: Response) => {
 export const updateShow = async (req: Request, res: Response) => {
     try {
         const { show_id } = req.params;
-        const updateData = req.body;
-        const updatedShow = await Show.findByIdAndUpdate(show_id, updateData, { new: true });
-        if (!updatedShow) {
-            return res.status(404).json({ message: "Show not found" });
+        const { name, description, start_time, end_time, sale_start, sale_end, venue_id } = req.body;
+
+        const show = await Show.findById(show_id);
+        if (!show) return res.status(404).json({ message: "Show không tồn tại" });
+
+        // Chặn không cho cập nhật bừa bãi khi Đang mở bán công khai
+        if (show.status === 'published') {
+            return res.status(400).json({
+                message: "Show đang mở bán công khai. Vui lòng 'Tạm dừng bán' trước khi điều chỉnh thông tin cấu hình."
+            });
         }
-        res.status(200).json(updatedShow);
+
+        // Chỉ cập nhật các trường thông tin thô từ form, loại bỏ status ra khỏi đây
+        show.name = name ?? show.name;
+        show.description = description ?? show.description;
+        show.start_time = start_time ? new Date(start_time) : show.start_time;
+        show.end_time = end_time ? new Date(end_time) : show.end_time;
+        show.sale_start = sale_start ? new Date(sale_start) : show.sale_start;
+        show.sale_end = sale_end ? new Date(sale_end) : show.sale_end;
+        show.venue_id = venue_id ?? show.venue_id;
+
+        const updatedShow = await show.save();
+        res.status(200).json({ message: "Cập nhật thông tin form thành công", data: updatedShow });
     } catch (error) {
         res.status(500).json({ message: "Error updating show", error });
     }
 };
-export const deleteShow = async (req: Request, res: Response) => {
+export const unpublishShow = async (req: Request, res: Response) => {
     try {
         const { show_id } = req.params;
-        const deletedShow = await Show.findByIdAndDelete(show_id);
-        if (!deletedShow) {
-            return res.status(404).json({ message: "Show not found" });
+        const show = await Show.findById(show_id);
+        if (!show) return res.status(404).json({ message: "Show không tồn tại" });
+
+        if (show.status !== 'published') {
+            return res.status(400).json({ message: "Chỉ có thể tạm dừng khi show đang ở trạng thái Công khai." });
         }
-        res.status(200).json({ message: "Show deleted successfully" });
+
+        // KIỂM TRA BẢO VỆ CHÍ MẠNG: Đã có ai giao dịch mua vé ở show này chưa?
+        const hasSoldTickets = await Order.exists({ show_id, status: { $in: ['completed', 'reserved'] } });
+        if (hasSoldTickets) {
+            return res.status(400).json({
+                message: "Show này đã ghi nhận giao dịch đặt vé thực tế. Tuyệt đối không thể đưa về dạng Nháp (Draft) để tránh sai lệch dữ liệu đối soát!"
+            });
+        }
+
+        // Hạ trạng thái về bản nháp để cho phép sửa form
+        show.status = 'draft';
+        await show.save();
+
+        // DỌN DẸP SẠCH SẼ REDIS: Tránh bộ nhớ rác khi đóng sơ đồ rạp
+        const zones = await Zone.find({ show_id }).select('_id');
+        const pipeline = redisClient.multi();
+
+        // Xóa các key summary và row trạng thái
+        zones.forEach(zone => {
+            const summaryKey = `event:${show.event_id}:show:${show._id}:zone:${zone._id}:summary`;
+            pipeline.del(summaryKey);
+        });
+        pipeline.del(`show:${show._id}:ticket_types`);
+        pipeline.del(`show:${show._id}:seats_static_layout`);
+
+        await pipeline.exec();
+
+        res.status(200).json({ message: "Đã tạm dừng bán thành công. Show đã quay về dạng bản nháp." });
     } catch (error) {
-        res.status(500).json({ message: "Error deleting show", error });
+        console.error("Lỗi khi unpublish show:", error);
+        res.status(500).json({ message: "Lỗi Server", error });
+    }
+};
+export const cancelShow = async (req: Request, res: Response) => {
+    try {
+        const { show_id } = req.params;
+        const show = await Show.findById(show_id);
+        if (!show) return res.status(404).json({ message: "Show không tồn tại" });
+
+        if (show.status === 'cancelled') {
+            return res.status(400).json({ message: "Show diễn này vốn đã bị hủy trước đó." });
+        }
+
+        // Chuyển sang hủy show (vẫn giữ data để đối soát hoàn tiền)
+        show.status = 'cancelled';
+        await show.save();
+
+        // Xóa sạch cache giữ chỗ và map hiển thị trên Redis để chặn đứng Client vào mua vé
+        const zones = await Zone.find({ show_id }).select('_id');
+        const pipeline = redisClient.multi();
+        zones.forEach(zone => {
+            pipeline.del(`event:${show.event_id}:show:${show._id}:zone:${zone._id}:summary`);
+        });
+        await pipeline.exec();
+
+        res.status(200).json({
+            message: "Hủy show diễn thành công. Sơ đồ bán vé đã đóng, dữ liệu giao dịch cũ được bảo toàn để phục vụ hoàn tiền."
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi hệ thống khi hủy show", error });
     }
 };
 export const publishShow = async (req: Request, res: Response) => {

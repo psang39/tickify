@@ -5,19 +5,19 @@ import { useState, useEffect } from 'react'
 import MainLayout from "@/components/layout/MainLayout";
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // import Home from './Home'
-import TicketBookingPage from './pages/TicketBookingPage'
-import CreateEvent from './pages/CreateEvent'
-import EventDetail from './pages/EventDetail'
-import OrganizerDashboard from './pages/OrganizerDashboard'
-import EventManagement from './pages/EventManagement'
+import TicketBookingPage from './pages/attendee/TicketBookingPage'
+import CreateEvent from './pages/organizer/CreateEvent'
+import EventDetail from './pages/organizer/EventDetail'
+import OrganizerDashboard from './pages/organizer/OrganizerDashboard'
+import EventManagement from './pages/organizer/EventManagement'
 import { useAuthStore } from "@/store/useAuthStore";
-import LoginPage from "@/pages/LoginPage";
-import MockGatewayPage from './pages/MockGatewayPage';
-import TicketDetailPage from './pages/TicketDetailPage';
+import LoginPage from "@/pages/attendee/LoginPage";
+import MockGatewayPage from './pages/attendee/MockGatewayPage';
+import TicketDetailPage from './pages/attendee/TicketDetailPage';
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { WaitingRoomPage } from './pages/WaitingRoomPage';
+import { WaitingRoomPage } from './pages/attendee/WaitingRoomPage';
 import OrganizerLayout from './components/layout/OrganizerLayout';
-import ShowDetail from './pages/ShowDetail';
+import ShowDetail from './pages/organizer/ShowDetail';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './App.css'
 const queryClient = new QueryClient({
@@ -47,10 +47,11 @@ function App() {
           {/* Đường dẫn tới trang đặt vé */}
           <Route element={<MainLayout />}>
             <Route path="/login" element={<LoginPage />} />
-            <Route element={<OrganizerLayout />}>
-              <Route
-                element={<ProtectedRoute allowedRoles={['Organizer', 'Admin', 'organizer', 'admin']} />}
-              >
+
+            <Route
+              element={<ProtectedRoute allowedRoles={['Organizer', 'Admin', 'organizer', 'admin']} />}
+            >
+              <Route element={<OrganizerLayout />}>
                 <Route path="/shows/:showId/booking" element={<TicketBookingPage />} />
                 <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
                 <Route path="/organizer/events" element={<EventManagement />} />

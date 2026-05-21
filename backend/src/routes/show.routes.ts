@@ -23,7 +23,6 @@ showRouter.post('/:show_id/zones', Verify, verifyRoles(['admin', 'organizer']), 
 
 showRouter.post('/:show_id/waiting-room/join', Verify, joinWaitingRoom);
 showRouter.get('/:show_id/waiting-room/status', Verify, checkMyTurn);
-showRouter.patch('/:id/publish', Verify, verifyRoles(['admin', 'organizer']), publishShow);
 showRouter.get('/:show_id/seats', Verify, verifyCheckoutToken, getSeatsByShow);
 showRouter.get('/:show_id/stream', (req, res) => {
     const show_id = req.params.show_id as string;

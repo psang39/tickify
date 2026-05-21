@@ -241,8 +241,10 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
 
         const seatsByRow: { [key: string]: typeof targetSeats } = {};
         const lockedByTier: Record<string, number> = {};
+        items.forEach(item => { lockedByTier[item.ticket_type_id] = (lockedByTier[item.ticket_type_id] || 0) + 1; });
+        console.log("Số lượng vé theo từng loại đang giữ trong request này:", lockedByTier);
         targetSeats.forEach(seat => {
-            lockedByTier[seat.tier] = (lockedByTier[seat.tier] || 0) + 1;
+
             if (!seatsByRow[seat.row]) seatsByRow[seat.row] = [];
             seatsByRow[seat.row].push(seat);
         });
@@ -364,8 +366,8 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
                 const updatedRowStrings = await redisClient.mGet(modifiedRowsForRollback.map(r => `event:${event_id}:show:${show_id}:zone:${zone_id}:row:${r.rowLabel}`)) as string[];
 
                 const pipeline = redisClient.multi();
-                for (const [tierName, lockedCount] of Object.entries(lockedByTier)) {
-                    pipeline.hIncrBy(summaryKey, `tier:${tierName}:count`, -lockedCount);
+                for (const [tierId, lockedCount] of Object.entries(lockedByTier)) {
+                    pipeline.hIncrBy(summaryKey, `tier:${tierId}:count`, -lockedCount);
                 }
 
                 const updatedValidQuantities = calculateValidQuantities(updatedRowStrings);

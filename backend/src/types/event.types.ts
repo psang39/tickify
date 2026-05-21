@@ -15,7 +15,7 @@ export interface IEvent extends Document {
     sale_end: Date,
     start_date: Date,
     end_date: Date,
-    status: "active" | "inactive" | "draft",
+    status: "draft" | "published" | "cancelled",
     organizer_id: Types.ObjectId,
     attendees: Types.ObjectId,
     staff: Types.ObjectId,

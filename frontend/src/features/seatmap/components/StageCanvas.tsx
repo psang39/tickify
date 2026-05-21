@@ -10,6 +10,7 @@ interface StageCanvasProps {
     seatsData: any[];
     zoneSummaries?: Record<string, any>;
     ticketTypeDictionary: Record<string, any>;
+    zoneDictionary?: Record<string, any>;
 }
 
 export const buildSeatMapCache = (allSeats: any[]) => {
@@ -94,11 +95,20 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     zonesData,
     seatsData,
     ticketTypeDictionary,
-    zoneSummaries = {}
+    zoneSummaries = {},
+    zoneDictionary = {}
 }) => {
     const { selectedSeats, toggleSeat, comboCount } = useCartStore();
 
     const [tooltip, setTooltip] = useState<any>({ visible: false, x: 0, y: 0, content: null, status: 'success' });
+    const [zoneTooltip, setZoneTooltip] = useState({
+        visible: false,
+        x: 0,
+        y: 0,
+        zoneName: "",
+        availableCount: 0,
+        minPrice: 0,
+    });
     const [hoveredIds, setHoveredIds] = useState<string[]>([]);
     const [hoverStatus, setHoverStatus] = useState<'success' | 'error' | null>(null);
 
@@ -211,23 +221,67 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             });
         }
     }, [mapBounds?.minX, mapBounds?.maxX, mapBounds?.minY, mapBounds?.maxY]);
+    const getZoneMinPrice = (summary: any) => {
+        if (!summary || !summary.tiers) return 0;
+        const tierIds = Object.keys(summary.tiers);
 
+        const prices = tierIds
+            .filter(id => summary.tiers[id].count > 0)
+            .map(id => ticketTypeDictionary[id]?.price || 0);
+
+        return prices.length > 0 ? Math.min(...prices) : 0;
+    };
     const getZoneColor = useCallback((zoneId: string) => {
         const summary = zoneSummaries[zoneId];
-        if (!summary) return { fill: "#bfdbfe", stroke: "#3b82f6" };
 
-        let totalAvailable = 0;
-        Object.keys(summary).forEach(key => {
-            if (key.includes(':count')) {
-                totalAvailable += parseInt(summary[key] || "0", 10);
-            }
-        });
+        if (!summary || !summary.tiers) return { fill: "#bfdbfe", stroke: "#3b82f6" };
 
-        if (totalAvailable <= 0) return { fill: "#e2e8f0", stroke: "#94a3b8" };
-        if (totalAvailable < 50) return { fill: "#fef08a", stroke: "#eab308" };
-        return { fill: "#bfdbfe", stroke: "#3b82f6" };
+        const totalAvailable = Object.values(summary.tiers).reduce(
+            (acc: number, tier: any) => acc + (tier.count || 0),
+            0
+        );
+        if (totalAvailable <= 0) return { fill: "#e2e8f0", stroke: "#94a3b8" }; // Hết vé
+        if (totalAvailable < 50) return { fill: "#fef08a", stroke: "#eab308" }; // Sắp hết
+        return { fill: "#bfdbfe", stroke: "#3b82f6" }; // Còn nhiều vé
     }, [zoneSummaries]);
 
+    const handleZoneMouseEnter = (e: any, zone: any) => {
+        const stage = e.target.getStage();
+        const pointerPosition = stage.getPointerPosition();
+        const summary = zoneSummaries?.[zone._id];
+        const minPrice = getZoneMinPrice(summary);
+        if (!summary) return;
+
+        const totalAvailable = Object.values(summary.tiers || {}).reduce(
+            (acc: number, tier: any) => acc + (tier.count || 0),
+            0
+        );
+
+        setZoneTooltip({
+            visible: true,
+            x: pointerPosition.x,
+            y: pointerPosition.y,
+            zoneName: zone.name || "Khu vực",
+            availableCount: totalAvailable,
+            minPrice: minPrice || 0,
+        });
+    };
+
+    const handleZoneMouseMove = (e: any) => {
+        // Cập nhật tọa độ liên tục để tooltip đi theo chuột
+        const stage = e.target.getStage();
+        const pointerPosition = stage.getPointerPosition();
+        setZoneTooltip(prev => ({
+            ...prev,
+            x: pointerPosition.x,
+            y: pointerPosition.y
+        }));
+    };
+
+    const handleZoneMouseLeave = () => {
+        // Tắt tooltip khi chuột rời khỏi zone
+        setZoneTooltip(prev => ({ ...prev, visible: false }));
+    };
     const handleMouseEnter = useCallback((e: any, seat: any, isAvailable: boolean) => {
         if (isAvailable) {
             const stage = e.target.getStage();
@@ -280,7 +334,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 setTooltip({
                     visible: true, x: pos.x, y: pos.y, status: 'success',
                     content: {
-                        title: `Combo ${cluster.length} vé - Khu ${seat.zone || ''}`,
+                        title: `Combo ${cluster.length} vé - Khu ${zoneDictionary[seat.zone_id]?.name || ''}`,
                         seats: labels,
                         total: totalPrice
                     }
@@ -430,16 +484,21 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                                     if (stage && !isZoomedIn) {
                                         stage.container().style.cursor = 'zoom-in';
                                         (e.target as Konva.Path).opacity(1);
+                                        handleZoneMouseEnter(e, zone);
                                     }
+
                                 }}
+                                onMouseMove={handleZoneMouseMove}
                                 onMouseLeave={(e) => {
                                     const stage = e.target.getStage();
                                     if (stage) {
                                         stage.container().style.cursor = 'grab';
                                         (e.target as Konva.Path).opacity(0.8);
+                                        handleZoneMouseLeave();
                                     }
                                 }}
                             />
+
                         );
                     })}
                     {!isZoomedIn && zoneLabels.map((lbl: any, idx) => (
@@ -509,6 +568,41 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                     </div>
                     <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full border-8 border-transparent 
                         ${tooltip.status === 'success' ? 'border-t-slate-900' : 'border-t-red-900'}`}></div>
+                </div>
+            )}
+            {zoneTooltip.visible && (
+                <div
+                    className="absolute z-50 pointer-events-none bg-slate-900/95 backdrop-blur-md border border-slate-700 text-white p-4 rounded-xl shadow-2xl transition-opacity duration-150 ease-out"
+                    style={{
+                        // Cộng thêm 15px để Tooltip không bị che bởi chính con trỏ chuột
+                        top: zoneTooltip.y + 15,
+                        left: zoneTooltip.x + 15,
+                        transform: 'translate(0, 0)'
+                    }}
+                >
+                    <h4 className="font-bold text-base text-blue-300 mb-2 border-b border-slate-700 pb-2">
+                        {zoneTooltip.zoneName}
+                    </h4>
+
+                    <div className="flex flex-col gap-1.5 text-sm">
+                        <div className="flex justify-between items-center gap-6">
+                            <span className="text-slate-400">Tình trạng:</span>
+                            {zoneTooltip.availableCount > 0 ? (
+                                <span className="font-medium text-emerald-400">
+                                    Còn <span className="font-bold">{zoneTooltip.availableCount}</span> vé
+                                </span>
+                            ) : (
+                                <span className="font-medium text-red-400">Hết vé</span>
+                            )}
+                        </div>
+
+                        <div className="flex justify-between items-center gap-6">
+                            <span className="text-slate-400">Giá chỉ từ:</span>
+                            <span className="font-bold text-pink-400 font-mono tracking-tight">
+                                {zoneTooltip.minPrice.toLocaleString('vi-VN')} đ
+                            </span>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
