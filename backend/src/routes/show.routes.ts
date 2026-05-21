@@ -7,7 +7,7 @@ import { Validate } from '../middleware/validate';
 import { Verify, verifyRoles, verifyCheckoutToken } from '../middleware/verify';
 import { createZone, getZonesByEvent } from "../controllers/zone.controller";
 import { addClient } from '../services/sse.service';
-
+import { getTicketTypesByShow } from "../controllers/ticket-type.controller";
 
 const showRouter = express.Router({ mergeParams: true });
 showRouter.get('/:show_id', getShowById);
@@ -29,4 +29,5 @@ showRouter.get('/:show_id/stream', (req, res) => {
     const show_id = req.params.show_id as string;
     addClient(res, show_id);
 });
+showRouter.get('/:show_id/ticket-types', getTicketTypesByShow);
 export default showRouter;

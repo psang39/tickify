@@ -16,10 +16,29 @@ export const createTicketType = async (req: Request, res: Response) => {
         //     const inventoryKey = `show:${show_id}:zone:${zone_id}:ticketType:${ticketType._id}:available`;
         //     await redisClient.set(inventoryKey, capacity.toString());
         // }
+
         res.status(201).json(ticketType);
     } catch (error) {
         console.error("Error creating ticket type:", error);
         res.status(500).json({ message: "Error creating ticket type", error });
+    }
+};
+export const getTicketTypesByShow = async (req: Request, res: Response) => {
+    try {
+        const { show_id } = req.params;
+        const ticketTypesCacheKey = `show:${show_id}:ticket_types`;
+        const cachedTicketTypes = await redisClient.get(ticketTypesCacheKey);
+        if (cachedTicketTypes) {
+            return res.status(200).json(JSON.parse(cachedTicketTypes));
+        }
+        const ticketTypes = await TicketType.find({ show_id });
+        await redisClient.set(ticketTypesCacheKey, JSON.stringify(ticketTypes), {
+            EX: 3600
+        });
+        res.status(200).json(ticketTypes);
+    } catch (error) {
+        console.error("Error fetching ticket types:", error);
+        res.status(500).json({ message: "Error fetching ticket types", error });
     }
 };
 
@@ -46,6 +65,7 @@ export const getTicketTypeById = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Error fetching ticket type", error });
     }
 };
+
 
 export const updateTicketType = async (req: Request, res: Response) => {
     try {

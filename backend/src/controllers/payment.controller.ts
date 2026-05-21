@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import Order from '../models/order.model';
 import crypto from 'crypto';
-import { MOCK_PAYMENT_SECRET } from '../config/index';
+import { MOCK_PAYMENT_SECRET, FRONTEND_URL, PORT } from '../config/index';
 import axios from 'axios';
 
 export const createPaymentUrl = async (req: Request, res: Response): Promise<void> => {
@@ -38,7 +38,7 @@ export const createPaymentUrl = async (req: Request, res: Response): Promise<voi
         if (paymentMethod === 'VNPAY') {
         } else if (paymentMethod === 'MOCK') {
 
-            const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+            const frontendBaseUrl = FRONTEND_URL || 'http://localhost:5173';
             paymentUrl = `${frontendBaseUrl}/mock-gateway?orderId=${order._id}&amount=${order.total_price}`;
 
         } else {
@@ -61,8 +61,8 @@ export const createPaymentUrl = async (req: Request, res: Response): Promise<voi
 
 export const generateMockReturnUrl = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { orderId, amount, status } = req.body; 
-        
+        const { orderId, amount, status } = req.body;
+
         const secret = process.env.MOCK_PAYMENT_SECRET;
         if (!secret) {
             res.status(500).json({ message: 'Chưa cấu hình MOCK_PAYMENT_SECRET trên server.' });
@@ -75,8 +75,8 @@ export const generateMockReturnUrl = async (req: Request, res: Response): Promis
         const signatureReturn = crypto.createHmac('sha256', secret).update(payloadToReturn).digest('hex');
         const payloadToWebhook = `order_id=${orderId}&amount=${amount}&status=${status}&transactionId=${transactionId}`;
         const signatureWebhook = crypto.createHmac('sha256', secret).update(payloadToWebhook).digest('hex');
-        const backendBaseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`;
-        
+        const backendBaseUrl = `http://localhost:${PORT || 5000}/api/v1`;
+
         // Nhớ sửa '/webhooks/payment-result' cho khớp với route thực tế trên server của bạn
         axios.post(`${backendBaseUrl}/webhooks/payment-result`, {
             order_id: orderId,
@@ -85,13 +85,13 @@ export const generateMockReturnUrl = async (req: Request, res: Response): Promis
             transaction_id: transactionId,
             signature: signatureWebhook
         }).then(() => {
-            console.log(`✅ [Mock Gateway] Đã bắn IPN thành công cho đơn hàng: ${orderId}`);
+            console.log(`[Mock Gateway] Đã bắn IPN thành công cho đơn hàng: ${orderId}`);
         }).catch((err) => {
-            console.error(`❌ [Mock Gateway] Lỗi khi bắn IPN ngầm cho ${orderId}:`, err.message);
+            console.error(`[Mock Gateway] Lỗi khi bắn IPN ngầm cho ${orderId}:`, err.message);
         });
 
         // 5. TRẢ RETURN URL VỀ CHO FRONTEND
-        const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const frontendBaseUrl = FRONTEND_URL || 'http://localhost:5173';
         const returnUrl = `${frontendBaseUrl}/payment/result?orderId=${orderId}&amount=${amount}&status=${status}&signature=${signatureReturn}`;
 
         res.status(200).json({

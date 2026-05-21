@@ -15,7 +15,7 @@ export const BookingStepper = ({ currentStep = 2 }) => {
                         {index !== 0 && (
                             <div
                                 className={`absolute right-1/2 top-4 w-full h-[2px] -translate-y-1/2 z-0 
-                ${step.id <= currentStep ? "bg-primary" : "bg-neutral-base"}`}
+                ${step.id <= currentStep ? "bg-primary" : "bg-neutral-dark"}`}
                             />
                         )}
                         <div
@@ -24,7 +24,7 @@ export const BookingStepper = ({ currentStep = 2 }) => {
                                     ? "bg-primary text-white"
                                     : step.id === currentStep
                                         ? "bg-secondary text-white ring-4 ring-secondary/20"
-                                        : "bg-neutral-base text-gray-400"
+                                        : "bg-neutral-dark text-gray-400"
                                 }`}
                         >
                             {step.id < currentStep ? <Check size={16} strokeWidth={3} /> : step.id}

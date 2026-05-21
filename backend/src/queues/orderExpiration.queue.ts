@@ -31,7 +31,10 @@ const releaseSeatsLuaScript = `
     local numSeatsToRelease = #ARGV
     for i = 1, numSeatsToRelease do
         local colIndex = tonumber(ARGV[i])
-        chars[colIndex] = 'O'
+        local luaIndex = colIndex + 1
+        if chars[luaIndex] == 'H' then
+            chars[luaIndex] = 'O'
+        end
     end
 
     local newRowStr = table.concat(chars)

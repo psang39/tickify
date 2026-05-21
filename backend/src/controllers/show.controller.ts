@@ -78,6 +78,15 @@ export const createShow = async (req: Request, res: Response) => {
                 createdTicketTypes.push(ticketType);
             }
         }
+        const ticketTypesCache = createdTicketTypes.map(tt => ({
+            id: tt._id,
+            name: tt.name,
+            price: tt.price,
+
+        }));
+
+
+        await redisClient.set(`show:${savedShow._id}:ticket_types`, JSON.stringify(ticketTypesCache));
         const tierToTicketTypeIdMap: Record<string, any> = {};
         createdTicketTypes.forEach(tt => {
             tierToTicketTypeIdMap[tt.target_tier.toUpperCase()] = tt._id;
@@ -85,8 +94,8 @@ export const createShow = async (req: Request, res: Response) => {
         let createdZones: any[] = [];
         let totalSeatsGenerated = 0;
         const pipeline = redisClient.multi();
-        pipeline.set(`event:${event_id}:show:${savedShow.id}:sale_start`, savedShow.sale_start.toISOString());
-        pipeline.set(`event:${event_id}:show:${savedShow.id}:sale_end`, savedShow.sale_end.toISOString());
+        pipeline.set(`event:${event_id}:show:${savedShow._id}:sale_start`, savedShow.sale_start.toISOString());
+        pipeline.set(`event:${event_id}:show:${savedShow._id}:sale_end`, savedShow.sale_end.toISOString());
         if (stadium_map_svg) {
             const $ = cheerio.load(stadium_map_svg, { xmlMode: true });
             const zoneDrafts: any[] = [];
@@ -103,7 +112,9 @@ export const createShow = async (req: Request, res: Response) => {
                 const rowsMap = new Map<string, any[]>();
                 const tiersData: Record<string, { count: number }> = {};
                 $(zoneGroup).find('g[id^="Type-"]').each((_, typeGroup) => {
-                    const typeName = $(typeGroup).attr('id')!.replace('Type-', '').toUpperCase();
+                    const typeId = $(typeGroup).attr('id') || '';
+                    const typeName = typeId.replace(/^Type-/, '').split(/[-_]/)[0].toUpperCase();
+
                     if (!tiersData[typeName]) tiersData[typeName] = { count: 0 };
                     $(typeGroup).find('g[id*="row-" i], g[id*="Row-"]').each((_, rowGroup) => {
                         const rowIdAttr = $(rowGroup).attr('id') || '';

@@ -9,25 +9,21 @@ interface StageCanvasProps {
     zonesData: any[];
     seatsData: any[];
     zoneSummaries?: Record<string, any>;
+    ticketTypeDictionary: Record<string, any>;
 }
 
-// 🚀 BƯỚC 1: TẠO HÀM CACHE O(1) NGAY TRONG FILE ĐỂ KHỚP VỚI ZUSTAND
-export const buildSeatMapCache = (allSeats: any[]) => { // Thay any[] bằng ISeat[] nếu bạn dùng interface
+export const buildSeatMapCache = (allSeats: any[]) => {
     const rowMap = new Map<string, any[]>();
 
     allSeats.forEach(s => {
-        // Cần đảm bảo có đủ cả row, col_index và zone_id
         if (!s.row || s.col_index === undefined || !s.zone_id) return;
 
-        // 🔥 BƯỚC QUAN TRỌNG: Tạo Composite Key
-        // Ví dụ: "65f1a..._A" thay vì chỉ là "A"
         const rowKey = `${s.zone_id}_${s.row}`;
 
         if (!rowMap.has(rowKey)) rowMap.set(rowKey, []);
         rowMap.get(rowKey)!.push(s);
     });
 
-    // Sắp xếp 1 lần duy nhất theo cột cho từng hàng của từng khu riêng biệt
     for (const [_, seatsInRow] of rowMap.entries()) {
         seatsInRow.sort((a, b) => Number(a.col_index) - Number(b.col_index));
     }
@@ -35,29 +31,33 @@ export const buildSeatMapCache = (allSeats: any[]) => { // Thay any[] bằng ISe
     return rowMap;
 };
 
-// 🚀 BƯỚC 2: COMPONENT CHỐNG LAG (CỨU CHỈ SỐ INP)
 const SeatNode = React.memo(({
     seat, isSelected, isHovered, hoverStatus, isMatchingCombo, isZoomedIn,
     onClick, onMouseEnter, onMouseLeave
 }: any) => {
     const isAvailable = seat.status === 'available' || seat.status === 1;
 
-    let seatColor = "#94a3b8";
-    let strokeColor = "#64748b";
+    let seatColor = "#cbd5e1";
+    let strokeColor = "#94a3b8";
 
     if (isAvailable) {
-        seatColor = "#10b981";
-        strokeColor = "#064e3b";
-        if (isHovered && hoverStatus === 'success') seatColor = "#6ee7b7";
-        if (isHovered && hoverStatus === 'error') seatColor = "#fca5a5";
+        seatColor = "#ffffff";
+        strokeColor = "#3b82f6";
+        if (isHovered && hoverStatus === 'success') {
+            seatColor = "#bfdbfe";
+        }
+        if (isHovered && hoverStatus === 'error') {
+            seatColor = "#fecaca";
+            strokeColor = "#ef4444";
+        }
     }
+
     if (isSelected) {
         if (!isAvailable) {
-            seatColor = "#ef4444"; // Cảnh báo ĐỎ bầm cho biết đã mất ghế
+            seatColor = "#ef4444";
             strokeColor = "#7f1d1d";
         } else {
-            // Trường hợp: Bình thường
-            seatColor = "#ec4899"; // Hồng
+            seatColor = "#ec4899";
             strokeColor = "#be185d";
         }
     }
@@ -81,7 +81,6 @@ const SeatNode = React.memo(({
         />
     );
 }, (prev, next) => {
-    // Chỉ render lại đúng cái ghế nào bị thay đổi trạng thái
     return prev.isSelected === next.isSelected &&
         prev.isHovered === next.isHovered &&
         prev.hoverStatus === next.hoverStatus &&
@@ -94,6 +93,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     mapAssets,
     zonesData,
     seatsData,
+    ticketTypeDictionary,
     zoneSummaries = {}
 }) => {
     const { selectedSeats, toggleSeat, comboCount } = useCartStore();
@@ -106,26 +106,23 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [stageConfig, setStageConfig] = useState({ scale: 1, x: 0, y: 0 });
-    const ZOOM_THRESHOLD = 1.2;
+    const ZOOM_THRESHOLD = 2.5;
     const isZoomedIn = stageConfig.scale >= ZOOM_THRESHOLD;
+
     const normalizedSeatsData = useMemo(() => {
         return seatsData.map((s, index) => {
-            // Tạo một ID duy nhất tuyệt đối cho Frontend bằng cách ghép các chuỗi lại với nhau
-            // VD: Nếu không có _id, nó sẽ tạo ra tên kiểu: "seat-A-1", "seat-B-1" -> Cam kết không bao giờ trùng!
             const uniqueId = s._id || `seat-${s.zone_id || 'zone'}-${s.row}-${s.col_index}-${index}`;
 
             return {
                 ...s,
                 id: uniqueId,
-                _id: s._id // Vẫn giữ lại _id gốc để qua Bước 3 gửi lên API
+                _id: s._id
             };
         });
     }, [seatsData]);
 
-    // 🔥 TẠO ROW MAP CACHE ĐỂ TRUYỀN VÀO ZUSTAND
     const rowMapCache = useMemo(() => buildSeatMapCache(normalizedSeatsData), [normalizedSeatsData]);
 
-    // 🔥 LOGIC TÍNH TOÁN CÁC GHẾ HỢP LỆ CHO COMBO ĐỂ LÀM MỜ (Sử dụng rowMapCache cho tốc độ ánh sáng)
     const validSeatIdsForCombo = useMemo(() => {
         if (comboCount === 1) return null;
 
@@ -141,11 +138,9 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                     if (streak.length === 0) {
                         streak.push(s);
                     } else {
-                        // Tính liền kề bằng col_index
                         if (Number(s.col_index) === Number(streak[streak.length - 1].col_index) + 1) {
                             streak.push(s);
                         } else {
-                            // Bị đứt chuỗi do lối đi (nhảy cột)
                             if (streak.length >= comboCount) {
                                 streak.forEach(st => validIds.add(st.id));
                             }
@@ -153,7 +148,6 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                         }
                     }
                 } else {
-                    // Bị đứt chuỗi do ghế đã bán
                     if (streak.length >= comboCount) {
                         streak.forEach(st => validIds.add(st.id));
                     }
@@ -216,11 +210,11 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 y: containerHeight / 2 - mapBounds.centerY * optimalScale
             });
         }
-    }, [mapBounds]);
+    }, [mapBounds?.minX, mapBounds?.maxX, mapBounds?.minY, mapBounds?.maxY]);
 
     const getZoneColor = useCallback((zoneId: string) => {
         const summary = zoneSummaries[zoneId];
-        if (!summary) return { fill: "#d1fae5", stroke: "#34d399" };
+        if (!summary) return { fill: "#bfdbfe", stroke: "#3b82f6" };
 
         let totalAvailable = 0;
         Object.keys(summary).forEach(key => {
@@ -231,7 +225,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
 
         if (totalAvailable <= 0) return { fill: "#e2e8f0", stroke: "#94a3b8" };
         if (totalAvailable < 50) return { fill: "#fef08a", stroke: "#eab308" };
-        return { fill: "#d1fae5", stroke: "#34d399" };
+        return { fill: "#bfdbfe", stroke: "#3b82f6" };
     }, [zoneSummaries]);
 
     const handleMouseEnter = useCallback((e: any, seat: any, isAvailable: boolean) => {
@@ -244,7 +238,6 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         const stage = e.target.getStage();
         const pos = stage.getPointerPosition();
 
-        // 🔥 SỬA Ở ĐÂY: Dùng trực tiếp ID đã được chuẩn hóa, không cần gán đè nữa
         const seatIdentifier = seat.id;
 
         if (!isAvailable) {
@@ -253,13 +246,12 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             timerRef.current = setTimeout(() => {
                 setTooltip({
                     visible: true, x: pos.x, y: pos.y, status: 'error',
-                    content: { title: "Không thể chọn", message: "Ghế này đã có người đặt" }
+                    content: { title: "Không thể chọn", message: "Ghế này đã có người đặt hoặc không hợp lệ" }
                 });
             }, 250);
             return;
         }
 
-        // 🔥 TRUYỀN THẲNG seat VÀO, KHÔNG CẦN DÙNG normalizedSeat NỮA
         const cluster = findCluster(seat, comboCount, rowMapCache);
 
         if (cluster.length > 0) {
@@ -281,7 +273,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             setHoveredIds(cluster.map(s => s.id));
             setHoverStatus('success');
 
-            const totalPrice = cluster.reduce((sum, s) => sum + (s.price || 0), 0);
+            const totalPrice = cluster.reduce((sum, s) => sum + (ticketTypeDictionary[s.ticket_type_id]?.price || 0), 0);
             const labels = cluster.map(s => s.seat_number || s.id).join(", ");
 
             timerRef.current = setTimeout(() => {
@@ -305,7 +297,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 });
             }, 250);
         }
-    }, [comboCount, rowMapCache, selectedSeats]);
+    }, [comboCount, rowMapCache, selectedSeats, ticketTypeDictionary]);
 
     const handleMouseLeave = useCallback((e?: any) => {
         if (e) {
@@ -324,8 +316,6 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
 
     const handleSeatClick = useCallback((seat: any) => {
         if (seat.status !== 'available' && seat.status !== 1) return;
-
-        // 🔥 SỬA Ở ĐÂY: Xóa logic tính toán ID cũ đi, truyền thẳng ghế vào Zustand Store
         toggleSeat(seat, rowMapCache);
     }, [rowMapCache, toggleSeat]);
 
@@ -365,7 +355,6 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         setStageConfig({ scale: newScale, x: newPos.x, y: newPos.y });
     };
 
-    // 🚀 BƯỚC 3: DÙNG SEAT NODE THAY VÌ KHỞI TẠO LẠI <CIRCLE />
     const renderedSeats = useMemo(() => {
         return normalizedSeatsData.map((seat: any) => {
             const isSelected = selectedSeats.some(s => s.id === seat.id);
@@ -414,10 +403,10 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             >
                 <Layer>
                     {mapAssets.map((asset, idx) => (
-                        <Path key={`asset-${idx}`} data={asset.path_data} fill="#334155" stroke="#0f172a" strokeWidth={1 / stageConfig.scale} />
+                        <Path key={`asset-${idx}`} data={asset.path_data} fill="#334155" stroke="#0f172a" strokeWidth={1} />
                     ))}
-                    {!isZoomedIn && assetLabels.map((lbl: any, idx) => (
-                        <Text key={`albl-${idx}`} x={lbl.x} y={lbl.y} text={lbl.name} fontSize={16 / stageConfig.scale} fill="white" fontStyle="bold" align="center" offsetX={50} opacity={0.8} listening={false} />
+                    {assetLabels.map((lbl: any, idx) => (
+                        <Text key={`albl-${idx}`} x={lbl.x} y={lbl.y} text={lbl.name} fontSize={16} fill="white" fontStyle="bold" align="center" verticalAlign="middle" offsetX={37} opacity={0.8} listening={false} />
                     ))}
                 </Layer>
 
@@ -428,7 +417,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                             <Path
                                 key={`zone-${idx}`}
                                 data={zone.path_data || zone.layout_map}
-                                fill={isZoomedIn ? "transparent" : colors.fill}
+                                fill={colors.fill}
                                 stroke={isZoomedIn ? "#cbd5e1" : colors.stroke}
                                 strokeWidth={1 / stageConfig.scale}
                                 opacity={isZoomedIn ? 0.3 : 0.8}
@@ -454,14 +443,13 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                         );
                     })}
                     {!isZoomedIn && zoneLabels.map((lbl: any, idx) => (
-                        <Text key={`zlbl-${idx}`} x={lbl.x} y={lbl.y} text={lbl.name} fontSize={30} fill="#41444b" fontStyle="bold" align="center" offsetX={30} offsetY={10} listening={false} />
+                        <Text key={`zlbl-${idx}`} x={lbl.x} y={lbl.y} text={lbl.name} fontSize={30} fill="#41444b" fontStyle="bold" align="center" offsetX={20} offsetY={10} listening={false} />
                     ))}
                 </Layer>
 
                 {isZoomedIn && <Layer>{renderedSeats}</Layer>}
             </Stage>
 
-            {/* MINIMAP */}
             {mapBounds && (
                 <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg shadow-xl border border-slate-200 overflow-hidden pointer-events-none" style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}>
                     <Stage width={MINIMAP_SIZE} height={MINIMAP_SIZE}>
@@ -489,25 +477,23 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 </div>
             )}
 
-            {/* ZOOM CONTROLS */}
             <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1 bg-white/90 backdrop-blur shadow-xl rounded-lg border border-slate-200 overflow-hidden pointer-events-auto">
                 <button onClick={() => handleZoomButton(1)} className="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-primary transition-colors text-xl font-medium active:bg-slate-200" >+</button>
                 <div className="w-full h-[1px] bg-slate-200"></div>
                 <button onClick={() => handleZoomButton(-1)} className="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-primary transition-colors text-2xl font-medium active:bg-slate-200" >-</button>
             </div>
 
-            {/* GIAO DIỆN TOOLTIP NỔI HTML */}
             {tooltip.visible && (
                 <div
                     className={`absolute z-[100] p-3 rounded-lg shadow-xl pointer-events-none transform -translate-x-1/2 -translate-y-full mt-[-15px] transition-all duration-100 ease-out
-                        ${tooltip.status === 'success' ? 'bg-slate-900 border-l-4 border-emerald-500' : 'bg-red-900 border-l-4 border-red-500'}`}
+                        ${tooltip.status === 'success' ? 'bg-slate-900 border-l-4 border-blue-500' : 'bg-red-900 border-l-4 border-red-500'}`}
                     style={{ left: tooltip.x, top: tooltip.y }}
                 >
                     <div className="text-white min-w-[150px]">
                         <p className="text-[11px] font-bold uppercase opacity-70 mb-1">{tooltip.content.title}</p>
                         {tooltip.status === 'success' ? (
                             <>
-                                <p className="text-lg font-mono text-emerald-400 break-words max-w-[200px] leading-tight mb-2">
+                                <p className="text-lg font-mono text-blue-400 break-words max-w-[200px] leading-tight mb-2">
                                     {tooltip.content.seats}
                                 </p>
                                 <div className="border-t border-slate-700 pt-2 flex justify-between items-center">
