@@ -1,5 +1,6 @@
 import Zone from "../models/zone.model";
 import Seat from "../models/seat.model";
+import Show from "../models/show.model";
 import { Request, Response } from "express";
 import redisClient from "../utils/redisClient";
 import { addClient } from "../services/sse.service";
@@ -30,6 +31,13 @@ export const getShowLayoutMinified = async (req: Request, res: Response) => {
 export const getSeatsByShow = async (req: Request, res: Response) => {
     try {
         const { show_id } = req.params;
+        const show = await Show.findById(show_id);
+        if (!show) {
+            return res.status(404).json({ message: "Show not found" });
+        }
+        if (show.status !== "published") {
+            return res.status(400).json({ message: "Show is not active" });
+        }
         const layoutCacheKey = `show:${show_id}:seats_static_layout`;
         const statusHashKey = `show:${show_id}:seat_status`;
         let seatsLayout: any[] = [];

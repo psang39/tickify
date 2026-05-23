@@ -163,6 +163,54 @@ export const unpublishEvent = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Lỗi hệ thống khi tạm dừng Sự kiện", error });
     }
 };
+export const cancelEvent = async (req: Request, res: Response) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        const { event_id } = req.params;
+        const organizer_id = req.user!.id;
+
+        const event = await Event.findOne({ _id: event_id, organizer_id });
+        if (!event) return res.status(404).json({ message: "Sự kiện không tồn tại" });
+
+        if (event.status === 'cancelled') {
+            return res.status(400).json({ message: "Sự kiện này vốn đã bị hủy trước đó." });
+        }
+
+        // Chuyển trạng thái Event sang hủy
+        event.status = 'cancelled';
+        await event.save({ session });
+
+        // TÁC ĐỘNG DÂY CHUYỀN: Đóng băng và chuyển TẤT CẢ các show con sang 'cancelled' bất kể đang draft hay published
+        const allShows = await Show.find({ event_id }).select('_id');
+
+        if (allShows.length > 0) {
+            const showIds = allShows.map(s => s._id);
+            await Show.updateMany({ _id: { $in: showIds } }, { status: 'cancelled' }, { session });
+
+            const pipeline = redisClient.multi();
+            for (const showId of showIds) {
+                const zones = await Zone.find({ show_id: showId }).select('_id');
+                zones.forEach(zone => {
+                    pipeline.del(`event:${event_id}:show:${showId}:zone:${zone._id}:summary`);
+                });
+            }
+            await pipeline.exec();
+        }
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(200).json({
+            message: "Hủy sự kiện thành công. Toàn bộ các đêm diễn liên quan đã bị đóng, dữ liệu hóa đơn cũ được giữ lại để đối soát hoàn tiền."
+        });
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error("Lỗi khi hủy sự kiện:", error);
+        res.status(500).json({ message: "Lỗi hệ thống khi hủy Sự kiện", error });
+    }
+};
 export const deleteEvent = async (req: Request, res: Response) => {
     try {
         const event = await Event.findById(req.params.id);

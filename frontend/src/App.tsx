@@ -18,8 +18,16 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { WaitingRoomPage } from './pages/attendee/WaitingRoomPage';
 import OrganizerLayout from './components/layout/OrganizerLayout';
 import ShowDetail from './pages/organizer/ShowDetail';
+import ProfilePage from './pages/attendee/ProfilePage';
+import OrderHistory from './pages/attendee/OrderHistory';
+import OrderDetailPage from './pages/attendee/OrderDetailPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import AdminLayout from './components/layout/AdminLayout';
+import ManageUsersPage from './pages/admin/ManageUsersPage';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import './App.css'
+import { PublicRoute } from './components/auth/PublicRoute';
+import AttendeeLayout from './components/layout/AttendeeLayout';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -46,13 +54,29 @@ function App() {
 
           {/* Đường dẫn tới trang đặt vé */}
           <Route element={<MainLayout />}>
+
             <Route path="/login" element={<LoginPage />} />
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'Admin']} />}>
+              <Route element={<AdminLayout />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<ManageUsersPage />} />
+              </Route>
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={['attendee', 'organizer', 'admin', 'Attendee', 'Organizer', 'Admin']} />}>
+              <Route element={<AttendeeLayout />}>
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/orders" element={<OrderHistory />} />
+                <Route path="/orders/detail" element={<OrderDetailPage />} />
+                <Route path="/tickets/:ticketId" element={<TicketDetailPage />} />
+
+              </Route>
+            </Route>
 
             <Route
               element={<ProtectedRoute allowedRoles={['Organizer', 'Admin', 'organizer', 'admin']} />}
             >
               <Route element={<OrganizerLayout />}>
-                <Route path="/shows/:showId/booking" element={<TicketBookingPage />} />
+
                 <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
                 <Route path="/organizer/events" element={<EventManagement />} />
                 <Route path="/organizer/events/create" element={<CreateEvent />} />
@@ -62,8 +86,9 @@ function App() {
               </Route>
             </Route>
           </Route>
-          <Route path="/tickets/:ticketId" element={<TicketDetailPage />} />
+          <Route element={<ProtectedRoute allowedRoles={['attendee', 'organizer', 'admin', 'Attendee', 'Organizer', 'Admin']} />} />
           <Route path="/queue/:showId" element={<WaitingRoomPage />} />
+          <Route path="/shows/:showId/booking" element={<TicketBookingPage />} />
           <Route path="/mock-gateway" element={<MockGatewayPage />} />
           {/* Đường dẫn 404 nếu nhập sai URL */}
           <Route path="*" element={<div className="p-10 text-center">404 - Không tìm thấy trang</div>} />

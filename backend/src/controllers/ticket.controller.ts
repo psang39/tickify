@@ -1,4 +1,7 @@
 import Ticket from '../models/ticket.model';
+import User from '../models/user.model';
+import Show from '../models/show.model';
+import Zone from '../models/zone.model';
 import TicketType from '../models/ticket-type.model';
 import Seat from '../models/seat.model';
 import Order from '../models/order.model';
@@ -15,7 +18,28 @@ if (!SERVER_PRIVATE_KEY) {
 export const getMyTickets = async (req: Request, res: Response) => {
     try {
         const user_id = req.user?.id;
-        const tickets = await Ticket.find({ user_id }).populate('ticket_type_id').populate('seat_id');
+        const order_id = req.params.order_id;
+        const order = await Order.findById(order_id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        if (order.user_id.toString() !== user_id) {
+            return res.status(403).json({ message: 'Unauthorized to view tickets of this order' });
+        }
+        const user = await User.findById(user_id).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        if (user.id !== user_id) {
+            return res.status(403).json({ message: 'Unauthorized to view tickets' });
+        }
+
+        const tickets = await Ticket.find({ user_id, order_id })
+            .populate('ticket_type_id')
+            .populate('seat_id')
+            .populate('show_id')
+            .populate('zone_id')
+            .populate('event_id').lean();
         res.status(200).json(tickets);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching tickets', error });
@@ -23,25 +47,48 @@ export const getMyTickets = async (req: Request, res: Response) => {
 };
 export const getTicketDetail = async (req: Request, res: Response): Promise<void> => {
     const user_id = req.user?.id;
+    const user = await User.findById(user_id).select('-password');
+    if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+    }
+
     const ticket_id = req.params.ticket_id;
     try {
-        const ticket = await Ticket.findById(ticket_id);
+        // Gộp 2 lệnh populate show_id làm một để tránh mất dữ liệu
+        const ticket = await Ticket.findById(ticket_id)
+            .populate('ticket_type_id', 'name description price')
+            .populate('seat_id', 'seat_number row col_index')
+            .populate('zone_id', 'name')
+            .populate('event_id', 'name poster_url banner_url')
+            .populate({
+                path: 'show_id',
+                // Gom tất cả các trường cần lấy của Show vào đây
+                select: 'name start_date end_date start_time venue_id',
+                populate: {
+                    path: 'venue_id',
+                    model: 'Venue',
+                    select: 'name'
+                }
+            })
+            .lean();
+
         if (!ticket || ticket.user_id.toString() !== user_id) {
             res.status(404).json({ message: 'Không tìm thấy vé.' });
             return;
         }
+
+        // Tạo signature bảo mật mã hóa QR offline
         const payloadToSign = `${ticket._id}|${ticket.ticket_secret}`;
         const signer = crypto.createSign('RSA-SHA256');
         signer.update(payloadToSign);
         const signature = signer.sign(SERVER_PRIVATE_KEY, 'base64');
+
+        // TRẢ VỀ CẤU TRÚC LỒNG NHAU (Rất sạch)
         res.status(200).json({
             data: {
-                ticket_id: ticket._id,
-                show_id: ticket.show_id,
-                zone_id: ticket.zone_id,
-                seat_id: ticket.seat_id,
-                ticket_secret: ticket.ticket_secret,
-                signature: signature
+                ...ticket, // Trải toàn bộ dữ liệu sạch của Ticket ra
+                signature: signature // Đính kèm thêm signature của server
             }
         });
     } catch (error) {

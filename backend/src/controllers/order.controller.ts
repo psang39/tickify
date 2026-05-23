@@ -12,6 +12,7 @@ import { validateOrphanSeats } from '../utils/seatValidation';
 import { calculateValidQuantities } from '../utils/validQuantities';
 import { formatHashToJSON } from '../utils/hashToJson';
 import { ITicketType } from '../types/ticket-type.types';
+import Attendee from '../models/attendee.model';
 
 
 const HOLD_DURATION_SECONDS = 600;
@@ -513,55 +514,52 @@ export const releaseSeats = async (req: Request, res: Response): Promise<void> =
     }
 };
 
-export const getMyOrders = async (req: Request, res: Response): Promise<void> => {
-    const user_id = req.user?.id;
+export const getOrders = async (req: Request, res: Response) => {
     try {
-        const orders = await Order.find({ user_id: user_id }).populate('seat_ids').populate('event_id').populate('ticket_type_id');
-        res.status(200).json({ message: 'Lấy đơn hàng thành công', data: orders });
+        const user_id = req.user!.id;
+        const attendee = await User.findById(user_id).select('-password');
+        if (!attendee) {
+            return res.status(404).json({ message: 'Attendee not found' });
+        }
+        if (attendee.id !== user_id) {
+            return res.status(403).json({ message: 'Unauthorized to view orders' });
+        }
+        const orders = await Order.find({ user_id: user_id }).populate('event_id', 'name').populate({
+            path: 'show_id', // Bước 1: Populate show trước
+            select: 'name venue_id start_time', // Chọn các trường cần ở show
+            populate: {
+                path: 'venue_id', // Bước 2: Populate tiếp venue từ show
+                model: 'Venue',    // Tên của collection Venue trong DB của bạn
+                select: 'name'     // Lấy tên của địa điểm
+            }
+        });
+        const ticketNumbers = orders.flatMap(order => order.items.map(item => item.seat_id));
+        res.status(200).json({ orders, ticketNumbers });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi máy chủ khi lấy đơn hàng', error });
+        res.status(500).json({ message: 'Error fetching attendee orders', error });
     }
 };
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export const getOrderDetail = async (req: Request, res: Response): Promise<void> => {
-    const user_id = req.user?.id;
-    const { order_id } = req.params;
+export const getOrderById = async (req: Request, res: Response) => {
     try {
-        const order = await Order.findById(order_id).populate('seat_ids').populate('event_id').populate('ticket_type_id');
-        if (!order || order.user_id.toString() !== user_id) {
-            res.status(404).json({ message: 'Không tìm thấy đơn hàng hoặc bạn không có quyền xem đơn hàng này.' });
-            return;
+        const user_id = req.user!.id;
+        const order_id = req.params.order_id;
+        const attendee = await User.findById(user_id).select('-password');
+        if (!attendee) {
+            return res.status(404).json({ message: 'Attendee not found' });
         }
-        res.status(200).json({ message: 'Lấy chi tiết đơn hàng thành công', data: order });
+        const order = await Order.findById(order_id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        if (order.user_id.toString() !== user_id) {
+            return res.status(403).json({ message: 'Unauthorized to view this order' });
+        }
+        const tickets = await Ticket.find({ order_id: order._id });
+        res.status(200).json({ order, tickets });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi máy chủ khi lấy chi tiết đơn hàng', error });
+        res.status(500).json({ message: 'Error fetching order details', error });
     }
 };

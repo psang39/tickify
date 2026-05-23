@@ -25,6 +25,15 @@ export const createShow = async (req: Request, res: Response) => {
         if (!event_id || !name || !start_time || !end_time || !venue_id || !organizer_id || !sale_start || !sale_end) {
             return res.status(400).json({ message: "Missing required fields" });
         }
+        if (start_time > end_time) {
+            return res.status(400).json({ message: "End time must be later than start time" }
+            );
+        }
+        if (sale_start > sale_end) {
+            return res.status(400).json({ message: "Sale end time must be later than sale start time" });
+        }
+
+
         let tier_pricing: Record<string, number> = {};
         if (req.body.tier_pricing) {
             try {
@@ -39,6 +48,13 @@ export const createShow = async (req: Request, res: Response) => {
         if (!event) {
             return res.status(403).json({ message: "Bạn không có quyền tạo show cho sự kiện này" });
         }
+        if (start_time < event.start_date) {
+            return res.status(400).json({ message: "Show start time must be within event duration" });
+        }
+        if (end_time > event.end_date) {
+            return res.status(400).json({ message: "Show end time must be within event duration" });
+        }
+
         const mapAssets: any[] = [];
         if (stadium_map_svg) {
             const $ = cheerio.load(stadium_map_svg, { xmlMode: true });
@@ -295,6 +311,9 @@ export const getShowById = async (req: Request, res: Response) => {
             .lean();
         if (!show) {
             return res.status(404).json({ message: "Show not found" });
+        }
+        if (show.status !== 'published') {
+            return res.status(403).json({ message: "Show is not published" });
         }
 
         const zones = await Zone.find({ show_id })

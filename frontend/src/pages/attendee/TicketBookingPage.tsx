@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useBlocker } from "react-router-dom";
 import { api } from "@/lib/axiosClient";
 import { BookingStepper } from "../../components/booking/BookingStepper";
 import { StageCanvas } from "@/features/seatmap/components/StageCanvas";
@@ -14,6 +14,7 @@ import { ErrorModal } from "@/components/shared/ErrorModal";
 import { EventInfoHeader } from "@/features/seatmap/components/EventInfoHeader";
 export default function TicketBookingPage() {
     const navigate = useNavigate();
+    const isPayingRef = useRef(false);
     const { showId } = useParams();
     const [orderData, setOrderData] = useState<any>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -34,9 +35,38 @@ export default function TicketBookingPage() {
     });
     const [paymentMethod, setPaymentMethod] = useState("MOCK");
 
-    // ==========================================
-    // KIỂM TRA QUYỀN TRUY CẬP (ROUTE GUARD)
-    // ==========================================
+    useEffect(() => {
+        const shouldBlock = orderData?.order_id && (currentStep === 3 || currentStep === 4) && !isPayingRef.current;
+        if (!shouldBlock) return;
+
+        window.history.pushState(null, '', window.location.href);
+
+        const handleBrowserBack = (e: PopStateEvent) => {
+            const confirmBack = window.confirm(
+                "Việc quay lại sẽ hủy bỏ các ghế bạn đang giữ chỗ. Bạn có chắc chắn muốn chọn lại ghế không?"
+            );
+
+            if (confirmBack) {
+                if (orderData?.order_id) {
+                    api.post(`/orders/release`, { order_id: orderData.order_id }, {
+                        headers: { 'x-checkout-token': localStorage.getItem(`checkoutToken_${showId}`) }
+                    }).catch(err => console.error("Lỗi nhả ghế khi back:", err));
+                }
+                clearCart();
+                navigate(-1);
+            } else {
+                window.history.pushState(null, '', window.location.href);
+            }
+        };
+
+        window.addEventListener('popstate', handleBrowserBack);
+
+        return () => {
+            window.removeEventListener('popstate', handleBrowserBack);
+        };
+    }, [orderData, currentStep, showId, clearCart, navigate]);
+
+
     useEffect(() => {
         if (!showId) return;
 
@@ -53,32 +83,34 @@ export default function TicketBookingPage() {
     }, [currentStep, orderData]);
 
     useEffect(() => {
-        // Sự kiện: Người dùng bấm F5 hoặc tắt Tab trình duyệt
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             const { step, orderId } = trackingRef.current;
-            if (orderId && (step === 3 || step === 4) && !createPaymentMutation.isPending) {
+
+            // NẾU ĐANG ĐI THANH TOÁN -> TUYỆT ĐỐI KHÔNG HIỆN POPUP CẢNH BÁO CỦA TRÌNH DUYỆT
+            if (isPayingRef.current) return;
+
+            if (orderId && (step === 3 || step === 4)) {
                 e.preventDefault();
-                e.returnValue = ''; // Bắt buộc phải có để Chrome/Edge hiện popup cảnh báo
+                e.returnValue = '';
             }
         };
 
         window.addEventListener("beforeunload", handleBeforeUnload);
 
-        // Sự kiện Cleanup: Hàm này sẽ chạy khi Component bị hủy (Người dùng bấm nút Back trình duyệt)
         return () => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
 
             const { step, orderId } = trackingRef.current;
 
-            // Nếu đang giữ ghế mà thoát trang -> Gọi API giải phóng ghế ngay lập tức
+            // NẾU ĐANG DI CHUYỂN SANG VNPAY -> BỎ QUA KHÔNG ĐƯỢC CHẠY LỆNH HỦY GHẾ
+            if (isPayingRef.current) {
+                console.log("Hệ thống chuyển hướng thanh toán an toàn. Giữ nguyên trạng thái ghế.");
+                return;
+            }
+
+            // Chỉ thực thi giải phóng ghế khi đóng tab vĩnh viễn hoặc crash ứng dụng
             if (orderId && (step === 3 || step === 4)) {
                 const checkoutToken = localStorage.getItem(`checkoutToken_${showId}`);
-
-                // LƯU Ý QUAN TRỌNG: Không dùng axios ở đây. 
-                // Khi rời trang, các kết nối mạng bình thường sẽ bị trình duyệt cắt đứt.
-                // Phải dùng fetch API thuần với cờ 'keepalive: true' để request vẫn bay đi dù tab đã đóng.
-
-                // Đổi URL này thành URL gốc trỏ tới Backend của bạn
                 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
                 fetch(`${baseUrl}/orders/release`, {
@@ -93,14 +125,14 @@ export default function TicketBookingPage() {
                 }).catch(err => console.error("Lỗi tự động nhả ghế:", err));
             }
         };
-    }, [showId]); // Rỗng, chỉ chạy 1 lần lúc mount và unmount
+    }, [showId]);
     // ==========================================
     // FETCH DỮ LIỆU BẰNG TANSTACK QUERY
     // ==========================================
     const { data: userData } = useQuery({
         queryKey: ['current-user'],
         queryFn: async () => {
-            const res = await api.get(`/users/me`);
+            const res = await api.get(`/user/profile`);
             return res.data?.data || res.data;
         },
     });
@@ -319,6 +351,7 @@ export default function TicketBookingPage() {
 
     const createPaymentMutation = useMutation({
         mutationFn: async (payload: any) => {
+            isPayingRef.current = true;
             const checkoutToken = localStorage.getItem(`checkoutToken_${showId}`);
             const res = await api.post(`/payments/create-url`, payload, {
                 headers: { 'x-checkout-token': checkoutToken }
@@ -331,6 +364,7 @@ export default function TicketBookingPage() {
             }
         },
         onError: (error: any) => {
+            isPayingRef.current = false;
             const errorMsg = error.response?.data?.message || "Lỗi khởi tạo thanh toán.";
             setErrorMessage(errorMsg);
         }
