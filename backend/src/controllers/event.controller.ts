@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import Show from "../models/show.model";
 import Order from "../models/order.model";
 import Zone from "../models/zone.model";
+import Venue from "../models/venue.model";
 import redisClient from "../utils/redisClient";
 export const createEvent = async (req: Request, res: Response) => {
     try {
@@ -177,11 +178,11 @@ export const cancelEvent = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Sự kiện này vốn đã bị hủy trước đó." });
         }
 
-        // Chuyển trạng thái Event sang hủy
+
         event.status = 'cancelled';
         await event.save({ session });
 
-        // TÁC ĐỘNG DÂY CHUYỀN: Đóng băng và chuyển TẤT CẢ các show con sang 'cancelled' bất kể đang draft hay published
+
         const allShows = await Show.find({ event_id }).select('_id');
 
         if (allShows.length > 0) {
@@ -282,5 +283,80 @@ export const getOrganizerEventById = async (req: Request, res: Response) => {
         res.status(200).json(event);
     } catch (error) {
         res.status(500).json({ message: "Error fetching event detail", error });
+    }
+};
+export const searchEventsPublic = async (req: Request, res: Response) => {
+    try {
+
+        const keyword = (req.query.q || req.query.keyword || req.query.search || req.query.name) as string;
+        const city = (req.query.city || req.query.location) as string;
+        const genre = req.query.genre as string;
+        const sort = req.query.sort as string || 'newest';
+        const limit = parseInt(req.query.limit as string) || 20;
+        const findQuery: any = { status: 'published' };
+        if (keyword && keyword.trim() !== '' && keyword !== 'undefined' && keyword !== 'null') {
+            const cleanKeyword = keyword.trim();
+            findQuery.$or = [
+                { name: { $regex: cleanKeyword, $options: 'i' } },
+                { description: { $regex: cleanKeyword, $options: 'i' } },
+                { artists: { $regex: cleanKeyword, $options: 'i' } }
+            ];
+        }
+
+        if (genre && genre.trim() !== '' && genre !== 'undefined' && genre !== 'all') {
+            findQuery.genre = genre.trim();
+        }
+
+        if (city && city.trim() !== '' && city !== 'undefined' && city !== 'all') {
+            const matchingVenues = await Venue.find({
+                city: { $regex: `^${city.trim()}$`, $options: 'i' }
+            }).select('_id');
+            const venueIds = matchingVenues.map(v => v._id);
+            const matchingShows = await Show.find({ venue_id: { $in: venueIds } }).select('event_id');
+            const allowedEventIds = matchingShows.map((s: any) => s.event_id || s.event);
+            findQuery._id = { $in: allowedEventIds };
+        }
+
+        let sortOption: any = { createdAt: -1 };
+        if (sort === 'upcoming') {
+            sortOption = { start_date: 1 };
+        }
+
+
+        const events = await Event.find(findQuery).sort(sortOption).limit(limit).lean();
+        const eventIds = events.map(e => e._id);
+        const relatedShows = await Show.find({ event_id: { $in: eventIds } })
+            .populate('venue_id')
+            .lean();
+        const formattedEvents = events.map((event: any) => {
+
+            const matchShow = relatedShows.find((s: any) =>
+                String(s.event_id || s.event) === String(event._id)
+            );
+            const venueInfo = matchShow?.venue_id as any;
+            return {
+                _id: event._id,
+                name: event.name,
+                description: event.description,
+                genre: event.genre,
+                artists: event.artists,
+                poster_url: event.poster_url,
+                start_date: event.start_date,
+                venue_info: venueInfo ? {
+                    name: venueInfo.name,
+                    city: venueInfo.city
+                } : null
+            };
+        });
+
+
+        return res.status(200).json({
+            success: true,
+            data: formattedEvents
+        });
+
+    } catch (error) {
+        console.error('[Search Events Backend Error]', error);
+        return res.status(500).json({ message: "Lỗi hệ thống khi truy vấn tìm kiếm sự kiện." });
     }
 };
