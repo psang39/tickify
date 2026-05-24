@@ -1,14 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 interface CheckoutCountdownProps {
     showId: string;
     cancellationDeadline?: string;
+    serverNow?: string;
 }
 
-export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({ showId, cancellationDeadline }) => {
+export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({
+    showId,
+    cancellationDeadline,
+    serverNow
+}) => {
     const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
     const [isPaymentPhase, setIsPaymentPhase] = useState<boolean>(false);
+    const serverOffsetMs = useMemo(() => {
+        if (!serverNow) return 0;
+
+        const serverTimeMs = new Date(serverNow).getTime();
+
+        if (Number.isNaN(serverTimeMs)) return 0;
+
+        return serverTimeMs - Date.now();
+    }, [serverNow]);
 
     useEffect(() => {
         let expireTimeMs = 0;
@@ -17,23 +31,28 @@ export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({ showId, ca
 
         try {
             if (isHolding) {
-                // 1A. Nếu đã Hold ghế -> Lấy mốc thời gian từ Order
                 expireTimeMs = new Date(cancellationDeadline).getTime();
             } else {
-                // 1B. Nếu đang chọn ghế -> Lấy mốc thời gian từ Token
                 const token = localStorage.getItem(`checkoutToken_${showId}`);
                 if (!token) return;
 
                 const decoded: any = jwtDecode(token);
                 if (!decoded.exp) return;
+
                 expireTimeMs = decoded.exp * 1000;
             }
 
-            // 2. Tính thời gian còn lại
-            const calculateTimeLeft = () => Math.max(0, expireTimeMs - Date.now());
+            if (Number.isNaN(expireTimeMs)) return;
+
+            // Dùng giờ server đã được offset
+            const getCurrentServerTimeMs = () => Date.now() + serverOffsetMs;
+
+            const calculateTimeLeft = () => {
+                return Math.max(0, expireTimeMs - getCurrentServerTimeMs());
+            };
+
             setTimeLeftMs(calculateTimeLeft());
 
-            // 3. Chạy Interval mỗi giây
             const interval = setInterval(() => {
                 const remaining = calculateTimeLeft();
                 setTimeLeftMs(remaining);
@@ -41,10 +60,8 @@ export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({ showId, ca
                 if (remaining <= 0) {
                     clearInterval(interval);
 
-                    // 4. Xử lý khi hết giờ tùy theo giai đoạn
                     if (isHolding) {
                         alert("⏳ Hết thời gian thanh toán! Ghế của bạn đã được nhả ra.");
-                        // Reload trang để tải lại sơ đồ ghế mới nhất và reset state
                         window.location.reload();
                     } else {
                         alert("⏳ Hết thời gian chọn ghế! Vui lòng xếp hàng lại.");
@@ -58,26 +75,28 @@ export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({ showId, ca
         } catch (error) {
             console.error("Lỗi parse thời gian Countdown:", error);
         }
-    }, [showId, cancellationDeadline]);
+    }, [showId, cancellationDeadline, serverOffsetMs]);
 
-    // Format ra mm:ss
     const formatTime = (ms: number) => {
         const totalSeconds = Math.floor(ms / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        return `${minutes.toString().padStart(2, '0')}:${seconds
+            .toString()
+            .padStart(2, '0')}`;
     };
 
     return (
-        <div className={`font-bold px-8 py-2 rounded-lg border  transition-colors
+        <div
+            className={`font-bold px-8 py-2 rounded-lg border transition-colors
             ${isPaymentPhase
-                ? "bg-gray-50 text-black-300 border-gray-200 font-medium"
-                : "bg-gray-50 text-black-300 border-gray-200 font-medium"
-            }`}
+                    ? "bg-gray-50 text-black-300 border-gray-200 font-medium"
+                    : "bg-gray-50 text-black-300 border-gray-200 font-medium"
+                }`}
         >
             {isPaymentPhase ? "Thời gian thanh toán: " : "Thời gian giữ chỗ: "}
             <span className="text-red-600 text-lg">{formatTime(timeLeftMs)}</span>
-
         </div>
     );
 };

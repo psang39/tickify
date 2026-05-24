@@ -1,4 +1,3 @@
-import { Request, Response } from 'express';
 import Ticket from '../models/ticket.model';
 import Order from '../models/order.model';
 import Seat from '../models/seat.model';
@@ -6,7 +5,7 @@ import Show from '../models/show.model';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import { decryptPrivateKey } from '../utils/cryptoUtils';
-import { generateTicketSecret, verifyTicketToken } from '../config/totp.util';
+import { generateTicketSecret } from '../config/totp.util';
 export const generateTicketsForOrder = async (order_id: string): Promise<void> => {
     try {
         const order = await Order.findById(order_id);

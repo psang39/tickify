@@ -1,8 +1,8 @@
 import express from 'express';
-import { createZone, getZonesByEvent, getZoneById, updateZone, checkZoneAvailability } from '../controllers/zone.controller';
+import { getZoneById, updateZone, checkZoneAvailability } from '../controllers/zone.controller';
 import { body } from 'express-validator';
-import { Validate } from '../middleware/validate';
-import { verifyRoles, Verify, verifyCheckoutToken } from '../middleware/verify';
+import { Validate } from '../middleware/validation.middleware';
+import { verifyRoles, Verify, verifyCheckoutToken } from '../middleware/auth.middleware';
 import { getSeatsByZone } from '../controllers/seat.controller';
 const zoneRouter = express.Router({ mergeParams: true });
 

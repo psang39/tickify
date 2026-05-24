@@ -2,7 +2,6 @@ import User from "../models/user.model";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { SECRET_ACCESS_TOKEN, JWT_SECRET } from "../config/index";
-import redisClient from "../utils/redisClient";
 
 // Helper để xác thực JWT dạng Promise cho sạch code
 const verifyJwt = (token: string, secret: string) => {
@@ -61,15 +60,8 @@ const verifyRoles = (allowedRoles: string[]) => {
 const verifyCheckoutToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = req.headers["x-checkout-token"] as string;
-        const event_id = req.body.event_id || req.params.eventId || req.query.event_id;
-        const show_id = req.body.show_id || req.params.showId || req.query.show_id;
 
-        const user_id = req.user!.id;
-        const storedToken = await redisClient.get(
-            `event:${event_id}:show:${show_id}:user:${user_id}:checkoutToken`
-        );
-
-        if (!token || !storedToken || storedToken !== "active") {
+        if (!token) {
             return res.status(403).json({ error: "Access denied. Bạn chưa tham gia phòng chờ." });
         }
 

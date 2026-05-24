@@ -1,6 +1,5 @@
-import { getMyTickets, getTicketDetail, syncCheckIn } from '../controllers/ticket.controller';
-import { Validate } from '../middleware/validate';
-import { Verify, verifyRoles } from '../middleware/verify';
+import { getTicketDetail, syncCheckIn } from '../controllers/ticket.controller';
+import { Verify, verifyRoles } from '../middleware/auth.middleware';
 import express from 'express';
 const ticketRouter = express.Router();
 

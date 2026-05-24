@@ -13,21 +13,6 @@ export default function MockGatewayPage() {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    // 🔐 Hàm tạo Chữ ký điện tử y hệt chuẩn của VNPAY/MoMo
-    const generateSignature = async (rawData: string, secret: string) => {
-        const enc = new TextEncoder();
-        const key = await crypto.subtle.importKey(
-            'raw',
-            enc.encode(secret),
-            { name: 'HMAC', hash: 'SHA-256' },
-            false,
-            ['sign']
-        );
-        const signature = await crypto.subtle.sign('HMAC', key, enc.encode(rawData));
-        return Array.from(new Uint8Array(signature))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
-    };
 
     const handlePayment = async (status: 'SUCCESS' | 'FAILED') => {
         setIsLoading(true);
@@ -62,7 +47,6 @@ export default function MockGatewayPage() {
     return (
         <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
             <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
-                {/* Header giống giao diện ngân hàng */}
                 <div className="bg-blue-600 p-6 text-center text-white">
                     <h1 className="text-2xl font-bold tracking-wider">MOCK GATEWAY</h1>
                     <p className="text-blue-100 mt-1 text-sm">Môi trường giả lập thanh toán</p>

@@ -4,10 +4,8 @@ import Event from "../models/event.model";
 import Show from "../models/show.model";
 import { Request, Response } from "express";
 import redisClient from "../utils/redisClient";
-import { calculateValidQuantities } from "../utils/validQuantities";
 import cheerio from "cheerio";
 import 'multer';
-import { validateOrphanSeats } from "../utils/seatValidation";
 
 export const createZone = async (req: Request, res: Response) => {
     try {

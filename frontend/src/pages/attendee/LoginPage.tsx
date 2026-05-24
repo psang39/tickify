@@ -30,7 +30,7 @@ export default function LoginPage() {
             alert("Đăng nhập thành công!");
 
             // Điều hướng chuẩn xác dựa theo Role bảo mật
-            if (userData.role === 'organizer') {
+            if (userData.role === 'organizer' || userData.role === 'Organizer') {
                 navigate('/organizer/dashboard');
             } else {
                 navigate('/');

@@ -31,7 +31,41 @@ export const buildSeatMapCache = (allSeats: any[]) => {
 
     return rowMap;
 };
+const getPathBounds = (pathData?: string) => {
+    if (!pathData) return null;
 
+    try {
+        const path = new Konva.Path({
+            data: pathData,
+        });
+
+        const rect = path.getClientRect({
+            skipTransform: true,
+        });
+
+        if (
+            !Number.isFinite(rect.x) ||
+            !Number.isFinite(rect.y) ||
+            !Number.isFinite(rect.width) ||
+            !Number.isFinite(rect.height)
+        ) {
+            return null;
+        }
+
+        return {
+            minX: rect.x,
+            minY: rect.y,
+            maxX: rect.x + rect.width,
+            maxY: rect.y + rect.height,
+            width: rect.width,
+            height: rect.height,
+            centerX: rect.x + rect.width / 2,
+            centerY: rect.y + rect.height / 2,
+        };
+    } catch {
+        return null;
+    }
+};
 const SeatNode = React.memo(({
     seat, isSelected, isHovered, hoverStatus, isMatchingCombo, isZoomedIn,
     onClick, onMouseEnter, onMouseLeave
@@ -172,35 +206,103 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     }, [rowMapCache, comboCount]);
 
     const { mapBounds, zoneLabels, assetLabels } = useMemo(() => {
-        if (seatsData.length === 0) return { mapBounds: null, zoneLabels: [], assetLabels: [] };
+        const boundsList: any[] = [];
 
-        const xs = seatsData.map(s => s.x);
-        const ys = seatsData.map(s => s.y);
-        const minX = Math.min(...xs);
-        const maxX = Math.max(...xs);
-        const minY = Math.min(...ys) - 200;
-        const maxY = Math.max(...ys);
+        // 1. Bounds từ seats
+        if (seatsData.length > 0) {
+            const xs = seatsData
+                .map(s => Number(s.x))
+                .filter(Number.isFinite);
+
+            const ys = seatsData
+                .map(s => Number(s.y))
+                .filter(Number.isFinite);
+
+            if (xs.length > 0 && ys.length > 0) {
+                boundsList.push({
+                    minX: Math.min(...xs),
+                    maxX: Math.max(...xs),
+                    minY: Math.min(...ys),
+                    maxY: Math.max(...ys),
+                });
+            }
+        }
+
+        // 2. Bounds từ zones
+        zonesData.forEach(zone => {
+            const bounds = getPathBounds(zone.path_data || zone.layout_map);
+            if (bounds) boundsList.push(bounds);
+        });
+
+        // 3. Bounds từ assets
+        mapAssets.forEach(asset => {
+            const bounds = getPathBounds(asset.path_data);
+            if (bounds) boundsList.push(bounds);
+        });
+
+        if (boundsList.length === 0) {
+            return { mapBounds: null, zoneLabels: [], assetLabels: [] };
+        }
+
+        const minX = Math.min(...boundsList.map(b => b.minX));
+        const maxX = Math.max(...boundsList.map(b => b.maxX));
+        const minY = Math.min(...boundsList.map(b => b.minY));
+        const maxY = Math.max(...boundsList.map(b => b.maxY));
 
         const zLabels = zonesData.map(zone => {
+            const bounds = getPathBounds(zone.path_data || zone.layout_map);
+
+            if (bounds) {
+                return {
+                    id: zone._id,
+                    name: zone.name,
+                    x: bounds.centerX,
+                    y: bounds.centerY,
+                };
+            }
+
+            // Fallback nếu zone không có path hợp lệ
             const seatsInZone = seatsData.filter(s => s.zone_id === zone._id);
+
             if (seatsInZone.length === 0) return null;
-            const avgX = seatsInZone.reduce((sum, s) => sum + s.x, 0) / seatsInZone.length;
-            const avgY = seatsInZone.reduce((sum, s) => sum + s.y, 0) / seatsInZone.length;
-            return { id: zone._id, name: zone.name, x: avgX, y: avgY };
+
+            const avgX = seatsInZone.reduce((sum, s) => sum + Number(s.x), 0) / seatsInZone.length;
+            const avgY = seatsInZone.reduce((sum, s) => sum + Number(s.y), 0) / seatsInZone.length;
+
+            return {
+                id: zone._id,
+                name: zone.name,
+                x: avgX,
+                y: avgY,
+            };
         }).filter(Boolean);
 
         const aLabels = mapAssets.map(asset => {
-            const match = asset.path_data.match(/M\s*([-\d.]+)[,\s]+([-\d.]+)/);
-            if (match) {
-                return { id: asset.asset_id, name: asset.asset_id.replace('asset_', '').replace(/_/g, ' ').toUpperCase(), x: parseFloat(match[1]) + 50, y: parseFloat(match[2]) + 50 };
-            }
-            return null;
+            const bounds = getPathBounds(asset.path_data);
+
+            if (!bounds) return null;
+
+            return {
+                id: asset.asset_id,
+                name: asset.asset_id.replace('asset_', '').replace(/_/g, ' ').toUpperCase(),
+                x: bounds.centerX,
+                y: bounds.centerY,
+            };
         }).filter(Boolean);
 
         return {
-            mapBounds: { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY, centerX: minX + (maxX - minX) / 2, centerY: minY + (maxY - minY) / 2 },
+            mapBounds: {
+                minX,
+                maxX,
+                minY,
+                maxY,
+                width: maxX - minX,
+                height: maxY - minY,
+                centerX: minX + (maxX - minX) / 2,
+                centerY: minY + (maxY - minY) / 2,
+            },
             zoneLabels: zLabels,
-            assetLabels: aLabels
+            assetLabels: aLabels,
         };
     }, [seatsData, zonesData, mapAssets]);
 
@@ -268,25 +370,39 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     };
 
     const handleZoneMouseMove = (e: any) => {
-        // Cập nhật tọa độ liên tục để tooltip đi theo chuột
+        if (isZoomedIn) {
+            setZoneTooltip(prev => ({ ...prev, visible: false }));
+            return;
+        }
+
         const stage = e.target.getStage();
         const pointerPosition = stage.getPointerPosition();
+
+        if (!pointerPosition) return;
+
         setZoneTooltip(prev => ({
             ...prev,
             x: pointerPosition.x,
-            y: pointerPosition.y
+            y: pointerPosition.y,
         }));
     };
+
 
     const handleZoneMouseLeave = () => {
         // Tắt tooltip khi chuột rời khỏi zone
         setZoneTooltip(prev => ({ ...prev, visible: false }));
     };
     const handleMouseEnter = useCallback((e: any, seat: any, isAvailable: boolean) => {
+        if (!isZoomedIn) {
+            setTooltip((prev: any) => ({ ...prev, visible: false }));
+            return;
+        }
+
         if (isAvailable) {
             const stage = e.target.getStage();
             if (stage) stage.container().style.cursor = 'pointer';
         }
+
 
         if (timerRef.current) clearTimeout(timerRef.current);
         const stage = e.target.getStage();
@@ -382,8 +498,29 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         const optimalScale = Math.min(scaleX, scaleY, 4);
         setStageConfig({ scale: optimalScale, x: window.innerWidth / 2 - (box.x + box.width / 2) * optimalScale, y: 600 / 2 - (box.y + box.height / 2) * optimalScale });
     };
+    const clearAllTooltips = useCallback(() => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+
+        setHoveredIds([]);
+        setHoverStatus(null);
+        setTooltip((prev: any) => ({ ...prev, visible: false }));
+        setZoneTooltip(prev => ({ ...prev, visible: false }));
+
+        const stage = stageRef.current;
+        if (stage) {
+            stage.container().style.cursor = 'grab';
+        }
+    }, []);
+    useEffect(() => {
+        clearAllTooltips();
+    }, [isZoomedIn, clearAllTooltips]);
+
 
     const handleZoomButton = (direction: 1 | -1) => {
+        clearAllTooltips();
         const scaleBy = 1.3;
         const oldScale = stageConfig.scale;
         let newScale = Math.max(0.2, Math.min(direction === 1 ? oldScale * scaleBy : oldScale / scaleBy, 15));
@@ -395,6 +532,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
 
     const handleWheel = (e: any) => {
         e.evt.preventDefault();
+
         const stage = stageRef.current;
         if (!stage) return;
         const oldScale = stage.scaleX();
@@ -433,10 +571,22 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     }, [normalizedSeatsData, selectedSeats, hoveredIds, hoverStatus, isZoomedIn, validSeatIdsForCombo, handleSeatClick, handleMouseEnter, handleMouseLeave]);
 
     const MINIMAP_SIZE = 140;
-    const minimapScale = mapBounds ? Math.min(MINIMAP_SIZE / mapBounds.width, MINIMAP_SIZE / mapBounds.height) * 0.85 : 1;
-    const minimapX = mapBounds ? (MINIMAP_SIZE - mapBounds.width * minimapScale) / 2 - mapBounds.minX * minimapScale : 0;
-    const minimapY = mapBounds ? (MINIMAP_SIZE - mapBounds.height * minimapScale) / 2 - mapBounds.minY * minimapScale : 0;
+    const MINIMAP_PADDING = 12;
 
+    const minimapScale = mapBounds
+        ? Math.min(
+            (MINIMAP_SIZE - MINIMAP_PADDING * 2) / mapBounds.width,
+            (MINIMAP_SIZE - MINIMAP_PADDING * 2) / mapBounds.height
+        )
+        : 1;
+
+    const minimapX = mapBounds
+        ? MINIMAP_PADDING + ((MINIMAP_SIZE - MINIMAP_PADDING * 2) - mapBounds.width * minimapScale) / 2 - mapBounds.minX * minimapScale
+        : 0;
+
+    const minimapY = mapBounds
+        ? MINIMAP_PADDING + ((MINIMAP_SIZE - MINIMAP_PADDING * 2) - mapBounds.height * minimapScale) / 2 - mapBounds.minY * minimapScale
+        : 0;
     return (
         <div className="w-full h-full relative cursor-grab active:cursor-grabbing bg-[#f8fafc] overflow-hidden">
             <Stage
@@ -460,7 +610,21 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                         <Path key={`asset-${idx}`} data={asset.path_data} fill="#334155" stroke="#0f172a" strokeWidth={1} />
                     ))}
                     {assetLabels.map((lbl: any, idx) => (
-                        <Text key={`albl-${idx}`} x={lbl.x} y={lbl.y} text={lbl.name} fontSize={16} fill="white" fontStyle="bold" align="center" verticalAlign="middle" offsetX={37} opacity={0.8} listening={false} />
+                        <Text
+                            key={`albl-${idx}`}
+                            x={lbl.x - 100}
+                            y={lbl.y - 10}
+                            width={200}
+                            height={20}
+                            text={lbl.name}
+                            fontSize={16}
+                            fill="white"
+                            fontStyle="bold"
+                            align="center"
+                            verticalAlign="middle"
+                            opacity={0.8}
+                            listening={false}
+                        />
                     ))}
                 </Layer>
 
@@ -502,7 +666,20 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                         );
                     })}
                     {!isZoomedIn && zoneLabels.map((lbl: any, idx) => (
-                        <Text key={`zlbl-${idx}`} x={lbl.x} y={lbl.y} text={lbl.name} fontSize={30} fill="#41444b" fontStyle="bold" align="center" offsetX={20} offsetY={10} listening={false} />
+                        <Text
+                            key={`zlbl-${idx}`}
+                            x={lbl.x - 150}
+                            y={lbl.y - 18}
+                            width={300}
+                            height={36}
+                            text={lbl.name}
+                            fontSize={25}
+                            fill="#41444b"
+                            fontStyle="bold"
+                            align="center"
+                            verticalAlign="middle"
+                            listening={false}
+                        />
                     ))}
                 </Layer>
 

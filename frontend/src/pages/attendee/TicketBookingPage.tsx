@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams, useBlocker } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { api } from "@/lib/axiosClient";
 import { BookingStepper } from "../../components/booking/BookingStepper";
 import { StageCanvas } from "@/features/seatmap/components/StageCanvas";
 import { Button } from "../../components/ui/button";
 import { CheckoutCountdown } from "@/features/seatmap/components/CheckoutCountdown";
 import { useCartStore } from "@/store/useCartStore";
-import { Trash2, Filter, User, Phone, MapPin, Mail, Edit2, CreditCard, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Trash2, Filter, User, Phone, MapPin, Mail, Edit2, CreditCard } from 'lucide-react';
 import { Slider } from "@/components/ui/slider";
 import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
 import { ErrorModal } from "@/components/shared/ErrorModal";
 import { EventInfoHeader } from "@/features/seatmap/components/EventInfoHeader";
+import { PaymentSummarySidebar } from "@/features/booking/components/PaymentSummarySidebar";
+import { PaymentSuccessPanel } from "@/features/booking/components/PaymentSuccessPanel";
+import { SeatMapLoadingState } from "@/features/booking/components/SeatMapLoadingState";
 export default function TicketBookingPage() {
     const navigate = useNavigate();
     const isPayingRef = useRef(false);
@@ -375,9 +378,6 @@ export default function TicketBookingPage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [currentStep]);
 
-    // Biến kiểm tra trạng thái đang tải/xử lý
-    const isProcessing = holdSeatsMutation.isPending || createPaymentMutation.isPending || releaseSeatsMutation.isPending;
-
     const handleNext = () => {
         if (currentStep === 2) {
             if (selectedSeats.length === 0) {
@@ -451,12 +451,7 @@ export default function TicketBookingPage() {
                 return <div className="h-[400px] flex items-center justify-center text-gray-500">Bước 1</div>;
             case 2:
                 if (isLoadingShow || isLoadingSeats) {
-                    return (
-                        <div className="w-full h-[600px] flex flex-col items-center justify-center bg-gray-50 rounded-xl border border-gray-200">
-                            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            <p className="mt-4 text-gray-500 font-medium">Đang tải sơ đồ rạp...</p>
-                        </div>
-                    );
+                    return <SeatMapLoadingState />;
                 }
 
                 return (
@@ -713,92 +708,22 @@ export default function TicketBookingPage() {
                         </div>
                     </div>
 
-                    {/* 🟡 CỘT PHẢI: SIDEBAR (Sticky - Luôn đứng yên khi scroll) */}
-                    <div className="w-full lg:w-[380px] shrink-0 rounded-[2rem] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.06)] self-start lg:sticky lg:top-6 bg-white border border-slate-200">
-
-                        {/* Nội dung chi tiết đơn hàng */}
-                        <div className="p-8 pb-6">
-                            <h3 className="text-l font-bold text-slate-800 mb-8">Chi tiết thanh toán</h3>
-                            <div className="space-y-4 text-sm">
-                                <div className="flex justify-between items-center text-slate-500">
-                                    <span>Mã đơn hàng</span>
-                                    <span className="font-mono text-slate-800">{orderData?.order_id || "..."}</span>
-                                </div>
-                                <div className="flex justify-between items-start text-slate-500 pt-2">
-                                    <div className="flex flex-col gap-1">
-                                        <span>Giá vé: {showInfo?.name || "Sự kiện"}</span>
-                                        <span className="text-xs text-slate-400">× {selectedSeats.length} vé</span>
-                                    </div>
-                                    <span className="font-medium text-slate-800">{tempTotalPrice.toLocaleString('vi-VN')} đ</span>
-                                </div>
-                                <div className="flex justify-between items-center text-slate-500">
-                                    <span>Phí xử lý</span>
-                                    <span className="font-medium text-slate-800">0 đ</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Chân trang Sidebar (Nền đen) */}
-                        <div className="bg-[#222222] p-8 mt-2">
-                            <div className="flex justify-between items-end mb-6 text-white">
-                                <span className="text-lg font-medium opacity-90">Tổng cộng</span>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[11px] opacity-60 font-mono mb-1">VND</span>
-                                    <span className="text-3xl font-bold text-primary font-mono tracking-tight">
-                                        {tempTotalPrice.toLocaleString('vi-VN')}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <Button
-                                onClick={handleNext}
-                                disabled={createPaymentMutation.isPending}
-                                className="w-full bg-primary hover:bg-pink-600 text-white py-7 rounded-full font-bold text-lg transition-all"
-                            >
-                                {createPaymentMutation.isPending ? "Đang xử lý..." : "Thanh toán ngay"}
-                            </Button>
-
-                            <p className="text-center text-xs text-slate-400 mt-4 opacity-60">
-                                Bằng việc thanh toán, bạn đồng ý với các điều khoản dịch vụ.
-                            </p>
-                        </div>
-                    </div>
+                    <PaymentSummarySidebar
+                        orderId={orderData?.order_id}
+                        showName={showInfo?.name}
+                        selectedSeatCount={selectedSeats.length}
+                        totalPrice={tempTotalPrice}
+                        isPaying={createPaymentMutation.isPending}
+                        onPay={handleNext}
+                    />
                 </div>)
             case 5:
                 return (
-                    <div className="w-full min-h-[500px] bg-[#f8fafc] rounded-xl relative overflow-hidden flex flex-col items-center justify-center p-8 border border-slate-100">
-                        <div className="absolute top-[15%] left-[20%] w-2 h-2 bg-emerald-400 rotate-45 opacity-60"></div>
-                        <div className="absolute top-[25%] right-[25%] w-2.5 h-2.5 bg-emerald-300 opacity-50"></div>
-                        <div className="absolute bottom-[20%] left-[28%] w-1.5 h-1.5 bg-emerald-500 opacity-60 rounded-full"></div>
-                        <div className="absolute bottom-[30%] right-[22%] w-2 h-2 bg-emerald-400 rotate-12 opacity-50"></div>
-                        <div className="absolute top-[40%] left-[10%] w-2 h-2 bg-emerald-300 opacity-40"></div>
-                        <div className="absolute top-[35%] right-[10%] w-1.5 h-1.5 bg-emerald-500 rotate-45 opacity-60"></div>
-                        <div className="absolute bottom-[10%] right-[40%] w-2 h-2 bg-emerald-400 opacity-50"></div>
-                        <div className="absolute top-[10%] right-[45%] w-1.5 h-1.5 bg-emerald-300 opacity-60"></div>
-
-                        <div className="z-10 text-center flex flex-col items-center max-w-2xl mx-auto">
-                            <h2 className="text-4xl md:text-5xl font-bold text-[#10b981] mb-4 flex items-center justify-center gap-3">
-                                Cảm ơn bạn! <span className="text-4xl">☺</span>
-                            </h2>
-                            <p className="text-l md:text-2xl font-medium text-[#10b981] mb-2">
-                                Giao dịch thanh toán thành công
-                            </p>
-                            <p className="text-lg text-[#10b981] mb-1">
-                                Vé điện tử đã được gửi đến hòm thư của bạn
-                            </p>
-                            <p className="text-lg font-bold text-[#059669] mb-10">
-                                {purchaserInfo.email || orderData?.billing_email || "email@example.com"}
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                                <Button variant="outline" onClick={() => navigate('/')} className="px-8 py-6 rounded-full border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 w-full sm:w-auto text-base h-14">
-                                    Về trang chủ
-                                </Button>
-                                <Button onClick={() => navigate('/my-tickets')} className="bg-primary hover:bg-pink-600 text-white px-8 py-6 rounded-full font-bold shadow-lg shadow-pink-500/20 w-full sm:w-auto text-base h-14">
-                                    Xem vé của tôi
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
+                    <PaymentSuccessPanel
+                        email={purchaserInfo.email || orderData?.billing_email}
+                        onBackHome={() => navigate('/')}
+                        onViewTickets={() => navigate('/tickets')}
+                    />
                 );
             default:
                 return null;

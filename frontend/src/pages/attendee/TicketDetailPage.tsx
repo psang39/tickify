@@ -30,7 +30,7 @@ export default function TicketDetailPage() {
     const [timeLeft, setTimeLeft] = useState<number>(30);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    // 1. FETCH CHI TIẾT MỘT VÉ DUY NHẤT TỪ BACKEND
+
     const { data: ticketDetail, isLoading, isError } = useQuery<TicketDetail>({
         queryKey: ['ticket-detail', ticketId],
         queryFn: async () => {
@@ -41,14 +41,14 @@ export default function TicketDetailPage() {
         refetchOnWindowFocus: false
     });
 
-    // Quản lý thông báo lỗi hệ thống
+
     useEffect(() => {
         if (isError) {
             setErrorMessage("Không thể kết nối dữ liệu vé điện tử. Vui lòng thử lại.");
         }
     }, [isError]);
 
-    // 2. ENGINE TỰ ĐỘNG XOAY VÒNG MÃ QR ĐỘNG OFFLINE (TOTP)
+
     useEffect(() => {
         if (!ticketDetail?.ticket_secret) return;
 
@@ -63,7 +63,7 @@ export default function TicketDetailPage() {
             const currentToken = totp.generate();
             setTotpCode(currentToken);
 
-            // Cấu trúc chuỗi giải mã cổng soát vé: [ID_Ve]|[Secret]|[TOTP]|[Chu_Ky_RSA]
+
             const payload = `${ticketDetail._id}|${ticketDetail.ticket_secret}|${currentToken}|${ticketDetail.signature}`;
             setQrPayload(payload);
 
@@ -78,7 +78,7 @@ export default function TicketDetailPage() {
         return () => clearInterval(interval);
     }, [ticketDetail]);
 
-    // Định dạng hiển thị tiền tệ và thời gian sự kiện
+
     const formatCurrency = (amount?: number) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
     };
@@ -93,23 +93,22 @@ export default function TicketDetailPage() {
     if (isLoading) return <LoadingOverlay isVisible={true} />;
     if (isError || !ticketDetail) return <ErrorModal message={errorMessage || "Lỗi tải vé"} onClose={() => navigate('/orders')} />;
 
-    // Trích xuất thông tin ảnh nền từ sự kiện (Ưu tiên ảnh Banner ngang)
+
     const ticketImage = ticketDetail.event_id?.banner_url || ticketDetail.event_id?.poster_url || "";
     const progressWidth = `${(timeLeft / 30) * 100}%`;
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-900 py-12 px-6 flex flex-col items-center justify-center">
+        <div className="min-h-screen font-sans text-slate-900  flex flex-col items-center justify-center">
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             {/* THANH ĐIỀU HƯỚNG QUAY LẠI ĐƠN HÀNG */}
             <div className="w-full max-w-4xl flex justify-start mb-6">
                 <Button
                     variant="ghost"
-                    // Quay trở lại chính xác trang chi tiết của Đơn hàng chứa chiếc vé này
                     onClick={() => navigate(`/orders/detail?order_id=${ticketDetail.order_id}`)}
-                    className="text-slate-600 hover:text-primary hover:bg-slate-100 font-bold gap-2 pl-2 shadow-none"
+                    className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-primary transition-colors group"
                 >
-                    <ArrowLeft size={16} /> Quay lại chi tiết đơn hàng
+                    <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" /> Quay lại chi tiết đơn hàng
                 </Button>
             </div>
 

@@ -30,6 +30,9 @@ export const handleMockPaymentWebhook = async (req: Request, res: Response): Pro
                 res.status(200).json({ message: "OK" });
                 return;
             }
+            const revenueKey = `event:${order.event_id}:show:${order.show_id}:total_revenue`;
+            const soldCountKey = `event:${order.event_id}:show:${order.show_id}:sold_count`;
+            const ticket_count = order.items.length;
             order.status = 'confirmed';
             const payment = new Payment({
                 order_id: order._id,
@@ -54,6 +57,19 @@ export const handleMockPaymentWebhook = async (req: Request, res: Response): Pro
                 await redisClient.del(`event:${order.event_id}:show:${order.show_id}:seat:${seat_id}:lock`);
             }
             await redisClient.DECRBY(`event:${order.event_id}:show:${order.show_id}:user:${order.user_id}:held_count`, order.items.length);
+            const checkoutToken = await redisClient.get(
+                `event:${order.event_id}:show:${order.show_id}:user:${order.user_id}:checkoutToken`
+            );
+            if (checkoutToken) {
+                await redisClient.del(
+                    `event:${order.event_id}:show:${order.show_id}:checkoutToken:${checkoutToken}`
+                );
+            }
+            await redisClient.del(
+                `event:${order.event_id}:show:${order.show_id}:user:${order.user_id}:checkoutToken`
+            );
+            await redisClient.incrby(revenueKey, payment.amount);
+            await redisClient.incrby(soldCountKey, ticket_count);
             console.log(`[WEBHOOK] Bắt đầu đẻ vé cho Order: ${order_id}`);
             await generateTicketsForOrder(order._id.toString());
             console.log(`[WEBHOOK] Xử lý hoàn tất Order: ${order_id}`);

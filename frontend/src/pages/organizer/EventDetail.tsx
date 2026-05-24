@@ -26,7 +26,6 @@ export default function EventDetail() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const location = useLocation();
-    // STATE LƯU THÔNG BÁO LỖI CHO ERROR MODAL
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     // ĐIỀU HƯỚNG TABS
@@ -41,7 +40,6 @@ export default function EventDetail() {
     });
     const [currentStatus, setCurrentStatus] = useState<'draft' | 'published' | 'cancelled'>('draft');
 
-    // STATE KÉO THẢ ẢNH BÌA (DRAG & DROP)
     const [isRepositioning, setIsRepositioning] = useState(false);
     const [dragState, setDragState] = useState({ isDragging: false, startY: 0 });
 
@@ -54,7 +52,6 @@ export default function EventDetail() {
         enabled: !!eventId
     });
 
-    // Điền dữ liệu vào form khi load xong Event
     useEffect(() => {
         if (eventData) {
             setEventFormData({
@@ -72,7 +69,6 @@ export default function EventDetail() {
         }
     }, [eventData]);
 
-    // LOGIC KÉO THẢ BANNER
     const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         if (!isRepositioning) return;
         const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
@@ -98,7 +94,6 @@ export default function EventDetail() {
         setDragState({ isDragging: false, startY: 0 });
     };
 
-    // Hàm upload ảnh từ máy tính (Xử lý Base64 đồng bộ)
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'banner' | 'poster') => {
         const file = e.target.files?.[0];
         if (file) {
@@ -119,64 +114,28 @@ export default function EventDetail() {
         }
     };
 
-    // MUTATION: CẬP NHẬT THÔNG TIN FORM THÔ
     const { mutateAsync: updateEventMutation, isPending: isUpdatingEvent } = useMutation({
-        mutationFn: async (updatedData: any) => {
-            const response = await api.put(`/organizer/events/${eventId}`, updatedData);
-            return response.data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] });
-            alert("Cập nhật thông tin sự kiện thành công.");
-        },
-        onError: (error: any) => {
-            setErrorMessage(error.response?.data?.message || "Lỗi cập nhật sự kiện.");
-        }
+        mutationFn: async (updatedData: any) => { return (await api.put(`/organizer/events/${eventId}`, updatedData)).data; },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); alert("Cập nhật thông tin sự kiện thành công."); },
+        onError: (error: any) => setErrorMessage(error.response?.data?.message || "Lỗi cập nhật sự kiện.")
     });
 
-    // MUTATION: CÔNG KHAI SỰ KIỆN (PUBLISH)
     const { mutateAsync: publishEventMutation, isPending: isPublishingEvent } = useMutation({
-        mutationFn: async () => {
-            const response = await api.post(`/organizer/events/${eventId}/publish`);
-            return response.data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] });
-            alert("Công khai Sự kiện thành công. Các đêm diễn con bên trong đã sẵn sàng mở bán.");
-        },
-        onError: (error: any) => {
-            setErrorMessage(error.response?.data?.message || "Không thể công khai Sự kiện này.");
-        }
+        mutationFn: async () => { return (await api.post(`/organizer/events/${eventId}/publish`)).data; },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); alert("Công khai Sự kiện thành công."); },
+        onError: (error: any) => setErrorMessage(error.response?.data?.message || "Không thể công khai Sự kiện này.")
     });
 
-    // MUTATION: TẠM DỪNG SỰ KIỆN (UNPUBLISH)
     const { mutateAsync: unpublishEventMutation, isPending: isUnpublishingEvent } = useMutation({
-        mutationFn: async () => {
-            const response = await api.post(`/organizer/events/${eventId}/unpublish`);
-            return response.data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] });
-            alert("Đã tạm dừng sự kiện, toàn bộ dữ liệu đêm diễn con chưa phát sinh giao dịch đã được hạ về bản nháp.");
-        },
-        onError: (error: any) => {
-            setErrorMessage(error.response?.data?.message || "Không thể tạm dừng Sự kiện.");
-        }
+        mutationFn: async () => { return (await api.post(`/organizer/events/${eventId}/unpublish`)).data; },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); alert("Đã tạm dừng sự kiện thành công."); },
+        onError: (error: any) => setErrorMessage(error.response?.data?.message || "Không thể tạm dừng Sự kiện.")
     });
 
-    // MUTATION: HỦY SỰ KIỆN KHẨN CẤP (CANCEL)
     const { mutateAsync: cancelEventMutation, isPending: isCancellingEvent } = useMutation({
-        mutationFn: async () => {
-            const response = await api.post(`/organizer/events/${eventId}/cancel`);
-            return response.data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] });
-            alert("Đã hủy thành công toàn bộ sự kiện và các đêm diễn trực thuộc.");
-        },
-        onError: (error: any) => {
-            setErrorMessage(error.response?.data?.message || "Không thể thực hiện hủy Sự kiện.");
-        }
+        mutationFn: async () => { return (await api.post(`/organizer/events/${eventId}/cancel`)).data; },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); alert("Đã hủy thành công toàn bộ sự kiện."); },
+        onError: (error: any) => setErrorMessage(error.response?.data?.message || "Không thể thực hiện hủy Sự kiện.")
     });
 
     const handleUpdateEvent = async () => {
@@ -200,6 +159,16 @@ export default function EventDetail() {
     const [venueSearch, setVenueSearch] = useState('');
     const [isVenueDropdownOpen, setIsVenueDropdownOpen] = useState(false);
 
+    // STATE BỔ SUNG CHO PHÂN HỆ INLINE VENUE CREATION TRONG BIỂU MẪU TẠO SHOW MỚI
+    const [isCreatingNewVenue, setIsCreatingNewVenue] = useState(false);
+    const [newVenueForm, setNewVenueForm] = useState({
+        name: '',
+        address: '',
+        city: '', // Đã có trường thành phố bắt buộc
+        latitude: '',
+        longitude: ''
+    });
+
     const { data: shows = [], isLoading: isLoadingShows } = useQuery({
         queryKey: ['event-shows', eventId],
         queryFn: async () => {
@@ -209,19 +178,43 @@ export default function EventDetail() {
         enabled: !!eventId
     });
 
-    const { data: venues = [] } = useQuery({
-        queryKey: ['venues'],
+    // ✨ NÂNG CẤP: useQuery cào dữ liệu địa điểm đồng bộ theo cơ chế Search-driven thực tế
+    const { data: venuesData = [] } = useQuery({
+        queryKey: ['venues', venueSearch],
         queryFn: async () => {
-            const response = await api.get(`/venues`);
+            if (isCreatingNewVenue) return [];
+            const response = await api.get(`/venues`, {
+                params: {
+                    search: venueSearch,
+                    limit: 20
+                }
+            });
             return response.data?.data || response.data || [];
+        }
+    });
+    const venues = Array.isArray(venuesData) ? venuesData : [];
+
+    // ✨ MUTATION MỚI: Đề xuất nhanh Địa điểm chứa thành phố từ biểu mẫu tạo Show
+    const { mutateAsync: suggestVenueMutation, isPending: isSuggestingVenue } = useMutation({
+        mutationFn: async (newVenuePayload: any) => {
+            const response = await api.post('/organizer/venues', newVenuePayload);
+            return response.data?.data || response.data;
+        },
+        onSuccess: (newVenue) => {
+            queryClient.invalidateQueries({ queryKey: ['venues'] });
+            setShowData(prev => ({ ...prev, venue_id: newVenue._id }));
+            setVenueSearch(newVenue.name);
+            setIsCreatingNewVenue(false);
+            setNewVenueForm({ name: '', address: '', city: '', latitude: '', longitude: '' });
+            alert(`Đã gửi đề xuất địa điểm "${newVenue.name}". Hệ thống tự động gán vị trí này vào Show.`);
+        },
+        onError: (error: any) => {
+            setErrorMessage(error.response?.data?.message || "Không thể khởi tạo đề xuất địa điểm.");
         }
     });
 
     const { mutateAsync: createShow } = useMutation({
-        mutationFn: async (newShowData: any) => {
-            const response = await api.post(`/events/${eventId}/shows`, newShowData);
-            return response.data;
-        }
+        mutationFn: async (newShowData: any) => { return (await api.post(`/events/${eventId}/shows`, newShowData)).data; }
     });
 
     const [isSubmittingShow, setIsSubmittingShow] = useState(false);
@@ -264,6 +257,10 @@ export default function EventDetail() {
 
     const handleCreateAllShow = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isCreatingNewVenue) {
+            alert("Vui lòng hoàn thành lưu thông tin Địa điểm mới đề xuất trước khi tạo Show.");
+            return;
+        }
         setIsSubmittingShow(true);
         try {
             const finalPayload = {
@@ -284,20 +281,18 @@ export default function EventDetail() {
         }
     };
 
-    const filteredVenues = venues.filter((v: any) => v.name.toLowerCase().includes(venueSearch.toLowerCase()));
+    // Vì dữ liệu đã được cào trực tiếp từ Backend theo chữ đã gõ nên gán thẳng để map dữ liệu
+    const filteredVenues = venues;
+    const isInfoTab = activeTab === 'INFO';
+    const isAnyActionPending = isUpdatingEvent || isPublishingEvent || isUnpublishingEvent || isCancellingEvent || isSuggestingVenue;
 
     if (isLoadingEvent) return <div className="p-10 text-center font-medium text-gray-500 animate-pulse">Đang tải thông tin sự kiện...</div>;
     if (!eventData) return <div className="p-10 text-center font-bold text-red-500">Không tìm thấy sự kiện!</div>;
 
-    const isInfoTab = activeTab === 'INFO';
-    const isAnyActionPending = isUpdatingEvent || isPublishingEvent || isUnpublishingEvent || isCancellingEvent;
-
     return (
         <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
-            {/* THÀNH PHẦN MODAL LỖI TẬP TRUNG CHUNG */}
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
-            {/* NÚT QUAY LẠI TÌM VỀ DANH SÁCH SỰ KIỆN */}
             <button
                 onClick={() => navigate('/organizer/events')}
                 className="absolute top-6 left-6 z-20 bg-black/40 hover:bg-black/70 text-white p-2.5 rounded-full backdrop-blur-md transition-all border border-transparent"
@@ -305,9 +300,7 @@ export default function EventDetail() {
                 <ArrowLeft size={24} />
             </button>
 
-            {/* ========================================== */}
-            {/* 1. KHU VỰC BANNER TRÀN VIỀN VÀ KÉO THẢ VỊ TRÍ */}
-            {/* ========================================== */}
+            {/* BANNER KHU VỰC TRÊN CÙNG */}
             <div
                 className={`relative w-full h-[300px] md:h-[450px] bg-gray-900 overflow-hidden select-none transition-all ${isRepositioning ? (dragState.isDragging ? 'cursor-grabbing' : 'cursor-grab') : (isInfoTab && currentStatus === 'draft' ? 'group' : '')}`}
                 onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}
@@ -329,9 +322,8 @@ export default function EventDetail() {
                     <div className="absolute inset-0 bg-black/30 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none transition-opacity duration-300" style={{ opacity: isRepositioning ? 0 : 1 }}></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" style={{ opacity: isRepositioning ? 0 : 1 }}></div>
 
-                {/* THANH ĐIỀU KHIỂN ĐỔI ẢNH / CĂN CHỈNH BANNER */}
                 {isInfoTab && currentStatus === 'draft' && (
                     <div className="absolute top-6 right-6 z-20 flex gap-2">
                         {isRepositioning ? (
@@ -355,7 +347,6 @@ export default function EventDetail() {
                     </div>
                 )}
 
-                {/* TEXT TRÊN BANNER (Mờ đi khi đang Drag định vị) */}
                 <div className={`absolute bottom-8 left-0 w-full px-6 lg:px-12 flex justify-center transition-all duration-300 ${isRepositioning ? 'opacity-20 pointer-events-none blur-sm' : 'opacity-100'}`}>
                     <div className="w-full max-w-6xl flex flex-col justify-end gap-2">
                         <div className="flex flex-wrap items-center justify-between gap-4 w-full">
@@ -368,7 +359,6 @@ export default function EventDetail() {
                                 />
                             </div>
 
-                            {/* BADGE TRẠNG THÁI KHỚP LỆNH MẶT BẰNG */}
                             <div className="flex items-center gap-2 px-3 py-1.5 border border-white/20 rounded-md bg-black/40 text-white backdrop-blur-md text-xs font-bold uppercase tracking-wider select-none">
                                 <span>Mặt bằng:</span>
                                 {currentStatus === 'draft' && <span className="text-slate-300 flex items-center gap-1"><EyeOff size={12} /> Bản nháp</span>}
@@ -403,97 +393,46 @@ export default function EventDetail() {
             {/* TAB NAVIGATION */}
             <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 mt-8">
                 <div className="flex gap-4 border-b border-gray-200">
-                    <button
-                        onClick={() => setActiveTab('INFO')}
-                        className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'INFO' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
-                    >
-                        <Settings size={18} /> Chỉnh sửa Thông tin
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('SHOWS')}
-                        className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'SHOWS' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
-                    >
-                        <ListVideo size={18} /> Quản lý Shows
-                    </button>
+                    <button onClick={() => setActiveTab('INFO')} className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'INFO' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}><Settings size={18} /> Chỉnh sửa Thông tin</button>
+                    <button onClick={() => setActiveTab('SHOWS')} className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'SHOWS' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}><ListVideo size={18} /> Quản lý Shows</button>
                 </div>
             </div>
 
             <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 mt-8">
-
-                {/* TAB 1: THÔNG TIN (Hỗ trợ khóa form an toàn giống CreateEvent) */}
                 {activeTab === 'INFO' && (
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-10 animate-in fade-in">
                         <div className="xl:col-span-2 space-y-10">
-
                             {currentStatus === 'published' && (
-                                <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl flex items-start gap-2.5 text-sm font-medium">
-                                    <Info size={18} className="shrink-0 mt-0.5" />
-                                    <span>Sự kiện này hiện đang mở hiển thị công khai trên sàn. Để điều chỉnh thông tin mô tả chi tiết hoặc mốc ngày bế mạc, vui lòng lựa chọn hành động "Tạm dừng sự kiện" bên dưới.</span>
-                                </div>
+                                <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl flex items-start gap-2.5 text-sm font-medium"><Info size={18} className="shrink-0 mt-0.5" /><span>Sự kiện này hiện đang mở hiển thị công khai trên sàn. Để điều chỉnh thông tin mô tả chi tiết hoặc mốc ngày bế mạc, vui lòng lựa chọn hành động "Tạm dừng sự kiện" bên dưới.</span></div>
                             )}
-
-                            {/* Description */}
                             <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 relative group/desc">
                                 {currentStatus === 'draft' && <div className="absolute top-6 right-6 text-gray-300 opacity-0 group-hover/desc:opacity-100"><Edit3 size={18} /></div>}
                                 <h2 className="text-xl font-bold text-secondary mb-3">Giới thiệu sự kiện</h2>
-                                <textarea
-                                    disabled={currentStatus !== 'draft'}
-                                    className="w-full bg-transparent outline-none border-2 border-transparent hover:border-gray-100 focus:border-primary/30 focus:bg-gray-50 rounded-xl p-3 -ml-3 text-gray-600 leading-relaxed text-base resize-none min-h-[150px] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-                                    value={eventFormData.description} placeholder="Viết vài lời giới thiệu hấp dẫn về sự kiện của bạn..."
-                                    onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })}
-                                />
+                                <textarea disabled={currentStatus !== 'draft'} className="w-full bg-transparent outline-none border-2 border-transparent hover:border-gray-100 focus:border-primary/30 focus:bg-gray-50 rounded-xl p-3 -ml-3 text-gray-600 leading-relaxed text-base resize-none min-h-[150px] transition-all disabled:opacity-70" value={eventFormData.description} placeholder="Viết vài lời giới thiệu hấp dẫn về sự kiện của bạn..." onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })} />
                             </div>
-
-                            {/* DATES */}
                             <div>
-                                <h2 className="text-xl font-bold text-secondary mb-3 flex items-center gap-2">
-                                    <Calendar className="text-primary" size={20} /> Thiết lập thời gian chung
-                                </h2>
+                                <h2 className="text-xl font-bold text-secondary mb-3 flex items-center gap-2"><Calendar className="text-primary" size={20} /> Thiết lập thời gian chung</h2>
                                 <div className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center bg-gradient-to-r from-slate-50 to-white">
-                                    <div className="flex-1 w-full space-y-1.5">
-                                        <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Ngày khai mạc</label>
-                                        <input type="datetime-local" disabled={currentStatus !== 'draft'} className="w-full bg-white border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm text-secondary disabled:opacity-60 disabled:cursor-not-allowed" value={eventFormData.start_date} onChange={(e) => setEventFormData({ ...eventFormData, start_date: e.target.value })} />
-                                    </div>
+                                    <div className="flex-1 w-full space-y-1.5"><label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Ngày khai mạc</label><input type="datetime-local" disabled={currentStatus !== 'draft'} className="w-full bg-white border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm disabled:opacity-60" value={eventFormData.start_date} onChange={(e) => setEventFormData({ ...eventFormData, start_date: e.target.value })} /></div>
                                     <div className="hidden md:block text-gray-300"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg></div>
-                                    <div className="flex-1 w-full space-y-1.5">
-                                        <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Ngày bế mạc</label>
-                                        <input type="datetime-local" disabled={currentStatus !== 'draft'} className="w-full bg-white border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm text-secondary disabled:opacity-60 disabled:cursor-not-allowed" value={eventFormData.end_date} onChange={(e) => setEventFormData({ ...eventFormData, end_date: e.target.value })} />
-                                    </div>
+                                    <div className="flex-1 w-full space-y-1.5"><label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Ngày bế mạc</label><input type="datetime-local" disabled={currentStatus !== 'draft'} className="w-full bg-white border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm disabled:opacity-60" value={eventFormData.end_date} onChange={(e) => setEventFormData({ ...eventFormData, end_date: e.target.value })} /></div>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Poster */}
                         <div className="space-y-6">
                             <div className="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col h-full">
                                 <h3 className="font-bold text-lg mb-1 text-secondary flex items-center gap-2">Ảnh Poster (Dọc)</h3>
                                 <p className="text-xs text-gray-500 mb-4">Tỉ lệ chuẩn 3:4. Dùng để hiển thị ở trang danh sách sự kiện.</p>
-
                                 <div className="w-full flex-1 min-h-[300px] bg-slate-50 rounded-xl overflow-hidden relative border-2 border-dashed border-gray-200 transition-colors group">
-                                    {eventFormData.poster_url ? (
-                                        <img src={eventFormData.poster_url} className="w-full h-full object-cover" alt="Poster" />
-                                    ) : (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-                                            <ImageIcon size={40} className="mb-2 opacity-50" />
-                                            <span className="text-sm font-medium">Chưa có Poster</span>
-                                        </div>
-                                    )}
-
-                                    {currentStatus === 'draft' && (
-                                        <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                            <span className="bg-white text-secondary font-bold text-sm px-4 py-2 rounded-full flex items-center">
-                                                <UploadCloud size={16} className="mr-2" /> Chọn Ảnh
-                                            </span>
-                                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'poster')} />
-                                        </label>
-                                    )}
+                                    {eventFormData.poster_url ? (<img src={eventFormData.poster_url} className="w-full h-full object-cover" alt="Poster" />) : (<div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400"><ImageIcon size={40} className="mb-2 opacity-50" /><span className="text-sm font-medium">Chưa có Poster</span></div>)}
+                                    {currentStatus === 'draft' && (<label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"><span className="bg-white text-secondary font-bold text-sm px-4 py-2 rounded-full flex items-center"><UploadCloud size={16} className="mr-2" /> Chọn Ảnh</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'poster')} /></label>)}
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* TAB 2: QUẢN LÝ SHOWS (UI List & Create) */}
+                {/* TAB 2: QUẢN LÝ SHOWS */}
                 {activeTab === 'SHOWS' && (
                     <div className="space-y-6 animate-in fade-in">
                         <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200">
@@ -501,16 +440,13 @@ export default function EventDetail() {
                                 <h2 className="text-xl font-bold text-slate-800">Danh sách Shows</h2>
                                 <p className="text-slate-500 text-sm mt-1">Quản lý lịch diễn và cấu hình vé cho sự kiện này.</p>
                             </div>
-                            <Button disabled={currentStatus === 'draft'} className="bg-secondary hover:bg-slate-800 text-white rounded-full px-6 disabled:opacity-40 disabled:cursor-not-allowed" onClick={() => setShowForm(!showForm)}>
+                            <Button disabled={currentStatus === 'draft'} className="bg-secondary hover:bg-slate-800 text-white rounded-full px-6 disabled:opacity-40" onClick={() => setShowForm(!showForm)}>
                                 {showForm ? "Đóng Form" : <><Plus size={18} className="mr-2" /> Thêm Show Mới</>}
                             </Button>
                         </div>
 
                         {currentStatus === 'draft' && (
-                            <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-start gap-2.5 text-sm font-medium">
-                                <Info size={18} className="shrink-0 mt-0.5" />
-                                <span>Vui lòng chọn hành động "Kích hoạt Sự kiện" ở thanh bên dưới trước khi khởi tạo hoặc mở rộng các đêm diễn (Show) bên trong.</span>
-                            </div>
+                            <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-start gap-2.5 text-sm font-medium"><Info size={18} className="shrink-0 mt-0.5" /><span>Vui lòng chọn hành động "Kích hoạt Sự kiện" ở thanh bên dưới trước khi khởi tạo hoặc mở rộng các đêm diễn (Show) bên trong.</span></div>
                         )}
 
                         {/* FORM TẠO SHOW */}
@@ -521,28 +457,103 @@ export default function EventDetail() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Tên Show</label>
-                                        <input required type="text" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary"
+                                        <input required type="text" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary text-sm"
                                             value={showData.name} onChange={e => setShowData({ ...showData, name: e.target.value })} />
                                     </div>
+
+                                    {/* 🌟 NÂNG CẤP PHÂN HỆ CHỌN/TẠO VENUE INLINE CHO FORM TẠO SHOW */}
                                     <div className="relative">
                                         <label className="block text-sm font-medium mb-1">Nơi tổ chức</label>
-                                        <div className="relative">
-                                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                            <input type="text" className="w-full border border-gray-300 rounded-lg py-2.5 pl-10 pr-4 outline-none focus:border-primary"
-                                                placeholder="Tìm địa điểm..." value={venueSearch}
-                                                onChange={e => { setVenueSearch(e.target.value); setShowData({ ...showData, venue_id: '' }); setIsVenueDropdownOpen(true); }}
-                                                onFocus={() => setIsVenueDropdownOpen(true)}
-                                                onBlur={() => setTimeout(() => setIsVenueDropdownOpen(false), 200)} />
-                                        </div>
-                                        {isVenueDropdownOpen && (
-                                            <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg max-h-60 overflow-y-auto">
-                                                {filteredVenues.map((venue: any) => (
-                                                    <div key={venue._id} className="px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-gray-50"
-                                                        onMouseDown={() => { setShowData({ ...showData, venue_id: venue._id }); setVenueSearch(venue.name); setIsVenueDropdownOpen(false); }}>
-                                                        <div className="font-medium text-gray-900">{venue.name}</div>
-                                                        <div className="text-xs text-gray-500 mt-0.5">{venue.address}</div>
+
+                                        {!isCreatingNewVenue ? (
+                                            /* BƯỚC 1: THANH TÌM KIẾM ĐỊA ĐIỂM CÓ SẴN (SEARCH-DRIVEN) */
+                                            <div className="relative">
+                                                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                <input type="text" className="w-full border border-gray-300 rounded-lg py-2.5 pl-10 pr-4 outline-none focus:border-primary text-sm"
+                                                    placeholder="Gõ từ khóa tìm vị trí..." value={venueSearch}
+                                                    onChange={e => { setVenueSearch(e.target.value); setShowData({ ...showData, venue_id: '' }); setIsVenueDropdownOpen(true); }}
+                                                    onFocus={() => setIsVenueDropdownOpen(true)}
+                                                    onBlur={() => setTimeout(() => setIsVenueDropdownOpen(false), 200)} />
+
+                                                {isVenueDropdownOpen && (
+                                                    <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg max-h-48 overflow-y-auto">
+                                                        {filteredVenues.map((venue: any) => (
+                                                            <div key={venue._id} className="px-4 py-2.5 hover:bg-slate-50 cursor-pointer border-b border-gray-50"
+                                                                onMouseDown={() => { setShowData({ ...showData, venue_id: venue._id }); setVenueSearch(venue.name); setIsVenueDropdownOpen(false); }}>
+                                                                <div className="font-semibold text-gray-800 text-xs">{venue.name}</div>
+                                                                {/* ✨ ĐÃ SỬA: Chuỗi địa chỉ gộp nối Address + City liền mạch */}
+                                                                <div className="text-[10px] text-gray-400 mt-0.5 truncate">{venue.address}{venue.city ? `, ${venue.city}` : ''}</div>
+                                                            </div>
+                                                        ))}
+                                                        {/* ✨ ĐÃ SỬA: Nút khởi động panel tạo nhanh tại chân kết quả tìm kiếm */}
+                                                        <div
+                                                            className="px-4 py-2.5 hover:bg-slate-100 cursor-pointer border-t border-slate-100 text-[11px] font-bold text-primary text-center bg-slate-50/60 sticky bottom-0 z-10 transition-colors"
+                                                            onMouseDown={() => setIsCreatingNewVenue(true)}
+                                                        >
+                                                            Không thấy Venue bạn muốn? Hãy tạo ngay!
+                                                        </div>
                                                     </div>
-                                                ))}
+                                                )}
+                                            </div>
+                                        ) : (
+                                            /* BƯỚC 2: FORM PHẲNG ĐIỀN ĐỦ THÔNG TIN ĐỊA ĐIỂM KÈM TRƯỜNG CITY */
+                                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 animate-in fade-in duration-200">
+                                                <div className="flex justify-between items-center border-b border-slate-200 pb-1.5">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Đề xuất địa điểm mới</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setIsCreatingNewVenue(false)}
+                                                        className="text-[11px] font-bold text-primary hover:opacity-80 transition-opacity underline bg-transparent border-none p-0 cursor-pointer"
+                                                    >
+                                                        Chọn địa điểm sẵn có?
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Tên địa điểm *</label>
+                                                        <input type="text" placeholder="VD: Khách sạn Mường Thanh" value={newVenueForm.name} onChange={e => setNewVenueForm({ ...newVenueForm, name: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700" />
+                                                    </div>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        <div className="col-span-2">
+                                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Địa chỉ chi tiết *</label>
+                                                            <input type="text" placeholder="VD: 78 Khúc Thừa Dụ" value={newVenueForm.address} onChange={e => setNewVenueForm({ ...newVenueForm, address: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700" />
+                                                        </div>
+                                                        {/* ✨ ĐÃ SỬA: Có ô nhập trường thành phố cho đối tác */}
+                                                        <div className="col-span-1">
+                                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Thành phố *</label>
+                                                            <input type="text" placeholder="Hà Nội" value={newVenueForm.city} onChange={e => setNewVenueForm({ ...newVenueForm, city: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Vĩ độ (Latitude)</label>
+                                                            <input type="number" step="any" placeholder="21.028" value={newVenueForm.latitude} onChange={e => setNewVenueForm({ ...newVenueForm, latitude: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs font-mono" />
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Kinh độ (Longitude)</label>
+                                                            <input type="number" step="any" placeholder="105.834" value={newVenueForm.longitude} onChange={e => setNewVenueForm({ ...newVenueForm, longitude: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs font-mono" />
+                                                        </div>
+                                                    </div>
+                                                    <Button
+                                                        type="button"
+                                                        onClick={async () => {
+                                                            if (!newVenueForm.name.trim() || !newVenueForm.address.trim() || !newVenueForm.city.trim()) {
+                                                                alert("Vui lòng điền đủ Tên, Địa chỉ và Thành phố của địa điểm đề xuất.");
+                                                                return;
+                                                            }
+                                                            await suggestVenueMutation({
+                                                                name: newVenueForm.name.trim(),
+                                                                address: newVenueForm.address.trim(),
+                                                                city: newVenueForm.city.trim(),
+                                                                latitude: newVenueForm.latitude ? Number(newVenueForm.latitude) : undefined,
+                                                                longitude: newVenueForm.longitude ? Number(newVenueForm.longitude) : undefined
+                                                            });
+                                                        }}
+                                                        className="w-full bg-primary text-white font-bold text-xs py-1.5 rounded-lg border-none mt-1"
+                                                    >
+                                                        Xác nhận & Áp dụng địa điểm
+                                                    </Button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -551,12 +562,12 @@ export default function EventDetail() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Bắt đầu Show</label>
-                                        <input required type="datetime-local" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary"
+                                        <input required type="datetime-local" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary text-sm"
                                             value={showData.start_time} onChange={e => setShowData({ ...showData, start_time: e.target.value })} />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Kết thúc Show</label>
-                                        <input required type="datetime-local" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary"
+                                        <input required type="datetime-local" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary text-sm"
                                             value={showData.end_time} onChange={e => setShowData({ ...showData, end_time: e.target.value })} />
                                     </div>
                                 </div>
@@ -564,12 +575,12 @@ export default function EventDetail() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Mở bán vé lúc</label>
-                                        <input required type="datetime-local" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary"
+                                        <input required type="datetime-local" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary text-sm"
                                             value={showData.sale_start} onChange={e => setShowData({ ...showData, sale_start: e.target.value })} />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium mb-1">Đóng bán vé lúc</label>
-                                        <input required type="datetime-local" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary"
+                                        <input required type="datetime-local" className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-primary text-sm"
                                             value={showData.sale_end} onChange={e => setShowData({ ...showData, sale_end: e.target.value })} />
                                     </div>
                                 </div>
@@ -579,12 +590,12 @@ export default function EventDetail() {
                                         <UploadCloud size={40} className="mx-auto text-primary mb-3" />
                                         <h3 className="text-base font-bold text-gray-900 mb-1">Sơ đồ ghế (Seat Map)</h3>
                                         <p className="text-sm text-gray-500 mb-6 mx-auto">Tải lên SVG có ID định dạng <code className="bg-white px-1 border rounded">type-VIP</code> để tự động quét Hạng Vé.</p>
-                                        <label className="inline-flex items-center justify-center bg-white border border-gray-200 text-slate-700 px-6 py-2.5 rounded-full font-semibold cursor-pointer hover:bg-slate-50 transition-all">
+                                        <label className="inline-flex items-center justify-center bg-white border border-gray-200 text-slate-700 px-6 py-2.5 rounded-full font-semibold cursor-pointer hover:bg-slate-50 transition-all text-xs">
                                             <span>Chọn File SVG</span>
                                             <input type="file" accept=".svg" className="hidden" onChange={handleSVGUpload} />
                                         </label>
                                         {showData.stadium_map_svg && (
-                                            <div className="mt-4 inline-flex items-center justify-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm font-medium border border-green-100">
+                                            <div className="mt-4 inline-flex items-center justify-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg text-xs font-medium border border-green-100">
                                                 <CheckCircle2 size={18} /> Đã nạp SVG thành công!
                                             </div>
                                         )}
@@ -592,7 +603,7 @@ export default function EventDetail() {
 
                                     <div className="xl:col-span-8 bg-slate-50 border border-slate-200 rounded-2xl p-6 h-full">
                                         <div className="flex justify-between items-center mb-4">
-                                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                            <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
                                                 <Ticket size={20} className="text-primary" /> Cấu hình Loại Vé
                                             </h3>
                                             <Button type="button" variant="outline" size="sm" className="h-8 text-xs font-bold bg-white"
@@ -618,7 +629,7 @@ export default function EventDetail() {
                                                         <div className="grid grid-cols-12 gap-4 mb-3">
                                                             <div className="col-span-12">
                                                                 <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Tên hiển thị vé</label>
-                                                                <input required type="text" placeholder="VD: Vé VIP Khu Vực A" className="w-full text-sm border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50 font-bold text-slate-800"
+                                                                <input required type="text" placeholder="VD: Vé VIP Khu Vực A" className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50 font-bold text-slate-800"
                                                                     value={ticket.name} onChange={e => { const arr = [...ticketTypes]; arr[index].name = e.target.value; setTicketTypes(arr); }} />
                                                             </div>
                                                         </div>
@@ -626,17 +637,17 @@ export default function EventDetail() {
                                                         <div className="grid grid-cols-12 gap-4 mb-3">
                                                             <div className="col-span-5">
                                                                 <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Giá vé (VNĐ)</label>
-                                                                <input required type="number" min="0" placeholder="0" className="w-full text-sm border border-slate-200 rounded p-2 outline-none focus:border-primary font-bold text-orange-600 bg-slate-50"
+                                                                <input required type="number" min="0" placeholder="0" className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary font-bold text-orange-600 bg-slate-50"
                                                                     value={ticket.price} onChange={e => { const arr = [...ticketTypes]; arr[index].price = e.target.value ? Number(e.target.value) : ''; setTicketTypes(arr); }} />
                                                             </div>
                                                             <div className="col-span-4">
                                                                 <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">SL Giới hạn</label>
-                                                                <input type="number" min="1" placeholder="Theo số ghế" className="w-full text-sm border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50"
+                                                                <input type="number" min="1" placeholder="Theo số ghế" className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50"
                                                                     value={ticket.total_quantity} onChange={e => { const arr = [...ticketTypes]; arr[index].total_quantity = e.target.value ? Number(e.target.value) : ''; setTicketTypes(arr); }} />
                                                             </div>
                                                             <div className="col-span-3 flex items-center pt-5">
-                                                                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer text-slate-600 hover:text-primary transition-colors">
-                                                                    <input type="checkbox" className="w-4 h-4 rounded text-primary focus:ring-primary"
+                                                                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-slate-600 hover:text-primary transition-colors">
+                                                                    <input type="checkbox" className="w-4 h-4 rounded text-primary"
                                                                         checked={ticket.is_limited_promo} onChange={e => { const arr = [...ticketTypes]; arr[index].is_limited_promo = e.target.checked; setTicketTypes(arr); }} />
                                                                     Vé Promo
                                                                 </label>
@@ -662,7 +673,7 @@ export default function EventDetail() {
                                                                 value={ticket.description} onChange={e => { const arr = [...ticketTypes]; arr[index].description = e.target.value; setTicketTypes(arr); }} />
                                                         </div>
 
-                                                        <button type="button" className="absolute top-2 right-2 text-slate-400 hover:text-white hover:bg-red-500 bg-slate-100 rounded-md p-1.5 transition-all opacity-0 group-hover:opacity-100"
+                                                        <button type="button" className="absolute top-2 right-2 text-slate-400 hover:text-white hover:bg-red-500 bg-slate-100 rounded-md p-1.5 transition-all opacity-0 group-hover:opacity-100 border-none cursor-pointer"
                                                             onClick={() => setTicketTypes(ticketTypes.filter((_, i) => i !== index))}>
                                                             <Trash2 size={14} />
                                                         </button>
@@ -675,20 +686,20 @@ export default function EventDetail() {
 
                                 <div className="pt-2 flex justify-end gap-3 border-t border-slate-100 mt-6">
                                     <Button type="button" variant="outline" className="px-6 rounded-full" onClick={() => setShowForm(false)}>Hủy</Button>
-                                    <Button type="submit" disabled={isSubmittingShow} className="bg-primary text-white px-8 rounded-full">
+                                    <Button type="submit" disabled={isSubmittingShow || isAnyActionPending} className="bg-primary text-white px-8 rounded-full border-none">
                                         {isSubmittingShow ? "Đang xử lý..." : "Lưu Show & Cấu hình Vé"}
                                     </Button>
                                 </div>
                             </form>
                         )}
 
-                        {/* Danh sách các Show */}
+                        {/* DANH SÁCH SHOWS HIỆN CÓ */}
                         {isLoadingShows ? (
                             <p className="text-gray-500 animate-pulse text-center py-10">Đang tải danh sách show...</p>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {shows.length === 0 ? (
-                                    <p className="text-gray-500 col-span-full bg-white p-12 text-center rounded-2xl border border-dashed border-slate-300">
+                                    <p className="text-gray-500 col-span-full bg-white p-12 text-center rounded-2xl border border-dashed border-slate-300 text-sm">
                                         Chưa có show nào được tạo cho sự kiện này.<br />Bấm "+ Thêm Show Mới" để bắt đầu!
                                     </p>
                                 ) : (
@@ -696,10 +707,10 @@ export default function EventDetail() {
                                         <div
                                             key={show._id}
                                             onClick={() => navigate(`/organizer/events/${eventId}/shows/${show._id}`)}
-                                            className="bg-white border border-slate-200 rounded-2xl p-6 hover:border-primary/50 cursor-pointer transition-all group"
+                                            className="bg-white border border-slate-200 rounded-2xl p-6 hover:border-primary/50 cursor-pointer transition-all group shadow-none"
                                         >
                                             <div className="flex justify-between items-start mb-4">
-                                                <h3 className="font-bold text-lg text-slate-800 group-hover:text-primary transition-colors line-clamp-2">{show.name}</h3>
+                                                <h3 className="font-bold text-base text-slate-800 group-hover:text-primary transition-colors line-clamp-2">{show.name}</h3>
                                                 <span className={`shrink-0 text-[10px] font-black uppercase px-2 py-1 rounded-md ${show.status === 'published' ? 'bg-green-100 text-green-700' :
                                                     show.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'
                                                     }`}>
@@ -708,20 +719,20 @@ export default function EventDetail() {
                                             </div>
 
                                             <div className="space-y-2 mb-6">
-                                                <p className="text-sm text-slate-500 flex items-center gap-2">
-                                                    <CalendarClock size={16} className="text-slate-400" />
+                                                <p className="text-xs text-slate-500 flex items-center gap-2">
+                                                    <CalendarClock size={15} className="text-slate-400" />
                                                     {new Date(show.start_time).toLocaleString('vi-VN')}
                                                 </p>
                                             </div>
 
                                             <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                                                <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
+                                                <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
                                                     Đã thiết lập Zone
                                                 </span>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="text-primary hover:bg-primary/10 hover:text-primary"
+                                                    className="text-primary hover:bg-primary/10 hover:text-primary h-8 text-xs font-bold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         navigate(`/organizer/events/${eventId}/shows/${show._id}`);
@@ -739,14 +750,10 @@ export default function EventDetail() {
                 )}
             </div>
 
-            {/* ========================================== */}
-            {/* 3. THANH CÔNG CỤ NỔI VỚI NÚT HÀNH ĐỘNG CÁCH 2 */}
-            {/* ========================================== */}
+            {/* BAR ĐIỀU KHIỂN CHẠY DƯỚI ĐÁY TRANG */}
             {activeTab === 'INFO' && (
                 <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50">
                     <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-
-                        {/* CỤM ĐIỀU HƯỚNG TRẠNG THÁI EVENT TÁCH BIỆT (CÁCH 2 MÁY TRẠNG THÁI) */}
                         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
                             {currentStatus === 'draft' && (
                                 <Button
@@ -757,7 +764,7 @@ export default function EventDetail() {
                                             await publishEventMutation();
                                         }
                                     }}
-                                    className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 rounded-full font-bold text-sm"
+                                    className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 rounded-full font-bold text-sm border-none"
                                 >
                                     <Globe size={16} className="mr-1.5" /> Kích hoạt Sự kiện
                                 </Button>
@@ -772,7 +779,7 @@ export default function EventDetail() {
                                             await unpublishEventMutation();
                                         }
                                     }}
-                                    className="w-full sm:w-auto bg-slate-600 hover:bg-slate-700 text-white px-6 rounded-full font-bold text-sm"
+                                    className="w-full sm:w-auto bg-slate-600 hover:bg-slate-700 text-white px-6 rounded-full font-bold text-sm border-none"
                                 >
                                     <EyeOff size={16} className="mr-1.5" /> Tạm dừng sự kiện
                                 </Button>
@@ -795,7 +802,6 @@ export default function EventDetail() {
                             )}
                         </div>
 
-                        {/* CỤM NÚT TƯƠNG TÁC BIỂU MẪU (FORM ACTIONS) */}
                         <div className="flex gap-3 w-full sm:w-auto justify-end">
                             <Button variant="outline" className="flex-1 sm:flex-none border-gray-300 px-6 rounded-full font-bold text-sm" onClick={() => navigate('/organizer/events')}>
                                 <X size={16} className="mr-1.5" /> Thoát
@@ -804,12 +810,11 @@ export default function EventDetail() {
                             <Button
                                 onClick={handleUpdateEvent}
                                 disabled={isAnyActionPending || currentStatus !== 'draft'}
-                                className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-white px-8 rounded-full font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none bg-primary hover:opacity-90 text-white px-8 rounded-full font-bold text-sm disabled:opacity-50 border-none"
                             >
                                 <Save size={16} className="mr-1.5" /> {isUpdatingEvent ? "Đang lưu..." : "Lưu Thay Đổi"}
                             </Button>
                         </div>
-
                     </div>
                 </div>
             )}

@@ -104,3 +104,37 @@ export const generateMockReturnUrl = async (req: Request, res: Response): Promis
         res.status(500).json({ message: 'Lỗi máy chủ khi tạo URL trả về.' });
     }
 };
+
+export const getPaymentResult = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { order_id } = req.params;
+
+        const order = await Order.findById(order_id).select(
+            "_id show_id event_id status purchaser_email total_price"
+        );
+
+        if (!order) {
+            res.status(404).json({
+                message: "Không tìm thấy đơn hàng"
+            });
+            return;
+        }
+
+        res.status(200).json({
+            message: "Lấy kết quả thanh toán thành công",
+            data: {
+                orderId: order._id,
+                showId: order.show_id,
+                eventId: order.event_id,
+                status: order.status,
+                email: order.purchaser_email,
+                totalPrice: order.total_price
+            }
+        });
+    } catch (error) {
+        console.error("Lỗi getPaymentResult:", error);
+        res.status(500).json({
+            message: "Lỗi máy chủ khi lấy kết quả thanh toán"
+        });
+    }
+};

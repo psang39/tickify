@@ -37,9 +37,20 @@ export default function ShowDetail() {
     const [venueSearch, setVenueSearch] = useState('');
     const [isVenueDropdownOpen, setIsVenueDropdownOpen] = useState(false);
 
+    // STATE CHO PHÂN HỆ INLINE VENUE CREATION
+    const [isCreatingNewVenue, setIsCreatingNewVenue] = useState(false);
+    const [newVenueForm, setNewVenueForm] = useState({
+        name: '',
+        address: '',
+        latitude: '',
+        longitude: ''
+    });
+
     // State hứng dữ liệu thời gian thực (SSE)
     const [liveMonitor, setLiveMonitor] = useState({
         activeUsers: 0,
+        holdingSeats: 0,
+        totalRevenue: 0,
         ticketsSoldLastMinute: 0,
         status: 'Đang kết nối...'
     });
@@ -60,6 +71,8 @@ export default function ShowDetail() {
                 const data = JSON.parse(event.data);
                 setLiveMonitor({
                     activeUsers: data.active_viewers || 0,
+                    holdingSeats: data.holding_seats || 0,
+                    totalRevenue: data.total_revenue || 0,
                     ticketsSoldLastMinute: data.tickets_sold || 0,
                     status: 'Live 🔴'
                 });
@@ -90,13 +103,21 @@ export default function ShowDetail() {
         enabled: !!showId
     });
 
-    const { data: venues = [] } = useQuery({
-        queryKey: ['venues'],
+    const { data: venuesData = [] } = useQuery({
+        queryKey: ['venues', venueSearch],
         queryFn: async () => {
-            const response = await api.get(`/venues`);
+            if (isCreatingNewVenue) return [];
+
+            const response = await api.get(`/venues`, {
+                params: {
+                    search: venueSearch,
+                    limit: 20
+                }
+            });
             return response.data?.data || response.data || [];
         }
     });
+    const venues = Array.isArray(venuesData) ? venuesData : [];
 
     const { data: staffListData } = useQuery({
         queryKey: ['organizer-staffs-list'],
@@ -137,6 +158,26 @@ export default function ShowDetail() {
     // ==========================================
     // 4. MUTATIONS MANAGEMENT
     // ==========================================
+
+    // MUTATION: ĐỀ XUẤT VENUE MỚI TẠI CHỖ TỪ ORGANIZER
+    const { mutateAsync: suggestVenueMutation, isPending: isSuggestingVenue } = useMutation({
+        mutationFn: async (newVenueData: any) => {
+            const response = await api.post('/organizer/venues', newVenueData);
+            return response.data?.data || response.data;
+        },
+        onSuccess: (newVenue) => {
+            queryClient.invalidateQueries({ queryKey: ['venues'] });
+            setFormData(prev => ({ ...prev, venue_id: newVenue._id }));
+            setVenueSearch(newVenue.name);
+            setIsCreatingNewVenue(false);
+            setNewVenueForm({ name: '', address: '', latitude: '', longitude: '' });
+            alert(`Đã gửi đề xuất địa điểm "${newVenue.name}". Bạn có thể tiếp tục cấu hình thông tin Show.`);
+        },
+        onError: (error: any) => {
+            setErrorMessage(error.response?.data?.message || "Không thể khởi tạo đề xuất địa điểm.");
+        }
+    });
+
     const { mutateAsync: updateShowMutation, isPending: isUpdating } = useMutation({
         mutationFn: async (updatedData: any) => { return (await api.put(`/organizer/shows/${showId}`, updatedData)).data; },
         onSuccess: () => {
@@ -196,10 +237,14 @@ export default function ShowDetail() {
     };
 
     const filteredVenues = venues.filter((v: any) => v.name.toLowerCase().includes(venueSearch.toLowerCase()));
-    const isAnyActionPending = isUpdating || isPublishing || isUnpublishing || isCancelling;
+    const isAnyActionPending = isUpdating || isPublishing || isUnpublishing || isCancelling || isSuggestingVenue;
 
     if (isLoadingShow) return <div className="min-h-screen flex items-center justify-center font-medium text-gray-500 animate-pulse">Đang tải cấu hình Show...</div>;
     if (!showData) return <div className="min-h-screen flex items-center justify-center font-bold text-red-500">Không tìm thấy dữ liệu đêm diễn!</div>;
+
+    // Tìm xem venue hiện tại có được verify không
+    const currentVenueData = venues.find((v: any) => v._id === formData.venue_id);
+    const isVenueVerified = currentVenueData ? currentVenueData.is_verified : true;
 
     return (
         <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
@@ -260,6 +305,17 @@ export default function ShowDetail() {
                             </div>
                         )}
 
+                        {/* HIỂN THỊ CẢNH BÁO NẾU VENUE LIÊN KẾT CHƯA ĐƯỢC ADMIN VERIFY */}
+                        {currentStatus === 'draft' && formData.venue_id && isVenueVerified === false && (
+                            <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-start gap-2.5 text-xs font-medium animate-in fade-in">
+                                <Info size={16} className="shrink-0 mt-0.5 text-amber-600" />
+                                <div className="space-y-1">
+                                    <p className="font-bold">Địa điểm đề xuất chưa được xét duyệt!</p>
+                                    <p>Địa điểm tổ chức này hiện tại đang trong trạng thái chờ Ban quản trị (Admin) kiểm định kỹ thuật sơ đồ ghế. Tính năng "Kích hoạt mở bán" dưới thanh công cụ sẽ bị khóa cho đến khi địa điểm được phê duyệt chính thức.</p>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100">
                             <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-50 pb-3"><Info className="text-primary" size={18} /> Thông tin cơ bản</h2>
                             <div className="space-y-5">
@@ -305,21 +361,143 @@ export default function ShowDetail() {
 
                     {/* CỘT PHẢI: VENUE, MAP SVG & QUẢN LÝ NHÂN SỰ TRỰC CA */}
                     <div className="space-y-6">
+
+                        {/* 🌟 PHÂN HỆ ĐỊA ĐIỂM (VENUE) ĐÃ ĐƯỢC ĐỔI SANG INLINE CREATION FLUID UX */}
                         <div className="bg-white rounded-2xl p-6 border border-gray-100">
-                            <h3 className="font-bold text-sm mb-3 text-slate-800 flex items-center gap-2"><MapPin size={16} className="text-primary" /> Nơi tổ chức</h3>
-                            <div className="relative">
-                                <input type="text" disabled={currentStatus === 'published' || currentStatus === 'cancelled'} className="w-full border border-gray-200 rounded-lg py-2 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 focus:bg-white disabled:opacity-60" placeholder="Lọc tìm kiếm Venue..." value={venueSearch} onChange={e => { setVenueSearch(e.target.value); setFormData({ ...formData, venue_id: '' }); setIsVenueDropdownOpen(true); }} onFocus={() => setIsVenueDropdownOpen(true)} onBlur={() => setTimeout(() => setIsVenueDropdownOpen(false), 200)} />
-                                {isVenueDropdownOpen && !['published', 'cancelled'].includes(currentStatus) && (
-                                    <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-lg max-h-48 overflow-y-auto">
-                                        {filteredVenues.map((venue: any) => (
-                                            <div key={venue._id} className="px-3 py-2.5 hover:bg-slate-50 cursor-pointer border-b border-gray-50 text-xs" onMouseDown={() => { setFormData({ ...formData, venue_id: venue._id }); setVenueSearch(venue.name); setIsVenueDropdownOpen(false); }}>
-                                                <div className="font-semibold text-gray-800">{venue.name}</div>
-                                                <div className="text-[10px] text-gray-400 mt-0.5 truncate">{venue.address}</div>
+                            <h3 className="font-bold text-sm mb-3 text-slate-800 flex items-center gap-2">
+                                <MapPin size={16} className="text-primary" /> Nơi tổ chức
+                            </h3>
+
+                            {!isCreatingNewVenue ? (
+                                /* CHẾ ĐỘ 1: CHỌN ĐỊA ĐIỂM SẴN CÓ */
+                                <div className="space-y-4">
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            disabled={currentStatus === 'published' || currentStatus === 'cancelled'}
+                                            className="w-full border border-gray-200 rounded-lg py-2 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 focus:bg-white disabled:opacity-60 transition-colors"
+                                            placeholder="Lọc tìm kiếm Venue..."
+                                            value={venueSearch}
+                                            onChange={e => { setVenueSearch(e.target.value); setFormData({ ...formData, venue_id: '' }); setIsVenueDropdownOpen(true); }}
+                                            onFocus={() => setIsVenueDropdownOpen(true)}
+                                            onBlur={() => setTimeout(() => setIsVenueDropdownOpen(false), 200)}
+                                        />
+                                        {isVenueDropdownOpen && !['published', 'cancelled'].includes(currentStatus) && (
+                                            <div className="absolute z-30 w-full mt-1 bg-white border border-slate-200 rounded-lg max-h-48 overflow-y-auto bg-white">
+                                                {venues.map((venue: any) => (
+                                                    <div key={venue._id} className="px-3 py-2.5 hover:bg-slate-50 cursor-pointer border-b border-gray-50 text-xs" onMouseDown={() => { setFormData({ ...formData, venue_id: venue._id }); setVenueSearch(venue.name); setIsVenueDropdownOpen(false); }}>
+                                                        <div className="font-semibold text-gray-800">{venue.name} ({venue.city || 'Chưa rõ thành phố'})</div>
+                                                        <div className="text-[10px] text-gray-400 mt-0.5 truncate">{venue.address}</div>
+                                                    </div>
+                                                ))}
+
+                                                {/* NÚT KÍCH HOẠT ĐỀ XUẤT VENUE MỚI TẠI CHÂN DROPDOWN */}
+                                                <div
+                                                    className="px-3 py-2.5 hover:bg-slate-100 cursor-pointer border-t border-slate-100 text-[11px] font-bold text-primary text-center bg-slate-50/50 sticky bottom-0 z-10 transition-colors"
+                                                    onMouseDown={() => setIsCreatingNewVenue(true)}
+                                                >
+                                                    Không thấy Venue bạn muốn? Hãy tạo ngay!
+                                                </div>
                                             </div>
-                                        ))}
+                                        )}
                                     </div>
-                                )}
-                            </div>
+                                    {formData.venue_id && (
+                                        <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-start gap-2 text-slate-600 animate-in fade-in">
+                                            <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-primary" />
+                                            <span className="text-[11px] font-medium leading-relaxed">
+                                                {isVenueVerified === false ? (
+                                                    <span className="text-amber-600 font-bold">Địa điểm do bạn tự đề xuất đang chờ duyệt. Đêm diễn tạm thời khóa mở bán.</span>
+                                                ) : (
+                                                    <span className="text-slate-500">Đã chốt địa điểm chính quy hệ thống. Sơ đồ ghế sẽ đồng bộ theo hạ tầng cơ sở này.</span>
+                                                )}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                /* CHẾ ĐỘ 2: FORM INLINE ĐỀ XUẤT ĐỊA ĐIỂM MỚI */
+                                <div className="space-y-4 animate-in fade-in duration-200">
+                                    <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Đề xuất địa điểm mới</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsCreatingNewVenue(false)}
+                                            className="text-[11px] font-bold text-primary hover:opacity-80 transition-opacity underline bg-transparent border-none p-0 cursor-pointer"
+                                        >
+                                            Chọn địa điểm có sẵn?
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Tên địa điểm *</label>
+                                            <input
+                                                type="text"
+                                                placeholder="VD: Hội trường Trung tâm Văn hóa"
+                                                value={newVenueForm.name}
+                                                onChange={(e) => setNewVenueForm({ ...newVenueForm, name: e.target.value })}
+                                                className="w-full border border-gray-200 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 focus:bg-white transition-all text-slate-700"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Địa chỉ chi tiết *</label>
+                                            <input
+                                                type="text"
+                                                placeholder="VD: 123 Đường Ba Tháng Hai, Quận 10"
+                                                value={newVenueForm.address}
+                                                onChange={(e) => setNewVenueForm({ ...newVenueForm, address: e.target.value })}
+                                                className="w-full border border-gray-200 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 focus:bg-white transition-all text-slate-700"
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Vĩ độ (Latitude)</label>
+                                                <input
+                                                    type="number"
+                                                    step="any"
+                                                    placeholder="10.777"
+                                                    value={newVenueForm.latitude}
+                                                    onChange={(e) => setNewVenueForm({ ...newVenueForm, latitude: e.target.value })}
+                                                    className="w-full border border-gray-200 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 focus:bg-white font-mono text-slate-700"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Kinh độ (Longitude)</label>
+                                                <input
+                                                    type="number"
+                                                    step="any"
+                                                    placeholder="106.695"
+                                                    value={newVenueForm.longitude}
+                                                    onChange={(e) => setNewVenueForm({ ...newVenueForm, longitude: e.target.value })}
+                                                    className="w-full border border-gray-200 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 focus:bg-white font-mono text-slate-700"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            type="button"
+                                            disabled={isSuggestingVenue}
+                                            onClick={async () => {
+                                                if (!newVenueForm.name.trim() || !newVenueForm.address.trim()) {
+                                                    alert("Vui lòng điền đầy đủ Tên và Địa chỉ của địa điểm.");
+                                                    return;
+                                                }
+                                                await suggestVenueMutation({
+                                                    name: newVenueForm.name.trim(),
+                                                    address: newVenueForm.address.trim(),
+                                                    latitude: newVenueForm.latitude ? Number(newVenueForm.latitude) : undefined,
+                                                    longitude: newVenueForm.longitude ? Number(newVenueForm.longitude) : undefined
+                                                });
+                                            }}
+                                            className="w-full bg-primary hover:opacity-90 text-white font-bold text-xs py-2 rounded-lg border-none transition-all mt-1"
+                                        >
+                                            {isSuggestingVenue ? "Đang xử lý đề xuất..." : "Tạo & Áp dụng ngay"}
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="bg-white rounded-2xl p-6 border border-gray-100">
@@ -346,7 +524,7 @@ export default function ShowDetail() {
 
                         {/* PHÂN HỆ QUẢN LÝ NHÂN SỰ TRỰC CA (KIỂM SOÁT VÉ ĐÊM DIỄN) */}
                         <div className="bg-white rounded-2xl p-6 border border-gray-100 space-y-4">
-                            <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2"><Users size={16} className="text-primary" /> Nhân viên điều phối ca</h3>
+                            <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2"><img src="" alt="" /><Users size={16} className="text-primary" /> Nhân viên điều phối ca</h3>
 
                             {currentStatus !== 'cancelled' && (
                                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
@@ -440,18 +618,18 @@ export default function ShowDetail() {
 
                         {/* Panel 1: Đếm lượng View truy cập đồng thời */}
                         <div className="bg-slate-800 text-white rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
-                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Khán giả đang truy cập phòng vé</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Khán giả đang giữ phòng vé</span>
                             <div className="text-5xl font-mono font-bold tracking-tight mt-4">
-                                {liveMonitor.activeUsers.toLocaleString()}
+                                {liveMonitor.holdingSeats.toLocaleString()}
                             </div>
                             <span className="text-[10px] text-slate-500 font-medium mt-2">* Cập nhật liên tục mỗi 3 giây</span>
                         </div>
 
                         {/* Panel 2: Vận tốc bán vé gối đầu */}
                         <div className="bg-white border-2 border-primary/20 rounded-2xl p-6 flex flex-col justify-between min-h-[140px] bg-gradient-to-br from-primary/5 to-white">
-                            <span className="text-xs font-bold uppercase tracking-wider text-primary">Tốc độ chốt vé / Phút</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-primary">Doanh thu hiện tại</span>
                             <div className="text-5xl font-mono font-bold tracking-tight text-primary mt-4">
-                                +{liveMonitor.ticketsSoldLastMinute}
+                                +{liveMonitor.totalRevenue.toLocaleString()}
                             </div>
                             <span className="text-[10px] text-primary/60 font-medium mt-2">* Đo lường dựa trên giao dịch thành công</span>
                         </div>
@@ -479,13 +657,14 @@ export default function ShowDetail() {
                         {currentStatus === 'draft' && (
                             <Button
                                 type="button"
-                                disabled={isAnyActionPending}
+                                // 🌟 TỰ ĐỘNG KHÓA NÚT MỞ BÁN NẾU ĐỊA ĐIỂM CHƯA ĐƯỢC ADMIN PHÊ DUYỆT (isVenueVerified === false)
+                                disabled={isAnyActionPending || !formData.venue_id || isVenueVerified === false}
                                 onClick={async () => {
                                     if (window.confirm("Xác nhận mở bán công khai show diễn này? Hệ thống sẽ kích hoạt phân tán dữ liệu thời gian thực.")) {
                                         await publishShowMutation();
                                     }
                                 }}
-                                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-5 rounded-full font-bold text-xs border-none"
+                                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-5 rounded-full font-bold text-xs border-none disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 <Globe size={14} className="mr-1" /> Kích hoạt Mở bán
                             </Button>

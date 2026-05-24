@@ -4,6 +4,7 @@ import Zone from '../models/zone.model';
 import Seat from '../models/seat.model';
 import TicketType from '../models/ticket-type.model';
 import Order from '../models/order.model';
+import Venue from '../models/venue.model';
 import { warmUpSeatmapCache } from '../services/seatmapService';
 import * as cheerio from 'cheerio';
 import { Request, Response } from 'express';
@@ -512,6 +513,13 @@ export const publishShow = async (req: Request, res: Response) => {
         if (seatCount === 0) {
             return res.status(400).json({
                 message: "Không thể Publish! Vui lòng generate ghế cho các Zone trước."
+            });
+        }
+        const venue = await Venue.findById(show.venue_id);
+        if (!venue || venue.is_verified !== true) {
+            return res.status(400).json({
+                success: false,
+                message: `Không thể mở bán! Địa điểm "${venue?.name || 'Chưa xác định'}" đang trong trạng thái chờ Admin xét duyệt hạ tầng sơ đồ ghế.`
             });
         }
         show.status = 'published';

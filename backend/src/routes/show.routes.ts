@@ -1,10 +1,10 @@
-import { createShow, getShowById, publishShow } from "../controllers/show.controller";
+import { getShowById } from "../controllers/show.controller";
 import { joinWaitingRoom, checkMyTurn } from '../controllers/waiting-room.controller';
 import { getSeatsByShow } from "../controllers/seat.controller";
 import express from 'express';
 import { body } from 'express-validator';
-import { Validate } from '../middleware/validate';
-import { Verify, verifyRoles, verifyCheckoutToken } from '../middleware/verify';
+import { Validate } from '../middleware/validation.middleware';
+import { Verify, verifyRoles, verifyCheckoutToken } from '../middleware/auth.middleware';
 import { createZone, getZonesByEvent } from "../controllers/zone.controller";
 import { addClient } from '../services/sse.service';
 import { getTicketTypesByShow } from "../controllers/ticket-type.controller";

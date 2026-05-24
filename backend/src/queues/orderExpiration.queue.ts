@@ -105,9 +105,9 @@ const worker = new Worker('order-expiration', async (job: Job) => {
 
             for (const rowLabel in seatsByRow) {
                 const seatsInRow = seatsByRow[rowLabel];
-                const rowKey = `show:${show_id}:zone:${zone_id}:row:${rowLabel}`;
+                const rowKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:row:${rowLabel}`;
 
-                const keys = [rowKey, `show:${show_id}:user:${order.user_id}:held_count`];
+                const keys = [rowKey, `event:${event_id}:show:${show_id}:user:${order.user_id}:held_count`];
                 const args: string[] = [];
 
                 seatsInRow.forEach(seat => {
@@ -124,8 +124,8 @@ const worker = new Worker('order-expiration', async (job: Job) => {
             }
 
 
-            const summaryKey = `show:${show_id}:zone:${zone_id}:summary`;
-            const statusHashKey = `show:${show_id}:seat_status`;
+            const summaryKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:summary`;
+            const statusHashKey = `event:${event_id}:show:${show_id}:seat_status`;
 
             const pipeline = redisClient.multi();
 

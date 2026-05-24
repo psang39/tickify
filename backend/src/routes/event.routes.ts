@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
-import { createEvent, getEvents, getEventById, getOrganizerEvents } from '../controllers/event.controller';
+import { createEvent, getEvents, getEventById } from '../controllers/event.controller';
 import { body } from 'express-validator';
-import { Validate } from '../middleware/validate';
-import { cachedMiddleware } from '../middleware/cachedMiddleware';
-import { Verify, verifyRoles } from '../middleware/verify';
+import { Validate } from '../middleware/validation.middleware';
+import { cachedMiddleware } from '../middleware/cache.middleware';
+import { Verify, verifyRoles } from '../middleware/auth.middleware';
 import { createShow, getShowsByEvent } from "../controllers/show.controller";
 const eventRouter = express.Router();
 

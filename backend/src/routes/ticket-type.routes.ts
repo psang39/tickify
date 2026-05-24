@@ -1,8 +1,8 @@
 import { createTicketType, getTicketTypesByEvent, getTicketTypeById, updateTicketType, deleteTicketType } from '../controllers/ticket-type.controller';
 import express from 'express';
 import { body } from 'express-validator';
-import { Validate } from '../middleware/validate';
-import { verifyRoles } from '../middleware/verify';
+import { Validate } from '../middleware/validation.middleware';
+import { verifyRoles } from '../middleware/auth.middleware';
 const ticketTypeRoutes = express.Router();
 
 ticketTypeRoutes.post('/', verifyRoles(['admin', 'organizer']), [

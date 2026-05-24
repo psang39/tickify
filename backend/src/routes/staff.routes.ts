@@ -1,4 +1,4 @@
-import { Verify, verifyRoles } from '../middleware/verify';
+import { Verify, verifyRoles } from '../middleware/auth.middleware';
 import { Router } from 'express';
 import { getMyAssignedShows, getShowById } from '../controllers/staff.controller';
 

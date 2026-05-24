@@ -3,7 +3,6 @@ import Seat from "../models/seat.model";
 import Show from "../models/show.model";
 import { Request, Response } from "express";
 import redisClient from "../utils/redisClient";
-import { addClient } from "../services/sse.service";
 export const getSeatsByZone = async (req: Request, res: Response) => {
     try {
         const { zone_id } = req.params;

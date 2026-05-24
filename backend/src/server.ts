@@ -9,8 +9,6 @@ import { connectRedis } from "./utils/redisClient";
 import app from './app';
 
 // import methodOverride from 'method-override';
-import path from 'path';
-import { glob } from 'fs';
 
 mongoose.Promise = global.Promise;
 mongoose.set("strictQuery", false);

@@ -1,6 +1,6 @@
 import { joinWaitingRoom, checkMyTurn } from '../controllers/waiting-room.controller';
 import express from 'express';
-import { Verify } from '../middleware/verify';
+import { Verify } from '../middleware/auth.middleware';
 const waitingRoomRouter = express.Router();
 
 waitingRoomRouter.post('/:show_id/join', Verify, joinWaitingRoom);

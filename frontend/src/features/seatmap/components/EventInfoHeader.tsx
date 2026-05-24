@@ -73,6 +73,7 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
                             <CheckoutCountdown
                                 showId={showId as string}
                                 cancellationDeadline={currentStep >= 3 ? orderData?.cancellation_deadline : undefined}
+                                serverNow={orderData?.server_now}
                             />
                         </div>
                     )}

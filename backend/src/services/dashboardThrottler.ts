@@ -1,11 +1,11 @@
 import redisClient from '../utils/redisClient';
 let activeThrottlers = new Set<string>();
-export const startAdminDashboardThrottler = (show_id: string) => {
+export const startAdminDashboardThrottler = (event_id: string, show_id: string) => {
     if (activeThrottlers.has(show_id)) return;
     activeThrottlers.add(show_id);
-    const holdingSetKey = `show:${show_id}:holding_seats`;
-    const soldCountKey = `show:${show_id}:sold_count`;
-    const revenueKey = `show:${show_id}:total_revenue`;
+    const holdingSetKey = `event:${event_id}:show:${show_id}:holding_seats`;
+    const soldCountKey = `event:${event_id}:show:${show_id}:sold_count`;
+    const revenueKey = `event:${event_id}:show:${show_id}:total_revenue`;
     const ADMIN_CHANNEL = `SHOW_${show_id}_ADMIN_DASHBOARD`;
     const intervalId = setInterval(async () => {
         try {

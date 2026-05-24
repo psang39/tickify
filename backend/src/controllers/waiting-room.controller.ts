@@ -62,7 +62,9 @@ export const checkMyTurn = async (req: Request, res: Response) => {
                 },
                 JWT_SECRET as string,
                 { expiresIn: '15m' }
+
             );
+            await redisClient.setEx(`event_id:${event._id}:show_id:${show_id}:user_id:${user_id}:checkoutToken:${checkoutToken}`, 15 * 60, "active");
             WaitingRoomService.leaveQueue(show_id, user_id);
             res.status(200).json({
                 message: "Đã đến lượt của bạn!",

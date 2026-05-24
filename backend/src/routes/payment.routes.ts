@@ -1,7 +1,7 @@
 
 import express from 'express';
 import { createPaymentUrl, generateMockReturnUrl } from '../controllers/payment.controller';
-import { Verify, verifyCheckoutToken } from '../middleware/verify';
+import { Verify, verifyCheckoutToken } from '../middleware/auth.middleware';
 
 const paymentRouter = express.Router();
 

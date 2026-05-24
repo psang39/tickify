@@ -9,9 +9,7 @@ import { Request, Response } from 'express';
 import redisClient from '../utils/redisClient';
 import crypto from 'crypto';
 import { RSA_PRIVATE_KEY } from '../config/index';
-import { Secret, TOTP } from '@otp-lib/authenticator';
 import { verifyTicketToken } from '../config/totp.util';
-import { decryptPrivateKey } from '../utils/cryptoUtils';
 const SERVER_PRIVATE_KEY = RSA_PRIVATE_KEY;
 if (!SERVER_PRIVATE_KEY) {
     throw new Error('RSA_PRIVATE_KEY is not configured');

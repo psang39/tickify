@@ -8,10 +8,8 @@ import TicketType from '../models/ticket-type.model';
 import Show from '../models/show.model';
 import Ticket from '../models/ticket.model';
 import { orderExpirationQueue } from '../queues/orderExpiration.queue';
-import { validateOrphanSeats } from '../utils/seatValidation';
 import { calculateValidQuantities } from '../utils/validQuantities';
 import { formatHashToJSON } from '../utils/hashToJson';
-import { ITicketType } from '../types/ticket-type.types';
 import Attendee from '../models/attendee.model';
 
 
@@ -356,7 +354,11 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
 
         res.status(201).json({
             message: 'Giữ chỗ thành công!',
-            data: { order_id: newOrder._id, total_price: newOrder.total_price, lockedSeats: seat_ids }
+            data: {
+                order_id: newOrder._id, total_price: newOrder.total_price, lockedSeats: seat_ids,
+                cancellation_deadline: newOrder.cancellation_deadline,
+                server_now: new Date()
+            }
         });
 
 

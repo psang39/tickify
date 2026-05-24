@@ -1,6 +1,6 @@
-import { getSeatsByZone, getSeatById, blockSeat, unblockSeat } from '../controllers/seat.controller';
+import { getSeatById, blockSeat, unblockSeat } from '../controllers/seat.controller';
 import express from 'express';
-import { Verify, verifyRoles, verifyCheckoutToken } from '../middleware/verify';
+import { Verify, verifyRoles, verifyCheckoutToken } from '../middleware/auth.middleware';
 const seatRouter = express.Router();
 
 seatRouter.get('/:seat_id', verifyCheckoutToken, getSeatById);

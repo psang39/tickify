@@ -1,4 +1,5 @@
 import Mongoose, { Schema, Document } from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { IUser } from '../types/user.types';
@@ -16,7 +17,7 @@ const UserSchema = new Mongoose.Schema<IUser>({
     {
         discriminatorKey: 'role',
     })
-
+UserSchema.plugin(mongoosePaginate);
 UserSchema.methods.generateAccessJWT = function () {
     const payload = {
         id: this._id,
@@ -34,6 +35,6 @@ UserSchema.pre("save", async function () {
     this.password = await bcrypt.hash(this.password as string, salt);
 });
 
-const User = Mongoose.model('User', UserSchema);
+const User = Mongoose.model<IUser, Mongoose.PaginateModel<IUser>>('User', UserSchema);
 
 export default User;
