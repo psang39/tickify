@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/axiosClient'; // Đường dẫn tới file Axios config của bạn
+import { ErrorModal } from '@/components/shared/ErrorModal';
+import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 
 export default function MockGatewayPage() {
     const [searchParams] = useSearchParams();
@@ -12,6 +14,7 @@ export default function MockGatewayPage() {
     const amount = searchParams.get('amount');
 
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 
     const handlePayment = async (status: 'SUCCESS' | 'FAILED') => {
@@ -33,20 +36,26 @@ export default function MockGatewayPage() {
 
         } catch (error) {
             console.error("Lỗi khi xử lý giả lập thanh toán:", error);
-            alert("Có lỗi hệ thống xảy ra khi giả lập thanh toán.");
-            navigate(`/`);
+            setErrorMessage("Có lỗi hệ thống xảy ra khi giả lập thanh toán.");
         } finally {
             setIsLoading(false);
         }
     };
 
     if (!orderId || !amount) {
-        return <div className="p-10 text-center text-red-500 font-bold">URL không hợp lệ. Thiếu thông tin đơn hàng!</div>;
+        return (
+            <>
+                <ErrorModal message="URL không hợp lệ. Thiếu thông tin đơn hàng!" onClose={() => navigate(`/`)} />
+                <div className="p-10 text-center text-red-500 font-bold">URL không hợp lệ. Thiếu thông tin đơn hàng!</div>
+            </>
+        );
     }
 
     return (
         <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
-            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+            <LoadingOverlay isVisible={isLoading} message="Đang xử lý thanh toán..." />
+            <ErrorModal message={errorMessage} onClose={() => { setErrorMessage(null); navigate(`/`); }} />
+            <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 overflow-hidden">
                 <div className="bg-blue-600 p-6 text-center text-white">
                     <h1 className="text-2xl font-bold tracking-wider">MOCK GATEWAY</h1>
                     <p className="text-blue-100 mt-1 text-sm">Môi trường giả lập thanh toán</p>
@@ -76,7 +85,7 @@ export default function MockGatewayPage() {
                         <button
                             onClick={() => handlePayment('SUCCESS')}
                             disabled={isLoading}
-                            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-green-500/30 flex justify-center items-center"
+                            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-colors flex justify-center items-center"
                         >
                             {isLoading ? "Đang xử lý..." : "Xác nhận Thanh toán"}
                         </button>

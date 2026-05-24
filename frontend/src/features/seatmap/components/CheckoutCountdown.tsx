@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { useFeedbackStore } from '@/store/useFeedbackStore';
 
 interface CheckoutCountdownProps {
     showId: string;
@@ -13,6 +14,7 @@ export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({
     serverNow
 }) => {
     const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
+    const showError = useFeedbackStore((state) => state.showError);
     const [isPaymentPhase, setIsPaymentPhase] = useState<boolean>(false);
     const serverOffsetMs = useMemo(() => {
         if (!serverNow) return 0;
@@ -61,10 +63,10 @@ export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({
                     clearInterval(interval);
 
                     if (isHolding) {
-                        alert("⏳ Hết thời gian thanh toán! Ghế của bạn đã được nhả ra.");
+                        showError("⏳ Hết thời gian thanh toán! Ghế của bạn đã được nhả ra.");
                         window.location.reload();
                     } else {
-                        alert("⏳ Hết thời gian chọn ghế! Vui lòng xếp hàng lại.");
+                        showError("⏳ Hết thời gian chọn ghế! Vui lòng xếp hàng lại.");
                         localStorage.removeItem(`checkoutToken_${showId}`);
                         window.location.href = `/queue/${showId}`;
                     }
@@ -75,7 +77,7 @@ export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({
         } catch (error) {
             console.error("Lỗi parse thời gian Countdown:", error);
         }
-    }, [showId, cancellationDeadline, serverOffsetMs]);
+    }, [showId, cancellationDeadline, serverOffsetMs, showError]);
 
     const formatTime = (ms: number) => {
         const totalSeconds = Math.floor(ms / 1000);

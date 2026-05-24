@@ -266,11 +266,12 @@ export default function TicketBookingPage() {
         const checkoutKey = `checkoutToken_${showId}`;
         const token = localStorage.getItem(checkoutKey);
         if (!token) return;
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
-        const sse = new EventSource(`http://localhost:3000/api/v1/shows/${showId}/stream`);
+        const sse = new EventSource(`${API_URL}/shows/${showId}/stream`, { withCredentials: true });
 
-        sse.onopen = () => console.log("🟢 Đã kết nối Real-time (SSE)");
-        sse.onerror = (err) => console.error("🔴 Lỗi mất kết nối SSE", err);
+        sse.onopen = () => console.log("Đã kết nối Real-time (SSE)");
+        sse.onerror = (err) => console.error("Lỗi mất kết nối SSE", err);
 
         sse.addEventListener('ZONE_SUMMARY_UPDATES', (event: any) => {
             try {

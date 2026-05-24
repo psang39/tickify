@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from '@/store/useAuthStore';
 import { Image as ImageIcon, Calendar, Info, Edit3, Save, X, UploadCloud, Mic2, Move, Check, ArrowLeft } from 'lucide-react';
 import { useCreateEvent } from '@/hooks/useEventQueries';
+import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
+import { useFeedbackStore } from '@/store/useFeedbackStore';
 
 export default function CreateEvent() {
     const navigate = useNavigate();
     const { user } = useAuthStore();
     const { mutateAsync: createEvent, isPending } = useCreateEvent();
+    const { showSuccess, showError } = useFeedbackStore();
 
     const [formData, setFormData] = useState({
         name: 'Taylor Swift - The Eras Tour',
@@ -59,7 +62,7 @@ export default function CreateEvent() {
         const file = e.target.files?.[0];
         if (file) {
             if (!file.type.startsWith('image/')) {
-                alert("Vui lòng chỉ chọn file hình ảnh!"); return;
+                showError("Vui lòng chỉ chọn file hình ảnh!"); return;
             }
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -75,12 +78,12 @@ export default function CreateEvent() {
     };
 
     const handleSubmit = async () => {
-        if (!formData.organizer_id) { alert("Bạn chưa đăng nhập!"); return; }
-        if (!formData.start_date || !formData.end_date) { alert("Vui lòng thiết lập mốc ngày khai mạc và bế mạc sự kiện!"); return; }
+        if (!formData.organizer_id) { showError("Bạn chưa đăng nhập!"); return; }
+        if (!formData.start_date || !formData.end_date) { showError("Vui lòng thiết lập mốc ngày khai mạc và bế mạc sự kiện!"); return; }
 
         try {
             await createEvent(formData);
-            alert("Tạo sự kiện bản nháp thành công.");
+            showSuccess("Tạo sự kiện bản nháp thành công.");
             navigate('/organizer/events');
         } catch (error) {
             console.error("Lỗi khi lưu sự kiện:", error);
@@ -89,6 +92,7 @@ export default function CreateEvent() {
 
     return (
         <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
+            <LoadingOverlay isVisible={isPending} message="Đang tạo sự kiện..." />
 
             {/* NÚT BACK GÓC TRÁI QUAY LẠI DANH SÁCH THEO THIẾT KẾ TRANG DETAIL */}
             <button

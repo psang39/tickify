@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient';
+import { useFeedbackStore } from '@/store/useFeedbackStore';
 
 // 1. HOOK LẤY DANH SÁCH (Thay cho fetchEvents)
 export const useOrganizerEvents = (page = 1, limit = 10) => {
@@ -31,7 +32,7 @@ export const useCreateEvent = () => {
             queryClient.invalidateQueries({ queryKey: ['organizer-events'] });
         },
         onError: (error: any) => {
-            alert(error.response?.data?.message || 'Có lỗi xảy ra khi tạo sự kiện');
+            useFeedbackStore.getState().showError(error.response?.data?.message || 'Có lỗi xảy ra khi tạo sự kiện');
         }
     });
 };

@@ -4,10 +4,13 @@ import { useMutation } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient'; // Sử dụng axiosClient phẳng đã bật với Credentials
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
+import { useFeedbackStore } from "@/store/useFeedbackStore";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const { login } = useAuthStore(); // Hàm login từ Zustand Store (bản mới chỉ nhận userData)
+    const { showSuccess, showError } = useFeedbackStore();
 
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [customError, setCustomError] = useState('');
@@ -27,7 +30,7 @@ export default function LoginPage() {
             // Cập nhật thông tin user vào Zustand Store (Cookie đã được trình duyệt tự quản lý)
             login(userData);
 
-            alert("Đăng nhập thành công!");
+            showSuccess("Đăng nhập thành công!");
 
             // Điều hướng chuẩn xác dựa theo Role bảo mật
             if (userData.role === 'organizer' || userData.role === 'Organizer') {
@@ -38,7 +41,9 @@ export default function LoginPage() {
         },
         onError: (err: any) => {
             // Trích xuất thông báo lỗi trả về từ tầng Backend Validation
-            setCustomError(err.response?.data?.message || err.response?.data?.error || 'Đăng nhập thất bại. Vui lòng thử lại.');
+            const message = err.response?.data?.message || err.response?.data?.error || 'Đăng nhập thất bại. Vui lòng thử lại.';
+            setCustomError(message);
+            showError(message);
         }
     });
 
@@ -50,6 +55,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+            <LoadingOverlay isVisible={loginMutation.isPending} message="Đang xác thực đăng nhập..." />
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-800">
                     Tickify

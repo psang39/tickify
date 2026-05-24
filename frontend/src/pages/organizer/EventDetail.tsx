@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient';
 import { ErrorModal } from '@/components/shared/ErrorModal';
+import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
+import { useFeedbackStore } from '@/store/useFeedbackStore';
 import {
     UploadCloud, Search, CheckCircle2, Plus, Trash2, Ticket,
     CalendarClock, Tag, Settings, ListVideo, Save, ArrowLeft,
@@ -27,6 +29,7 @@ export default function EventDetail() {
     const queryClient = useQueryClient();
     const location = useLocation();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { showSuccess, showError } = useFeedbackStore();
 
     // ĐIỀU HƯỚNG TABS
     const [activeTab, setActiveTab] = useState<'INFO' | 'SHOWS'>('INFO');
@@ -116,25 +119,25 @@ export default function EventDetail() {
 
     const { mutateAsync: updateEventMutation, isPending: isUpdatingEvent } = useMutation({
         mutationFn: async (updatedData: any) => { return (await api.put(`/organizer/events/${eventId}`, updatedData)).data; },
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); alert("Cập nhật thông tin sự kiện thành công."); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); showSuccess("Cập nhật thông tin sự kiện thành công."); },
         onError: (error: any) => setErrorMessage(error.response?.data?.message || "Lỗi cập nhật sự kiện.")
     });
 
     const { mutateAsync: publishEventMutation, isPending: isPublishingEvent } = useMutation({
         mutationFn: async () => { return (await api.post(`/organizer/events/${eventId}/publish`)).data; },
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); alert("Công khai Sự kiện thành công."); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); showSuccess("Công khai Sự kiện thành công."); },
         onError: (error: any) => setErrorMessage(error.response?.data?.message || "Không thể công khai Sự kiện này.")
     });
 
     const { mutateAsync: unpublishEventMutation, isPending: isUnpublishingEvent } = useMutation({
         mutationFn: async () => { return (await api.post(`/organizer/events/${eventId}/unpublish`)).data; },
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); alert("Đã tạm dừng sự kiện thành công."); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); showSuccess("Đã tạm dừng sự kiện thành công."); },
         onError: (error: any) => setErrorMessage(error.response?.data?.message || "Không thể tạm dừng Sự kiện.")
     });
 
     const { mutateAsync: cancelEventMutation, isPending: isCancellingEvent } = useMutation({
         mutationFn: async () => { return (await api.post(`/organizer/events/${eventId}/cancel`)).data; },
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); alert("Đã hủy thành công toàn bộ sự kiện."); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-event-detail', eventId] }); showSuccess("Đã hủy thành công toàn bộ sự kiện."); },
         onError: (error: any) => setErrorMessage(error.response?.data?.message || "Không thể thực hiện hủy Sự kiện.")
     });
 
@@ -206,7 +209,7 @@ export default function EventDetail() {
             setVenueSearch(newVenue.name);
             setIsCreatingNewVenue(false);
             setNewVenueForm({ name: '', address: '', city: '', latitude: '', longitude: '' });
-            alert(`Đã gửi đề xuất địa điểm "${newVenue.name}". Hệ thống tự động gán vị trí này vào Show.`);
+            showSuccess(`Đã gửi đề xuất địa điểm "${newVenue.name}". Hệ thống tự động gán vị trí này vào Show.`);
         },
         onError: (error: any) => {
             setErrorMessage(error.response?.data?.message || "Không thể khởi tạo đề xuất địa điểm.");
@@ -258,7 +261,7 @@ export default function EventDetail() {
     const handleCreateAllShow = async (e: React.FormEvent) => {
         e.preventDefault();
         if (isCreatingNewVenue) {
-            alert("Vui lòng hoàn thành lưu thông tin Địa điểm mới đề xuất trước khi tạo Show.");
+            showError("Vui lòng hoàn thành lưu thông tin Địa điểm mới đề xuất trước khi tạo Show.");
             return;
         }
         setIsSubmittingShow(true);
@@ -268,7 +271,7 @@ export default function EventDetail() {
                 ticket_types: ticketTypes.map(tt => ({ ...tt, price: Number(tt.price), total_quantity: tt.total_quantity !== '' ? Number(tt.total_quantity) : null }))
             };
             await createShow(finalPayload);
-            alert("Tạo Show và Cấu hình Vé thành công.");
+            showSuccess("Tạo Show và Cấu hình Vé thành công.");
             setShowForm(false);
             queryClient.invalidateQueries({ queryKey: ['event-shows', eventId] });
             setShowData({ name: '', description: '', start_time: '', end_time: '', venue_id: '', sale_start: '', sale_end: '', stadium_map_svg: '' });
@@ -286,11 +289,12 @@ export default function EventDetail() {
     const isInfoTab = activeTab === 'INFO';
     const isAnyActionPending = isUpdatingEvent || isPublishingEvent || isUnpublishingEvent || isCancellingEvent || isSuggestingVenue;
 
-    if (isLoadingEvent) return <div className="p-10 text-center font-medium text-gray-500 animate-pulse">Đang tải thông tin sự kiện...</div>;
+    if (isLoadingEvent) return <LoadingOverlay isVisible={true} message="Đang tải thông tin sự kiện..." />;
     if (!eventData) return <div className="p-10 text-center font-bold text-red-500">Không tìm thấy sự kiện!</div>;
 
     return (
         <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
+            <LoadingOverlay isVisible={isAnyActionPending || isSubmittingShow} message="Đang xử lý thao tác..." />
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             <button
@@ -538,7 +542,7 @@ export default function EventDetail() {
                                                         type="button"
                                                         onClick={async () => {
                                                             if (!newVenueForm.name.trim() || !newVenueForm.address.trim() || !newVenueForm.city.trim()) {
-                                                                alert("Vui lòng điền đủ Tên, Địa chỉ và Thành phố của địa điểm đề xuất.");
+                                                                showError("Vui lòng điền đủ Tên, Địa chỉ và Thành phố của địa điểm đề xuất.");
                                                                 return;
                                                             }
                                                             await suggestVenueMutation({

@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient';
 import { ErrorModal } from '@/components/shared/ErrorModal';
+import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
+import { useFeedbackStore } from '@/store/useFeedbackStore';
 import {
     ArrowLeft, Save, X, MapPin, Calendar, CheckCircle2,
     UploadCloud, EyeOff, Globe, Ban, Info, Clock, Ticket,
@@ -20,6 +22,7 @@ export default function ShowDetail() {
     // ==========================================
     const [activeTab, setActiveTab] = useState<'CONFIG' | 'LIVE'>('CONFIG'); // State điều hướng Tab
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { showSuccess, showError } = useFeedbackStore();
     const [selectedStaffId, setSelectedStaffId] = useState<string>(''); // State quản lý ô select staff
 
     const [formData, setFormData] = useState({
@@ -61,8 +64,8 @@ export default function ShowDetail() {
     useEffect(() => {
         if (!showId || activeTab !== 'LIVE') return;
 
-        // Kết nối đến luồng sự kiện động dựa trên showId đang xem
-        const eventSource = new EventSource(`http://localhost:3000/api/v1/organizer/sse/dashboard/${showId}`,
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+        const eventSource = new EventSource(`${API_URL}/organizer/sse/dashboard/${showId}`,
             { withCredentials: true }
         );
 
@@ -171,7 +174,7 @@ export default function ShowDetail() {
             setVenueSearch(newVenue.name);
             setIsCreatingNewVenue(false);
             setNewVenueForm({ name: '', address: '', latitude: '', longitude: '' });
-            alert(`Đã gửi đề xuất địa điểm "${newVenue.name}". Bạn có thể tiếp tục cấu hình thông tin Show.`);
+            showSuccess(`Đã gửi đề xuất địa điểm "${newVenue.name}". Bạn có thể tiếp tục cấu hình thông tin Show.`);
         },
         onError: (error: any) => {
             setErrorMessage(error.response?.data?.message || "Không thể khởi tạo đề xuất địa điểm.");
@@ -182,26 +185,26 @@ export default function ShowDetail() {
         mutationFn: async (updatedData: any) => { return (await api.put(`/organizer/shows/${showId}`, updatedData)).data; },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['organizer-show-detail', showId] });
-            alert("Cập nhật thông tin Show thành công.");
+            showSuccess("Cập nhật thông tin Show thành công.");
         },
         onError: (err: any) => setErrorMessage(err.response?.data?.message || "Lỗi cập nhật Show.")
     });
 
     const { mutateAsync: publishShowMutation, isPending: isPublishing } = useMutation({
         mutationFn: async () => { return (await api.post(`/organizer/shows/${showId}/publish`)).data; },
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-show-detail', showId] }); alert("Mở bán thành công."); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-show-detail', showId] }); showSuccess("Mở bán thành công."); },
         onError: (err: any) => setErrorMessage(err.response?.data?.message || "Lỗi kích hoạt show.")
     });
 
     const { mutateAsync: unpublishShowMutation, isPending: isUnpublishing } = useMutation({
         mutationFn: async () => { return (await api.post(`/organizer/shows/${showId}/unpublish`)).data; },
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-show-detail', showId] }); alert("Đã tạm dừng bán vé."); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-show-detail', showId] }); showSuccess("Đã tạm dừng bán vé."); },
         onError: (err: any) => setErrorMessage(err.response?.data?.message || "Lỗi tạm dừng.")
     });
 
     const { mutateAsync: cancelShowMutation, isPending: isCancelling } = useMutation({
         mutationFn: async () => { return (await api.post(`/organizer/shows/${showId}/cancel`)).data; },
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-show-detail', showId] }); alert("Đã hủy đêm diễn."); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-show-detail', showId] }); showSuccess("Đã hủy đêm diễn."); },
         onError: (err: any) => setErrorMessage(err.response?.data?.message || "Lỗi hủy show.")
     });
 
@@ -239,7 +242,7 @@ export default function ShowDetail() {
     const filteredVenues = venues.filter((v: any) => v.name.toLowerCase().includes(venueSearch.toLowerCase()));
     const isAnyActionPending = isUpdating || isPublishing || isUnpublishing || isCancelling || isSuggestingVenue;
 
-    if (isLoadingShow) return <div className="min-h-screen flex items-center justify-center font-medium text-gray-500 animate-pulse">Đang tải cấu hình Show...</div>;
+    if (isLoadingShow) return <LoadingOverlay isVisible={true} message="Đang tải cấu hình Show..." />;
     if (!showData) return <div className="min-h-screen flex items-center justify-center font-bold text-red-500">Không tìm thấy dữ liệu đêm diễn!</div>;
 
     // Tìm xem venue hiện tại có được verify không
@@ -248,6 +251,7 @@ export default function ShowDetail() {
 
     return (
         <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
+            <LoadingOverlay isVisible={isAnyActionPending} message="Đang xử lý thao tác..." />
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             {/* BAR TIÊU ĐỀ TRÊN CÙNG */}
@@ -481,7 +485,7 @@ export default function ShowDetail() {
                                             disabled={isSuggestingVenue}
                                             onClick={async () => {
                                                 if (!newVenueForm.name.trim() || !newVenueForm.address.trim()) {
-                                                    alert("Vui lòng điền đầy đủ Tên và Địa chỉ của địa điểm.");
+                                                    showError("Vui lòng điền đầy đủ Tên và Địa chỉ của địa điểm.");
                                                     return;
                                                 }
                                                 await suggestVenueMutation({
@@ -546,7 +550,7 @@ export default function ShowDetail() {
                                                 if (selectedStaffId) {
                                                     await assignStaffMutation(selectedStaffId);
                                                 } else {
-                                                    alert("Vui lòng chọn tài khoản từ danh sách thả xuống.");
+                                                    showError("Vui lòng chọn tài khoản từ danh sách thả xuống.");
                                                 }
                                             }}
                                             className="bg-primary hover:opacity-90 text-white px-3 py-2 rounded-lg text-xs font-bold transition-opacity"

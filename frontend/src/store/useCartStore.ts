@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { ISeat } from '@/types/seat.types'
+import { useFeedbackStore } from '@/store/useFeedbackStore';
 
 interface CartState {
     selectedSeats: ISeat[];
@@ -97,7 +98,7 @@ export const useCartStore = create<CartState>((set, get) => ({
         if (selectedSeats.find(s => s.id === seat.id)) {
             const newSelected = selectedSeats.filter(s => s.id !== seat.id);
             if (hasOrphanSeat(newSelected.map(s => s.id), allSeats)) {
-                alert("Không thể bỏ chọn vì sẽ tạo ra ghế trống đơn lẻ!");
+                useFeedbackStore.getState().showError("Không thể bỏ chọn vì sẽ tạo ra ghế trống đơn lẻ!");
                 return;
             }
             set({ selectedSeats: newSelected });
@@ -107,7 +108,7 @@ export const useCartStore = create<CartState>((set, get) => ({
         // 2. Logic CHỌN CỤM
         const cluster = findCluster(seat, comboCount, allSeats);
         if (cluster.length === 0) {
-            alert(`Không tìm thấy ${comboCount} chỗ trống liền kề ở khu vực này!`);
+            useFeedbackStore.getState().showError(`Không tìm thấy ${comboCount} chỗ trống liền kề ở khu vực này!`);
             return;
         }
 
@@ -115,13 +116,13 @@ export const useCartStore = create<CartState>((set, get) => ({
         const newSeats = cluster.filter(s => !selectedSeats.some(sel => sel.id === s.id));
 
         if (selectedSeats.length + newSeats.length > maxTickets) {
-            alert(`Bạn chỉ được mua tối đa ${maxTickets} vé!`);
+            useFeedbackStore.getState().showError(`Bạn chỉ được mua tối đa ${maxTickets} vé!`);
             return;
         }
 
         const pendingSelectedIds = [...selectedSeats, ...newSeats].map(s => s.id);
         if (hasOrphanSeat(pendingSelectedIds, allSeats)) {
-            alert("Vị trí này sẽ để lại 1 ghế trống đơn lẻ. Vui lòng chọn cụm khác!");
+            useFeedbackStore.getState().showError("Vị trí này sẽ để lại 1 ghế trống đơn lẻ. Vui lòng chọn cụm khác!");
             return;
         }
 

@@ -3,9 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient';
 import { Users, Ticket, CalendarClock, DollarSign, CheckCircle, XCircle, MapPin, ChevronLeft, ChevronRight, PlusCircle, Trash2, Edit3 } from 'lucide-react';
 import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
+import { useFeedbackStore } from '@/store/useFeedbackStore';
 
 export default function AdminDashboard() {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useFeedbackStore();
 
     // STATE QUẢN LÝ PHÂN TRANG
     const [orgPage, setOrgPage] = useState(1);
@@ -84,10 +86,10 @@ export default function AdminDashboard() {
             setEditingVenueId(null);
             setIsVenueFormOpen(false);
             setVenueForm({ name: '', address: '', latitude: '', longitude: '', city: '' });
-            alert(editingVenueId ? "Cập nhật thông tin địa điểm thành công!" : "Khởi tạo địa điểm hệ thống dùng chung thành công!");
+            showSuccess(editingVenueId ? "Cập nhật thông tin địa điểm thành công!" : "Khởi tạo địa điểm hệ thống dùng chung thành công!");
         },
         onError: (err: any) => {
-            alert(err.response?.data?.message || "Thao tác thất bại. Vui lòng kiểm tra lại dữ liệu.");
+            showError(err.response?.data?.message || "Thao tác thất bại. Vui lòng kiểm tra lại dữ liệu.");
         }
     });
 
@@ -97,9 +99,9 @@ export default function AdminDashboard() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['adminAllVenues'] });
             queryClient.invalidateQueries({ queryKey: ['adminDashboardStats'] });
-            alert("Đã xóa vĩnh viễn địa điểm khỏi hệ thống.");
+            showSuccess("Đã xóa vĩnh viễn địa điểm khỏi hệ thống.");
         },
-        onError: (err: any) => alert(err.response?.data?.message || "Không thể xóa địa điểm này!")
+        onError: (err: any) => showError(err.response?.data?.message || "Không thể xóa địa điểm này!")
     });
 
     // Mutation: Phê duyệt Địa điểm do đối tác đề xuất
@@ -141,7 +143,7 @@ export default function AdminDashboard() {
     const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!venueForm.name.trim() || !venueForm.address.trim()) {
-            alert("Vui lòng điền đầy đủ Tên và Địa chỉ.");
+            showError("Vui lòng điền đầy đủ Tên và Địa chỉ.");
             return;
         }
         saveVenueMutation.mutate(venueForm);

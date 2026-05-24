@@ -24,7 +24,9 @@ import OrganizerDashboard from '@/pages/organizer/OrganizerDashboard';
 import OrganizerStaff from '@/pages/organizer/OrganizerStaff';
 import ShowDetail from '@/pages/organizer/ShowDetail';
 import PaymentResultPage from '@/pages/attendee/PaymentResultPage';
+import SearchPage from '@/pages/attendee/SearchPage';
 import { useAuthStore } from '@/store/useAuthStore';
+import { FeedbackModalHost } from '@/components/shared/FeedbackModalHost';
 
 import './App.css';
 
@@ -51,9 +53,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <FeedbackModalHost />
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/search" element={<SearchPage />} />
 
             <Route element={<ProtectedRoute allowedRoles={ADMIN_ROLES} />}>
               <Route element={<AdminLayout />}>
