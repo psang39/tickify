@@ -64,7 +64,7 @@ export default function ManageUsersPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            {user.role === 'Organizer' ? (
+                                            {user.role === 'Organizer' || user.role === 'organizer' ? (
                                                 <span className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-blue-100">
                                                     <ShieldCheck size={12} /> Organizer
                                                 </span>

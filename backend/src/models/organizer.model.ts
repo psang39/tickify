@@ -4,7 +4,7 @@ import { IOrganizer } from '../types/organizer.types';
 const OrganizerSchema = new Mongoose.Schema<IOrganizer>({
     company_name: { type: String, required: true },
     tax_id: { type: String, required: true, unique: true },
-    verified: { type: Boolean, default: false }
+    is_verified: { type: Boolean, default: false }
 });
 
 const Organizer = User.discriminator('Organizer', OrganizerSchema);

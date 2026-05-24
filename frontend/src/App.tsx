@@ -25,6 +25,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminLayout from './components/layout/AdminLayout';
 import ManageUsersPage from './pages/admin/ManageUsersPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import OrganizerStaff from './pages/organizer/OrganizerStaff';
 import './App.css'
 import { PublicRoute } from './components/auth/PublicRoute';
 import AttendeeLayout from './components/layout/AttendeeLayout';
@@ -78,6 +79,7 @@ function App() {
               <Route element={<OrganizerLayout />}>
 
                 <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
+                <Route path="/organizer/staff" element={<OrganizerStaff />} />
                 <Route path="/organizer/events" element={<EventManagement />} />
                 <Route path="/organizer/events/create" element={<CreateEvent />} />
 

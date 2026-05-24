@@ -107,7 +107,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             maxAge: 20 * 60 * 1000,
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: "none" as const,
+            sameSite: process.env.NODE_ENV === 'production' ? "none" as const : "lax" as const,
         };
 
         const token = user.generateAccessJWT();
@@ -165,7 +165,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
         res.clearCookie("SessionID", {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: "none"
+            sameSite: process.env.NODE_ENV === 'production' ? "none" as const : "lax" as const,
         });
 
         res.status(200).json({ message: 'Logout successful' });

@@ -15,12 +15,18 @@ const verifyJwt = (token: string, secret: string) => {
 
 const Verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: "Access denied. No token provided." });
+        const token = req.cookies.SessionID;
+        if (!token) {
+            console.log(req.cookies.SessionID);
+            return res.status(401).json({ message: "Không tìm thấy quyền truy cập hợp lệ!" });
         }
-        const token = authHeader.split(" ")[1];
+
+        // const authHeader = req.headers.authorization;
+
+        // if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        //     return res.status(401).json({ error: "Access denied. No token provided." });
+        // }
+        // const token = authHeader.split(" ")[1];
 
         const decoded: any = await verifyJwt(token, SECRET_ACCESS_TOKEN as string);
 

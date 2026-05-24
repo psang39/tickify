@@ -40,7 +40,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
         const skip = page * limit;
 
         // Nâng cấp: Cho phép lọc theo role nếu có truyền query (?role=Organizer hoặc ?role=User)
-        const filter: any = {};
+        const filter: any = { role: { $ne: 'Admin' } };
         if (req.query.role) {
             filter.role = req.query.role;
         }

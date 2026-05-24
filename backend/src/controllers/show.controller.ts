@@ -11,6 +11,8 @@ import redisClient from '../utils/redisClient';
 import { calculateValidQuantities } from '../utils/validQuantities';
 import mongoose from 'mongoose';
 import { formatHashToJSON } from '../utils/hashToJson';
+import { generateRSAKeyPair, encryptPrivateKey } from '../utils/cryptoUtils';
+
 export const createShow = async (req: Request, res: Response) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -70,6 +72,9 @@ export const createShow = async (req: Request, res: Response) => {
                 }
             });
         }
+        const { publicKey, privateKey } = generateRSAKeyPair();
+        const encryptedPrivateKey = encryptPrivateKey(privateKey);
+
         const newShow = new Show({
             event_id,
             name,
@@ -81,7 +86,9 @@ export const createShow = async (req: Request, res: Response) => {
             venue_id,
             organizer_id,
             stadium_map_svg,
-            map_assets: mapAssets
+            map_assets: mapAssets,
+            public_key: publicKey,
+            encrypted_private_key: encryptedPrivateKey
         });
         const savedShow = await newShow.save();
         const createdTicketTypes = [] as any[];
@@ -307,7 +314,7 @@ export const getShowById = async (req: Request, res: Response) => {
         const show = await Show.findById(show_id)
             .populate('event_id', 'name poster')
             .populate('venue_id', 'name address')
-            .select('-stadium_map_svg')
+            .select('-stadium_map_svg -encrypted_private_key ')
             .lean();
         if (!show) {
             return res.status(404).json({ message: "Show not found" });
@@ -344,6 +351,41 @@ export const getShowById = async (req: Request, res: Response) => {
                 };
             }
         });
+        res.status(200).json({
+            show_info: show,
+            zones: zones,
+            zone_summaries: zoneSummariesDict
+        });
+
+
+
+    } catch (error) {
+        console.error("Lỗi khi fetch Show:", error);
+        res.status(500).json({ message: "Error fetching show", error });
+    }
+};
+export const getOrganizerShowById = async (req: Request, res: Response) => {
+    try {
+        const { show_id } = req.params;
+        const show = await Show.findById(show_id)
+            .populate('event_id', 'name poster')
+            .populate('venue_id', 'name address')
+            .select('-stadium_map_svg -encrypted_private_key ')
+            .lean();
+        if (!show) {
+            return res.status(404).json({ message: "Show not found" });
+        }
+        if (show.organizer_id.toString() !== req.user!.id) {
+            return res.status(403).json({ message: "Bạn không có quyền truy cập thông tin show này" });
+        }
+
+
+        const zones = await Zone.find({ show_id })
+            .select('_id name path_data overall_map_svg_id capacity')
+            .lean();
+        const zoneSummariesDict: Record<string, any> = {};
+
+
         res.status(200).json({
             show_info: show,
             zones: zones,

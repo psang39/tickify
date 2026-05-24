@@ -14,7 +14,8 @@ const TicketSchema = new mongoose.Schema<ITicket>({
         enum: ['VALID', 'USED', 'INVALID'],
         default: 'VALID'
     },
-    check_in_time: { type: Date }
+    check_in_time: { type: Date },
+    signature: { type: String, required: true },
 }, { timestamps: true });
 
 TicketSchema.index({ event_id: 1, seat_id: 1 }, { unique: true });

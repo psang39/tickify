@@ -118,10 +118,11 @@ export default function TicketBookingPage() {
                     headers: {
                         'Content-Type': 'application/json',
                         'x-checkout-token': checkoutToken || '',
-                        'Authorization': `Bearer ${localStorage.getItem('tickify_token')}`,
+
                     },
                     body: JSON.stringify({ order_id: orderId }),
-                    keepalive: true
+                    keepalive: true,
+                    credentials: 'include'
                 }).catch(err => console.error("Lỗi tự động nhả ghế:", err));
             }
         };

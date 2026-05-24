@@ -19,7 +19,9 @@ const ShowSchema = new mongoose.Schema<IShow>({
     venue_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Venue', required: true },
     organizer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Organizer', required: true },
     created_at: { type: Date, default: Date.now },
-    updated_at: { type: Date, default: Date.now }
+    updated_at: { type: Date, default: Date.now },
+    public_key: { type: String, required: true, unique: true },
+    encrypted_private_key: { type: String, required: true, unique: true }
 });
 
 ShowSchema.plugin(paginate);

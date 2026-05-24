@@ -6,12 +6,27 @@ export const api = axios.create({
     withCredentials: true
 });
 
-// Interceptor tự động đính kèm Token
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('tickify_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
+api.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response) {
+            const status = error.response.status;
+            if (status === 401) {
+                console.warn("Phiên đăng nhập không hợp lệ hoặc đã hết hạn.");
 
-    return config;
-});
+                if (!window.location.pathname.includes('/login')) {
+                    localStorage.removeItem('tickify_user');
+                    window.location.href = '/login';
+                }
+            }
+
+            if (status === 403) {
+                console.error("Bạn không có quyền truy cập vào tài nguyên này!");
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);

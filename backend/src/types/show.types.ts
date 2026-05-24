@@ -20,5 +20,7 @@ export interface IShow extends Document {
     organizer_id: Types.ObjectId;
     created_at: Date;
     updated_at: Date;
+    encrypted_private_key: string;
+    public_key: string;
 }
 

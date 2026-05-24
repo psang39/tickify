@@ -9,6 +9,7 @@
 // import methodOverride from 'method-override';
 // import path from 'path';
 // const app = express();
+import cookieParser from 'cookie-parser';
 import { setServers } from "node:dns/promises";
 import compression from 'compression';
 import router from "./routes/index";
@@ -29,6 +30,7 @@ import Express from "express";
 // import authRoutes from "./routes/auth";
 
 const app = Express();
+app.use(cookieParser());
 app.use(cors({
     origin: 'http://localhost:5173', // Điền đúng địa chỉ Frontend của bạn
     credentials: true // Cho phép đính kèm token/cookie
@@ -51,7 +53,6 @@ app.use(compression({
         return compression.filter(req, res);
     }
 }));
-app.use(Express.json());
 app.use('/api/v1/', router);
 
 export default app;

@@ -11,4 +11,5 @@ export interface ITicket extends Document {
     ticket_secret: string;
     status: 'VALID' | 'USED' | 'INVALID';
     check_in_time?: Date;
+    signature: string;
 }
