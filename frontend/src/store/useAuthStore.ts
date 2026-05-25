@@ -9,7 +9,7 @@ interface User {
     last_name: string;
     username: string;
     email: string;
-    role: 'organizer' | 'attendee' | 'admin';
+    role: 'Organizer' | 'Attendee' | 'Admin';
 }
 
 interface AuthState {

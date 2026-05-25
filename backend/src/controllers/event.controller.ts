@@ -287,7 +287,6 @@ export const getOrganizerEventById = async (req: Request, res: Response) => {
 };
 export const searchEventsPublic = async (req: Request, res: Response) => {
     try {
-
         const keyword = (req.query.q || req.query.keyword || req.query.search || req.query.name) as string;
         const city = (req.query.city || req.query.location) as string;
         const genre = req.query.genre as string;

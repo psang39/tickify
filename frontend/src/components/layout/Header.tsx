@@ -7,8 +7,6 @@ export default function Header() {
     const navigate = useNavigate();
     const { user, isAuthenticated, logout } = useAuthStore();
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Xử lý kích hoạt tìm kiếm khi gõ Enter
     const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchQuery.trim()) {
             navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
@@ -36,7 +34,7 @@ export default function Header() {
                 />
             </div>
             <div className="flex items-center gap-6">
-                {(!user || user.role === 'attendee') && (
+                {(!user || user.role === 'Attendee') && (
                     <Link to="/orders" className="flex items-center gap-2 text-gray-600 hover:text-primary font-bold text-sm transition-colors">
                         <Ticket size={18} />
                         <span>Lịch sử đặt vé</span>
@@ -48,19 +46,18 @@ export default function Header() {
                     VN <ChevronDown size={14} />
                 </button>
 
-                {/* KHU VỰC PHÂN CHIA TRẠNG THÁI LOGIN / PROFILE / DASHBOARD */}
+
                 {!isAuthenticated ? (
-                    /* TRẠNG THÁI 1: CHƯA ĐĂNG NHẬP */
+
                     <Link to="/login">
                         <button className="bg-[#4C4DCC] hover:bg-[#3b3ca3] text-white flex items-center gap-2 rounded-full px-6 py-2 text-sm font-bold transition-colors shadow-sm border-none cursor-pointer">
                             Đăng nhập / Đăng ký
                         </button>
                     </Link>
                 ) : (
-                    /* TRẠNG THÁI 2: ĐÃ ĐĂNG NHẬP */
+
                     <div className="flex items-center gap-3">
-                        {user?.role === 'attendee' ? (
-                            /* 2A. KHÁCH HÀNG: Hiện chữ Hồ Sơ */
+                        {user?.role === 'Attendee' ? (
                             <Link to="/profile">
                                 <button className="bg-gray-100 hover:bg-gray-200 text-gray-800 flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors border-none cursor-pointer">
                                     <User size={16} />
@@ -69,7 +66,7 @@ export default function Header() {
                             </Link>
                         ) : (
                             /* 2B. ADMIN / ORGANIZER: Hiện Trang quản trị điều hướng thẳng về hệ thống */
-                            <Link to={user?.role === 'admin' ? '/admin/dashboard' : '/organizer/dashboard'}>
+                            <Link to={user?.role === 'Admin' ? '/admin/dashboard' : '/organizer/dashboard'}>
                                 <button className="bg-[#4C4DCC] hover:bg-[#3b3ca3] text-white flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors shadow-sm border-none cursor-pointer">
                                     <LayoutDashboard size={16} />
                                     <span>Trang quản trị</span>
