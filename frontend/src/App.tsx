@@ -59,17 +59,17 @@ function App() {
       <BrowserRouter>
         <FeedbackModalHost />
         <Routes>
+          <Route element={<ProtectedRoute allowedRoles={ADMIN_ROLES} />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/users" element={<ManageUsersPage />} />
+            </Route>
+          </Route>
+
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/events/:eventId" element={<EventDetailPage />} />
-
-            <Route element={<ProtectedRoute allowedRoles={ADMIN_ROLES} />}>
-              <Route element={<AdminLayout />}>
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<ManageUsersPage />} />
-              </Route>
-            </Route>
 
             <Route element={<ProtectedRoute allowedRoles={ATTENDEE_ROLES} />}>
               <Route element={<AttendeeLayout />}>
@@ -77,7 +77,6 @@ function App() {
                 <Route path="/orders" element={<OrderHistory />} />
                 <Route path="/orders/detail" element={<OrderDetailPage />} />
                 <Route path="/tickets/:ticketId" element={<TicketDetailPage />} />
-
               </Route>
             </Route>
 
@@ -92,18 +91,17 @@ function App() {
                 <Route path="/organizer/events/:eventId/shows/:showId" element={<ShowDetail />} />
               </Route>
             </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={ATTENDEE_ROLES} />}>
+              <Route path="/queue/:showId" element={<WaitingRoomPage />} />
+              <Route path="/shows/:showId/booking" element={<TicketBookingPage />} />
+              <Route path="/mock-gateway" element={<MockGatewayPage />} />
+              <Route path="/payment/result" element={<PaymentResultPage />} />
+            </Route>
           </Route>
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-
-          <Route element={<ProtectedRoute allowedRoles={ATTENDEE_ROLES} />}>
-            <Route path="/queue/:showId" element={<WaitingRoomPage />} />
-            <Route path="/shows/:showId/booking" element={<TicketBookingPage />} />
-            <Route path="/mock-gateway" element={<MockGatewayPage />} />
-            <Route path="/payment/result" element={<PaymentResultPage />} />
-
-          </Route>
 
           <Route path="*" element={<div className="p-10 text-center">404 - Không tìm thấy trang</div>} />
         </Routes>

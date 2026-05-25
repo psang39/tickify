@@ -9,13 +9,11 @@ export default function AdminDashboard() {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useFeedbackStore();
 
-    // STATE QUẢN LÝ PHÂN TRANG
     const [orgPage, setOrgPage] = useState(1);
     const [venuePage, setVenuePage] = useState(1);
     const LIMIT = 5;
 
-    // STATE ĐIỀU KHIỂN ĐÓNG/MỞ VÀ BIỂU MẪU ĐỊA ĐIỂM
-    const [isVenueFormOpen, setIsVenueFormOpen] = useState(false); // 🌟 State đóng/mở form tại chỗ
+    const [isVenueFormOpen, setIsVenueFormOpen] = useState(false);
     const [editingVenueId, setEditingVenueId] = useState<string | null>(null);
     const [venueForm, setVenueForm] = useState({
         name: '',
@@ -25,11 +23,6 @@ export default function AdminDashboard() {
         longitude: ''
     });
 
-    // ==========================================
-    // 1. FETCH DATA (STATS & LISTS)
-    // ==========================================
-
-    // Fetch Thống kê tổng quan vĩ mô
     const { data: statsData, isLoading: isStatsLoading } = useQuery({
         queryKey: ['adminDashboardStats'],
         queryFn: async () => {
@@ -38,7 +31,6 @@ export default function AdminDashboard() {
         }
     });
 
-    // Fetch danh sách Ban tổ chức chờ duyệt
     const { data: orgsResponse, isLoading: isOrgLoading } = useQuery({
         queryKey: ['pendingOrganizers', orgPage],
         queryFn: async () => {
@@ -51,7 +43,6 @@ export default function AdminDashboard() {
     const pendingOrganizers = orgsResponse?.data || [];
     const orgPagination = orgsResponse?.pagination;
 
-    // Fetch TẤT CẢ Địa điểm hệ thống
     const { data: venuesResponse, isLoading: isVenueLoading } = useQuery({
         queryKey: ['adminAllVenues', venuePage],
         queryFn: async () => {
@@ -93,7 +84,7 @@ export default function AdminDashboard() {
         }
     });
 
-    // MUTATION: XÓA ĐỊA ĐIỂM TẠI CHỖ
+
     const deleteVenueMutation = useMutation({
         mutationFn: async (venueId: string) => api.delete(`/admin/venues/${venueId}`),
         onSuccess: () => {
@@ -104,13 +95,13 @@ export default function AdminDashboard() {
         onError: (err: any) => showError(err.response?.data?.message || "Không thể xóa địa điểm này!")
     });
 
-    // Mutation: Phê duyệt Địa điểm do đối tác đề xuất
+
     const verifyVenueMutation = useMutation({
         mutationFn: async (venueId: string) => api.put(`/admin/venues/${venueId}/verify`),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['adminAllVenues'] })
     });
 
-    // Mutations xác thực tài khoản Tổ chức
+
     const verifyOrgMutation = useMutation({
         mutationFn: async (userId: string) => api.put(`/admin/organizers/${userId}/verify`),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pendingOrganizers'] })
@@ -120,10 +111,10 @@ export default function AdminDashboard() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pendingOrganizers'] })
     });
 
-    // Kích hoạt chế độ sửa dữ liệu (Mở form + Đổ dữ liệu cũ)
+
     const handleStartEdit = (venue: any) => {
         setEditingVenueId(venue._id);
-        setIsVenueFormOpen(true); // Tự động mở form ra khi bấm nút sửa trên hàng
+        setIsVenueFormOpen(true);
         setVenueForm({
             name: venue.name || '',
             address: venue.address || '',
@@ -136,7 +127,7 @@ export default function AdminDashboard() {
 
     const handleCancelEdit = () => {
         setEditingVenueId(null);
-        setIsVenueFormOpen(false); // Xếp gọn form biến mất khi nhấn hủy
+        setIsVenueFormOpen(false);
         setVenueForm({ name: '', address: '', latitude: '', longitude: '', city: '' });
     };
 
@@ -160,7 +151,7 @@ export default function AdminDashboard() {
                 <p className="text-slate-500 mt-1 font-medium">Cập nhật hệ thống: {new Date().toLocaleTimeString('vi-VN')}</p>
             </header>
 
-            {/* CARD THỐNG KÊ */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Tổng Tài khoản" value={statsData?.totalUsers?.toLocaleString() || 0} icon={<Users size={24} className="text-blue-500" />} bg="bg-blue-50" />
                 <StatCard title="Sự kiện Active" value={statsData?.totalActiveEvents?.toLocaleString() || 0} icon={<Ticket size={24} className="text-emerald-500" />} bg="bg-emerald-50" />
@@ -168,7 +159,7 @@ export default function AdminDashboard() {
                 <StatCard title="Tổng Doanh thu" value={new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(statsData?.totalSystemRevenue || 0)} icon={<DollarSign size={24} className="text-primary" />} bg="bg-pink-50" />
             </div>
 
-            {/* 🌟 FORM TÁI SỬ DỤNG: CHỈ HIỂN THỊ KHI CLICK THÊM HOẶC SỬA */}
+
             {(isVenueFormOpen || editingVenueId) && (
                 <section className={`bg-white border rounded-[24px] p-6 transition-all duration-300 ${editingVenueId ? 'border-primary ring-2 ring-primary/5' : 'border-slate-200'} animate-in slide-in-from-top duration-200`}>
                     <div className="border-b border-slate-100 pb-4 mb-5">
@@ -323,8 +314,8 @@ export default function AdminDashboard() {
                             type="button"
                             onClick={() => {
                                 setEditingVenueId(null);
-                                setVenueForm({ name: '', address: '', latitude: '', longitude: '', city: '' }); // Reset form về trống
-                                setIsVenueFormOpen(true); // Bật form trống lên
+                                setVenueForm({ name: '', address: '', latitude: '', longitude: '', city: '' });
+                                setIsVenueFormOpen(true);
                             }}
                             className="bg-primary hover:opacity-90 text-white font-bold text-xs h-9 px-4 rounded-xl transition-all border-none flex items-center gap-1.5 cursor-pointer"
                         >

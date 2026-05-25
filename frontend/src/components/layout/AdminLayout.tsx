@@ -1,6 +1,14 @@
 import React from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Building2, AlertTriangle, LogOut } from 'lucide-react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import {
+    AlertTriangle,
+    Building2,
+    LayoutDashboard,
+    LogOut,
+    Menu,
+    ShieldCheck,
+    Users,
+} from 'lucide-react';
 
 export default function AdminLayout() {
     const navigate = useNavigate();
@@ -8,44 +16,113 @@ export default function AdminLayout() {
     const currentPath = location.pathname;
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-900 flex">
-            <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between fixed h-screen top-0 left-0">
-                <div className="p-6">
-                    {/* Logo */}
-                    <div className="mb-10 flex items-center gap-2">
-                        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-black text-xl">T</div>
-                        <span className="font-black text-xl tracking-tight text-slate-800">Tickify <span className="text-primary">Admin</span></span>
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+            <div className="flex min-h-screen">
+                <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:block">
+                    <div className="sticky top-0 flex h-screen flex-col justify-between">
+                        <div className="px-5 py-5">
+                            <button
+                                type="button"
+                                onClick={() => navigate('/admin')}
+                                className="mb-8 flex w-full items-center gap-3 text-left"
+                            >
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-lg font-black text-white shadow-sm">
+                                    T
+                                </div>
+                                <div className="leading-tight">
+                                    <p className="text-base font-black tracking-tight text-slate-900">Tickify</p>
+                                    <p className="text-xs font-semibold text-slate-500">Trang quản trị</p>
+                                </div>
+                            </button>
+
+                            <nav className="space-y-1">
+                                <SidebarLink
+                                    icon={<LayoutDashboard size={18} />}
+                                    label="Tổng quan"
+                                    active={currentPath === '/admin'}
+                                    onClick={() => navigate('/admin')}
+                                />
+                                <SidebarLink
+                                    icon={<Building2 size={18} />}
+                                    label="Duyệt nhà tổ chức"
+                                    active={currentPath.startsWith('/admin/organizers')}
+                                    onClick={() => navigate('/admin/organizers')}
+                                />
+                                <SidebarLink
+                                    icon={<Users size={18} />}
+                                    label="Người dùng"
+                                    active={currentPath.startsWith('/admin/users')}
+                                    onClick={() => navigate('/admin/users')}
+                                />
+                                <SidebarLink
+                                    icon={<AlertTriangle size={18} />}
+                                    label="Báo cáo vi phạm"
+                                    active={currentPath.startsWith('/admin/reports')}
+                                    onClick={() => navigate('/admin/reports')}
+                                />
+                            </nav>
+                        </div>
+
+                        <div className="border-t border-slate-100 p-5">
+                            <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:bg-red-50 hover:text-red-500">
+                                <LogOut size={18} />
+                                <span>Đăng xuất</span>
+                            </button>
+                        </div>
                     </div>
+                </aside>
 
-                    {/* Navigation */}
-                    <nav className="space-y-1">
-                        <SidebarLink icon={<LayoutDashboard size={18} />} label="Tổng quan" active={currentPath === '/admin'} onClick={() => navigate('/admin')} />
-                        <SidebarLink icon={<Building2 size={18} />} label="Duyệt Organizer" active={currentPath.startsWith('/admin/organizers')} onClick={() => navigate('/admin/organizers')} />
-                        <SidebarLink icon={<Users size={18} />} label="Quản lý Users" active={currentPath.startsWith('/admin/users')} onClick={() => navigate('/admin/users')} />
-                        <SidebarLink icon={<AlertTriangle size={18} />} label="Báo cáo vi phạm" active={currentPath.startsWith('/admin/reports')} onClick={() => navigate('/admin/reports')} />
-                    </nav>
-                </div>
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:px-8">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <button className="rounded-lg border border-slate-200 p-2 text-slate-600 lg:hidden" type="button">
+                                    <Menu size={18} />
+                                </button>
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản trị hệ thống</p>
+                                    <h1 className="text-lg font-bold text-slate-900 md:text-xl">Bảng điều khiển Admin</h1>
+                                </div>
+                            </div>
+                            <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 sm:flex">
+                                <ShieldCheck size={15} className="text-primary" />
+                                Quyền quản trị
+                            </div>
+                        </div>
+                    </header>
 
-                <div className="p-6 border-t border-slate-100">
-                    <button className="flex items-center gap-3 w-full px-4 py-3 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors font-semibold text-sm">
-                        <LogOut size={18} />
-                        <span>Đăng xuất</span>
-                    </button>
+                    <main className="flex-1 px-4 py-6 md:px-8 lg:px-10">
+                        <Outlet />
+                    </main>
                 </div>
-            </aside>
-            <main className="flex-1 ml-64 p-10">
-                <Outlet />
-            </main>
+            </div>
         </div>
     );
 }
 
-function SidebarLink({ icon, label, active = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void }) {
+function SidebarLink({
+    icon,
+    label,
+    active = false,
+    onClick,
+}: {
+    icon: React.ReactNode;
+    label: string;
+    active?: boolean;
+    onClick?: () => void;
+}) {
     return (
-        <div onClick={onClick} className={`flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all font-semibold text-sm
-            ${active ? 'bg-primary/10 text-primary' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}>
-            <span className={active ? "text-primary" : "text-slate-400"}>{icon}</span>
+        <button
+            type="button"
+            onClick={onClick}
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all ${
+                active
+                    ? 'bg-primary/10 text-primary shadow-sm'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+            }`}
+        >
+            <span className={active ? 'text-primary' : 'text-slate-400'}>{icon}</span>
             <span>{label}</span>
-        </div>
+        </button>
     );
 }

@@ -12,13 +12,42 @@ export default function ManageUsersPage() {
         queryKey: ['allUsers', page],
         queryFn: async () => {
             const res = await api.get(`/admin/users?page=${page}&limit=${limit}`);
-            return res.data; // Trả về { data: users, total, hasMore }
+            return res.data;
         }
     });
 
     const users = data?.data || [];
     const hasMore = data?.hasMore || false;
     const total = data?.total || 0;
+    const renderRoleBadge = (role: string) => {
+        const lowerRole = role?.toLowerCase();
+
+        if (lowerRole === 'organizer') {
+            return (
+                <span className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-blue-100">
+                    <ShieldCheck size={12} /> Organizer
+                </span>
+            );
+        }
+
+        if (lowerRole === 'attendee') {
+            return (
+                <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-slate-200">
+                    <UserIcon size={12} /> Attendee
+                </span>
+            );
+        }
+        if (lowerRole === 'staff') {
+            return (
+                <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-slate-200">
+                    <UserIcon size={12} /> Staff
+                </span>
+            );
+        }
+
+        return null;
+    };
+
 
     return (
         <div className="w-full max-w-6xl animate-in fade-in duration-300">
@@ -29,7 +58,7 @@ export default function ManageUsersPage() {
                     <h1 className="text-2xl font-black text-slate-800 mb-2">Quản lý Tài khoản</h1>
                     <p className="text-slate-500 text-sm">Hệ thống ghi nhận tổng cộng <span className="font-bold text-primary">{total}</span> tài khoản đăng ký.</p>
                 </div>
-                {/* Thanh tìm kiếm (UI) */}
+
                 <div className="relative w-full md:w-72">
                     <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
@@ -64,15 +93,7 @@ export default function ManageUsersPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            {user.role === 'Organizer' || user.role === 'organizer' ? (
-                                                <span className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-blue-100">
-                                                    <ShieldCheck size={12} /> Organizer
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-slate-200">
-                                                    <UserIcon size={12} /> Attendee
-                                                </span>
-                                            )}
+                                            {renderRoleBadge(user.role)}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="text-sm font-medium text-emerald-600">Đang hoạt động</span>

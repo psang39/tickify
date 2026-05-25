@@ -1,101 +1,87 @@
-import React from 'react';
-import { Disc, Play, Apple } from 'lucide-react';
+import { Apple, Play } from 'lucide-react';
 
 export default function Footer() {
     return (
-        <footer className="w-full bg-[#27272A] text-white py-16 px-8 font-sans">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-6 mb-12">
-                    <div className="lg:col-span-2 space-y-6">
+        <footer className="w-full bg-zinc-900 px-5 py-10 font-sans text-white md:px-8">
+            <div className="mx-auto max-w-7xl">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
+                    <div className="space-y-4 lg:col-span-2">
                         <div>
-                            <h3 className="font-bold text-xl mb-2">Let's keep in touch</h3>
-                            <p className="text-gray-400 text-sm leading-relaxed">
-                                Stay updated with Tickify's latest<br />news and exclusive offers!
+                            <h3 className="mb-2 text-xl font-bold">Luôn kết nối với Tickify</h3>
+                            <p className="max-w-md text-sm leading-relaxed text-zinc-400">
+                                Nhận thông tin sự kiện mới, ưu đãi vé và các cập nhật dành cho người tham dự.
                             </p>
                         </div>
 
-                        <div className="relative max-w-sm">
+                        <div className="relative max-w-md">
                             <input
                                 type="email"
-                                placeholder="Enter your email address"
-                                className="w-full rounded-full py-3.5 px-5 text-gray-900 outline-none text-sm pr-36"
+                                placeholder="Nhập email của bạn"
+                                className="w-full rounded-full px-5 py-3 pr-32 text-sm text-zinc-900 outline-none"
                             />
-                            <button className="absolute right-1 top-1 bottom-1 bg-[#FF0082] hover:bg-pink-700 text-white font-bold rounded-full px-6 text-sm transition-colors shadow-md">
-                                Subscribe Now
+                            <button className="absolute bottom-1 right-1 top-1 rounded-full bg-primary px-5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-primary/90">
+                                Đăng ký
                             </button>
                         </div>
 
-                        <p className="text-[11px] text-gray-500">
-                            By subscribing, you agree to our terms & conditions & Privacy Policy
+                        <p className="text-xs text-zinc-500">
+                            Khi đăng ký, bạn đồng ý nhận thông tin từ Tickify theo chính sách bảo mật của hệ thống.
                         </p>
 
-                        <div className="flex gap-3 pt-2">
-                            <button className="bg-white text-black flex items-center gap-2 rounded-full px-4 py-2 hover:bg-gray-100 transition-colors">
-                                <Play size={20} className="text-[#FF0082]" />
-                                <div className="text-left flex flex-col">
-                                    <span className="text-[10px] leading-none text-gray-600">Download on the</span>
+                        <div className="flex flex-wrap gap-3 pt-1">
+                            <button className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-black transition-colors hover:bg-zinc-100">
+                                <Play size={18} className="text-primary" />
+                                <div className="flex flex-col text-left">
+                                    <span className="text-[10px] leading-none text-zinc-600">Tải trên</span>
                                     <span className="text-xs font-bold leading-tight">Google Play</span>
                                 </div>
                             </button>
-                            <button className="bg-white text-black flex items-center gap-2 rounded-full px-4 py-2 hover:bg-gray-100 transition-colors">
-                                <Apple size={20} className="text-[#FF0082]" />
-                                <div className="text-left flex flex-col">
-                                    <span className="text-[10px] leading-none text-gray-600">Download on the</span>
+                            <button className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-black transition-colors hover:bg-zinc-100">
+                                <Apple size={18} className="text-primary" />
+                                <div className="flex flex-col text-left">
+                                    <span className="text-[10px] leading-none text-zinc-600">Tải trên</span>
                                     <span className="text-xs font-bold leading-tight">App Store</span>
                                 </div>
                             </button>
                         </div>
                     </div>
 
-                    <div>
-                        <h4 className="font-semibold text-lg mb-6 text-gray-100">Tickify Hub</h4>
-                        <ul className="space-y-4 text-sm text-gray-400">
-                            <li><a href="#" className="hover:text-white transition-colors">About us</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Press</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Event organizers</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Getting there</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Privacy policy</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Terms & conditions</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-semibold text-lg mb-6 text-gray-100">Looking For Help</h4>
-                        <ul className="space-y-4 text-sm text-gray-400">
-                            <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Customer Service</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-semibold text-lg mb-6 text-gray-100">Looking For More</h4>
-                        <ul className="space-y-4 text-sm text-gray-400">
-                            <li><a href="#" className="hover:text-white transition-colors">Cancelled Concerts</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Cancellation Insurance</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Rescheduled Events</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Cột 5: Social Icons */}
-                    {/* <div className="flex flex-col items-end gap-6 justify-start">
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors"><Instagram size={24} /></a>
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors"><Youtube size={24} /></a>
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors"><Twitter size={24} /></a>
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors"><Disc size={24} /></a>
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors"><Facebook size={24} /></a>
-                    </div> */}
-
+                    <FooterColumn
+                        title="Về Tickify"
+                        items={['Giới thiệu', 'Dành cho nhà tổ chức', 'Tin tức', 'Chính sách bảo mật']}
+                    />
+                    <FooterColumn
+                        title="Hỗ trợ"
+                        items={['Câu hỏi thường gặp', 'Trung tâm trợ giúp', 'Liên hệ', 'Điều khoản sử dụng']}
+                    />
+                    <FooterColumn
+                        title="Sự kiện"
+                        items={['Sự kiện nổi bật', 'Sự kiện đã hủy', 'Sự kiện đổi lịch', 'Hướng dẫn mua vé']}
+                    />
                 </div>
 
-                <div className="pt-8 border-t border-gray-700/50 flex flex-col md:flex-row items-center justify-center gap-2 text-sm text-gray-400">
-                    <span className="border border-gray-400 rounded-full w-4 h-4 flex items-center justify-center text-[10px]">C</span>
-                    <span>Tickify All Rights Reserved</span>
+                <div className="mt-8 flex flex-col items-center justify-center gap-2 border-t border-zinc-700/60 pt-6 text-sm text-zinc-400 md:flex-row">
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full border border-zinc-500 text-[10px]">C</span>
+                    <span>Tickify. Đã đăng ký mọi quyền.</span>
                 </div>
-
             </div>
         </footer>
+    );
+}
+
+function FooterColumn({ title, items }: { title: string; items: string[] }) {
+    return (
+        <div>
+            <h4 className="mb-4 text-base font-semibold text-zinc-100">{title}</h4>
+            <ul className="space-y-3 text-sm text-zinc-400">
+                {items.map((item) => (
+                    <li key={item}>
+                        <a href="#" className="transition-colors hover:text-white">
+                            {item}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </div>
     );
 }

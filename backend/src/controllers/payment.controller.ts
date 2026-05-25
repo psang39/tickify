@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import Order from '../models/order.model';
 import crypto from 'crypto';
-import { MOCK_PAYMENT_SECRET, FRONTEND_URL, PORT } from '../config/index';
+import { MOCK_PAYMENT_SECRET, FRONTEND_URL, BACKEND_URL, PORT } from '../config/index';
 import axios from 'axios';
 
 export const createPaymentUrl = async (req: Request, res: Response): Promise<void> => {
@@ -75,10 +75,9 @@ export const generateMockReturnUrl = async (req: Request, res: Response): Promis
         const signatureReturn = crypto.createHmac('sha256', secret).update(payloadToReturn).digest('hex');
         const payloadToWebhook = `order_id=${orderId}&amount=${amount}&status=${status}&transactionId=${transactionId}`;
         const signatureWebhook = crypto.createHmac('sha256', secret).update(payloadToWebhook).digest('hex');
-        const backendBaseUrl = `http://localhost:${PORT || 5000}/api/v1`;
 
         // Nhớ sửa '/webhooks/payment-result' cho khớp với route thực tế trên server của bạn
-        axios.post(`${backendBaseUrl}/webhooks/payment-result`, {
+        axios.post(`${BACKEND_URL}/webhooks/payment-result`, {
             order_id: orderId,
             amount: amount,
             status: status,
