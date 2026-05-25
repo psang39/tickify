@@ -1,133 +1,121 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { api } from '@/lib/axiosClient'; // Sử dụng axiosClient phẳng đã bật với Credentials
+import { api } from '@/lib/axiosClient';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Button } from "@/components/ui/button";
-import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
-import { useFeedbackStore } from "@/store/useFeedbackStore";
+import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
+import { useFeedbackStore } from '@/store/useFeedbackStore';
+
+const authBg = 'https://images.unsplash.com/photo-1508973379184-7517410fb0bc?auto=format&fit=crop&w=1200&q=80';
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const { login } = useAuthStore(); // Hàm login từ Zustand Store (bản mới chỉ nhận userData)
+    const { login } = useAuthStore();
     const { showSuccess, showError } = useFeedbackStore();
-
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [customError, setCustomError] = useState('');
 
-    // ==========================================
-    // TANSTACK QUERY - MUTATION XỬ LÝ ĐĂNG NHẬP
-    // ==========================================
     const loginMutation = useMutation({
         mutationFn: async (loginData: typeof formData) => {
-            // Gọi qua axiosClient, Backend tự động gán cookie SessionID vào trình duyệt
             const response = await api.post('/auth/login', loginData);
             return response.data;
         },
         onSuccess: (data) => {
             const userData = data.user;
-
-            // Cập nhật thông tin user vào Zustand Store (Cookie đã được trình duyệt tự quản lý)
             login(userData);
+            showSuccess('Đăng nhập thành công!');
 
-            showSuccess("Đăng nhập thành công!");
-
-            // Điều hướng chuẩn xác dựa theo Role bảo mật
             if (userData.role === 'organizer' || userData.role === 'Organizer') {
                 navigate('/organizer/dashboard');
+            } else if (userData.role === 'admin' || userData.role === 'Admin') {
+                navigate('/admin');
             } else {
                 navigate('/');
             }
         },
         onError: (err: any) => {
-            // Trích xuất thông báo lỗi trả về từ tầng Backend Validation
             const message = err.response?.data?.message || err.response?.data?.error || 'Đăng nhập thất bại. Vui lòng thử lại.';
             setCustomError(message);
             showError(message);
         }
     });
 
+    const isDisabled = loginMutation.isPending || !formData.email || !formData.password;
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setCustomError('');
-        loginMutation.mutate(formData); // Kích hoạt Mutation
+        loginMutation.mutate(formData);
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+        <div className="grid min-h-screen grid-cols-1 bg-white font-sans lg:grid-cols-2">
             <LoadingOverlay isVisible={loginMutation.isPending} message="Đang xác thực đăng nhập..." />
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-800">
-                    Tickify
-                </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
-                    Đăng nhập để quản lý sự kiện và mua vé
-                </p>
-            </div>
+            <section className="relative hidden overflow-hidden bg-slate-950 lg:block">
+                <img src={authBg} alt="Concert" className="h-full w-full object-cover opacity-55" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80" />
+                <div className="absolute left-20 top-24 max-w-xl text-white">
+                    <Link to="/" className="text-3xl font-black tracking-wide text-[#FF0082]">Tickify</Link>
+                    <h1 className="mt-16 text-4xl font-black leading-tight tracking-wide text-[#FF0082]">Chào mừng<br />trở lại</h1>
+                    <p className="mt-8 max-w-md text-base leading-7 text-white/90">
+                        Khám phá hàng triệu concert, nhận thông báo từ nghệ sĩ yêu thích và đặt vé an toàn, nhanh chóng.
+                    </p>
+                    <div className="mt-8 h-1 w-44 rounded-full bg-[#FF0082]" />
+                </div>
+            </section>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                {/* CARD ĐĂNG NHẬP PHẲNG - ĐÃ GỠ TRƯỜNG SHADOW */}
-                <div className="bg-white py-8 px-4 sm:rounded-lg sm:px-10 border border-gray-200">
-
-                    <form className="space-y-6" onSubmit={handleSubmit}>
+            <section className="flex items-center justify-center px-6 py-12 lg:px-16">
+                <div className="w-full max-w-lg">
+                    <Link to="/" className="mb-8 block text-2xl font-black tracking-wide text-[#FF0082] lg:hidden">Tickify</Link>
+                    <h2 className="text-3xl font-black tracking-tight text-slate-800">Đăng nhập</h2>
+                    <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Địa chỉ Email
-                            </label>
-                            <div className="mt-1">
-                                <input
-                                    type="email"
-                                    required
-                                    disabled={loginMutation.isPending}
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm disabled:opacity-60"
-                                    placeholder="admin@tickify.com"
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                />
-                            </div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
+                            <input
+                                type="email"
+                                required
+                                disabled={loginMutation.isPending}
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                className="h-12 w-full rounded-xl border border-slate-300 px-4 text-sm text-slate-800 outline-none transition focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100 disabled:opacity-60"
+                                placeholder="Nhập email của bạn"
+                            />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                                Mật khẩu
-                            </label>
-                            <div className="mt-1">
-                                <input
-                                    type="password"
-                                    required
-                                    disabled={loginMutation.isPending}
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm disabled:opacity-60"
-                                    placeholder="••••••••"
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                />
-                            </div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">Mật khẩu</label>
+                            <input
+                                type="password"
+                                required
+                                disabled={loginMutation.isPending}
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                className="h-12 w-full rounded-xl border border-slate-300 px-4 text-sm text-slate-800 outline-none transition focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100 disabled:opacity-60"
+                                placeholder="Nhập mật khẩu"
+                            />
+                            <button type="button" className="mt-3 text-sm font-medium text-slate-400 hover:text-[#FF0082]">Quên mật khẩu?</button>
                         </div>
 
-                        {/* HIỂN THỊ THÔNG BÁO LỖI TẬP TRUNG */}
                         {customError && (
-                            <div className="text-red-500 text-sm font-medium text-center bg-red-50 py-2 rounded border border-red-100">
+                            <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-center text-sm font-semibold text-red-500">
                                 {customError}
                             </div>
                         )}
 
-                        <div>
-                            <Button
-                                type="submit"
-                                disabled={loginMutation.isPending}
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all disabled:opacity-50"
-                            >
-                                {loginMutation.isPending ? "Đang xác thực..." : "Đăng nhập"}
-                            </Button>
-                        </div>
+                        <button
+                            type="submit"
+                            disabled={isDisabled}
+                            className="h-12 w-full rounded-xl bg-[#FF0082] text-sm font-bold text-white transition hover:bg-pink-700 disabled:bg-slate-200 disabled:text-slate-400"
+                        >
+                            {loginMutation.isPending ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                        </button>
                     </form>
 
-                    <div className="mt-6 text-center">
-                        <span className="text-sm text-gray-500">Chưa có tài khoản? </span>
-                        <a href="#" className="text-sm font-medium text-primary hover:opacity-80">
-                            Đăng ký ngay
-                        </a>
-                    </div>
+                    <p className="mt-6 text-center text-sm text-slate-400">
+                        Chưa có tài khoản? <Link to="/register" className="font-bold text-[#FF0082] hover:text-pink-700">Tạo tài khoản</Link>
+                    </p>
                 </div>
-            </div>
+            </section>
         </div>
     );
 }

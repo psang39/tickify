@@ -5,7 +5,7 @@ import Seat from '../models/seat.model';
 import TicketType from '../models/ticket-type.model';
 import Order from '../models/order.model';
 import Venue from '../models/venue.model';
-import { warmUpSeatmapCache } from '../services/seatmapService';
+import { rebuildShowRedisCache, purgeShowRedisCache, hasBlockingOrdersForShow, regenerateSeatmapWithTransaction, parseMapAssetsFromSvg } from '../services/seatmap-cache.service';
 import * as cheerio from 'cheerio';
 import { Request, Response } from 'express';
 import redisClient from '../utils/redisClient';
@@ -255,25 +255,32 @@ export const createShow = async (req: Request, res: Response) => {
 };
 export const getShowsByEvent = async (req: Request, res: Response) => {
     try {
-        const { event_id, page } = req.params;
-        const { start_time, end_time } = req.body;
+        const { event_id } = req.params;
+        const { page, limit, start_time, end_time, status } = req.query;
         const event = await Event.findById(event_id);
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
-        const now = new Date();
-        let filter = {};
+
+        const filter: any = { event_id };
+        if (status) {
+            filter.status = status;
+        } else if (event.status === 'published') {
+            filter.status = 'published';
+        }
         if (start_time && end_time) {
-            filter = { ...filter, start_time: { $gte: new Date(start_time as string) }, end_time: { $lte: new Date(end_time as string) } };
+            filter.start_time = {
+                $gte: new Date(start_time as string),
+                $lte: new Date(end_time as string)
+            };
         }
-        else {
-            filter = { ...filter, start_date: { $gte: now } };
-        }
-        filter = { ...filter, event_id: event_id };
+
         const options = {
             page: parseInt(page as string) || 1,
-            limit: 10,
-            sort: { date: 1 }
+            limit: parseInt(limit as string) || 10,
+            sort: { start_time: 1 },
+            populate: { path: 'venue_id', select: 'name address city latitude longitude capacity' },
+            select: '-stadium_map_svg -encrypted_private_key'
         };
         const shows = await Show.paginate(filter, options);
         res.status(200).json(shows);
@@ -402,20 +409,31 @@ export const getOrganizerShowById = async (req: Request, res: Response) => {
 };
 export const updateShow = async (req: Request, res: Response) => {
     try {
-        const { show_id } = req.params;
-        const { name, description, start_time, end_time, sale_start, sale_end, venue_id } = req.body;
+        const show_id = req.params.show_id as string;
+        const {
+            name, description, start_time, end_time, sale_start, sale_end,
+            venue_id, stadium_map_svg, ticket_types
+        } = req.body;
 
         const show = await Show.findById(show_id);
         if (!show) return res.status(404).json({ message: "Show không tồn tại" });
 
-        // Chặn không cho cập nhật bừa bãi khi Đang mở bán công khai
         if (show.status === 'published') {
             return res.status(400).json({
                 message: "Show đang mở bán công khai. Vui lòng 'Tạm dừng bán' trước khi điều chỉnh thông tin cấu hình."
             });
         }
 
-        // Chỉ cập nhật các trường thông tin thô từ form, loại bỏ status ra khỏi đây
+        const isSeatmapUpdate = Boolean(stadium_map_svg || ticket_types);
+        if (isSeatmapUpdate) {
+            const hasBlockingOrders = await hasBlockingOrdersForShow(show_id);
+            if (hasBlockingOrders) {
+                return res.status(400).json({
+                    message: "Show đã có đơn pending/confirmed nên không thể upload lại SVG hoặc tạo lại seatmap."
+                });
+            }
+        }
+
         show.name = name ?? show.name;
         show.description = description ?? show.description;
         show.start_time = start_time ? new Date(start_time) : show.start_time;
@@ -424,15 +442,39 @@ export const updateShow = async (req: Request, res: Response) => {
         show.sale_end = sale_end ? new Date(sale_end) : show.sale_end;
         show.venue_id = venue_id ?? show.venue_id;
 
+        if (stadium_map_svg) {
+            show.stadium_map_svg = stadium_map_svg;
+            show.map_assets = parseMapAssetsFromSvg(stadium_map_svg);
+        }
+
         const updatedShow = await show.save();
-        res.status(200).json({ message: "Cập nhật thông tin form thành công", data: updatedShow });
+
+        let seatmapResult = null;
+        if (isSeatmapUpdate) {
+            seatmapResult = await regenerateSeatmapWithTransaction({
+                showId: show_id,
+                stadiumMapSvg: stadium_map_svg || updatedShow.stadium_map_svg,
+                ticketTypes: ticket_types
+            });
+        } else {
+            await rebuildShowRedisCache(show_id);
+        }
+
+        res.status(200).json({
+            message: isSeatmapUpdate
+                ? "Cập nhật show và tạo lại seatmap thành công"
+                : "Cập nhật thông tin form thành công",
+            data: updatedShow,
+            seatmap: seatmapResult
+        });
     } catch (error) {
+        console.error("Error updating show:", error);
         res.status(500).json({ message: "Error updating show", error });
     }
 };
 export const unpublishShow = async (req: Request, res: Response) => {
     try {
-        const { show_id } = req.params;
+        const show_id = req.params.show_id as string;
         const show = await Show.findById(show_id);
         if (!show) return res.status(404).json({ message: "Show không tồn tại" });
 
@@ -440,33 +482,18 @@ export const unpublishShow = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Chỉ có thể tạm dừng khi show đang ở trạng thái Công khai." });
         }
 
-        // KIỂM TRA BẢO VỆ CHÍ MẠNG: Đã có ai giao dịch mua vé ở show này chưa?
-        const hasSoldTickets = await Order.exists({ show_id, status: { $in: ['completed', 'reserved'] } });
-        if (hasSoldTickets) {
+        const hasBlockingOrders = await hasBlockingOrdersForShow(show_id);
+        if (hasBlockingOrders) {
             return res.status(400).json({
-                message: "Show này đã ghi nhận giao dịch đặt vé thực tế. Tuyệt đối không thể đưa về dạng Nháp (Draft) để tránh sai lệch dữ liệu đối soát!"
+                message: "Show này đã có đơn pending/confirmed. Không thể unpublish để tránh sai lệch giữ chỗ, đối soát và vé đã bán."
             });
         }
 
-        // Hạ trạng thái về bản nháp để cho phép sửa form
         show.status = 'draft';
         await show.save();
+        await purgeShowRedisCache(show_id);
 
-        // DỌN DẸP SẠCH SẼ REDIS: Tránh bộ nhớ rác khi đóng sơ đồ rạp
-        const zones = await Zone.find({ show_id }).select('_id');
-        const pipeline = redisClient.multi();
-
-        // Xóa các key summary và row trạng thái
-        zones.forEach(zone => {
-            const summaryKey = `event:${show.event_id}:show:${show._id}:zone:${zone._id}:summary`;
-            pipeline.del(summaryKey);
-        });
-        pipeline.del(`show:${show._id}:ticket_types`);
-        pipeline.del(`show:${show._id}:seats_static_layout`);
-
-        await pipeline.exec();
-
-        res.status(200).json({ message: "Đã tạm dừng bán thành công. Show đã quay về dạng bản nháp." });
+        res.status(200).json({ message: "Đã tạm dừng bán thành công. Show đã quay về dạng bản nháp và Redis cache đã được dọn sạch." });
     } catch (error) {
         console.error("Lỗi khi unpublish show:", error);
         res.status(500).json({ message: "Lỗi Server", error });
@@ -474,25 +501,16 @@ export const unpublishShow = async (req: Request, res: Response) => {
 };
 export const cancelShow = async (req: Request, res: Response) => {
     try {
-        const { show_id } = req.params;
+        const show_id = req.params.show_id as string;
         const show = await Show.findById(show_id);
         if (!show) return res.status(404).json({ message: "Show không tồn tại" });
 
         if (show.status === 'cancelled') {
             return res.status(400).json({ message: "Show diễn này vốn đã bị hủy trước đó." });
         }
-
-        // Chuyển sang hủy show (vẫn giữ data để đối soát hoàn tiền)
         show.status = 'cancelled';
         await show.save();
-
-        // Xóa sạch cache giữ chỗ và map hiển thị trên Redis để chặn đứng Client vào mua vé
-        const zones = await Zone.find({ show_id }).select('_id');
-        const pipeline = redisClient.multi();
-        zones.forEach(zone => {
-            pipeline.del(`event:${show.event_id}:show:${show._id}:zone:${zone._id}:summary`);
-        });
-        await pipeline.exec();
+        await purgeShowRedisCache(show_id);
 
         res.status(200).json({
             message: "Hủy show diễn thành công. Sơ đồ bán vé đã đóng, dữ liệu giao dịch cũ được bảo toàn để phục vụ hoàn tiền."
@@ -525,11 +543,11 @@ export const publishShow = async (req: Request, res: Response) => {
         show.status = 'published';
         await show.save();
         try {
-            await warmUpSeatmapCache(show_id);
+            await rebuildShowRedisCache(show_id);
         } catch (cacheError) {
             show.status = 'draft';
             await show.save();
-            throw new Error("Lỗi nạp Cache Redis, đã hạ Show về lại bản Draft.");
+            throw new Error("Lỗi rebuild Redis cache, đã hạ Show về lại bản Draft.");
         }
         res.status(200).json({
             message: "Publish Show thành công! Hệ thống đã sẵn sàng đón tải.",

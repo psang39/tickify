@@ -17,9 +17,6 @@ export default function ShowDetail() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    // ==========================================
-    // 1. STATE MANAGEMENT
-    // ==========================================
     const [activeTab, setActiveTab] = useState<'CONFIG' | 'LIVE'>('CONFIG'); // State điều hướng Tab
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { showSuccess, showError } = useFeedbackStore();
@@ -209,13 +206,13 @@ export default function ShowDetail() {
     });
 
     const { mutateAsync: assignStaffMutation } = useMutation({
-        mutationFn: async (staffId: string) => { return await api.post('/organizer/staff/assign', { staff_id: staffId, show_id: showId }); },
+        mutationFn: async (staffId: string) => { return await api.post(`organizer/shows/${showId}/assign-staff`, { staff_id: staffId, show_id: showId }); },
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['organizer-staffs-list'] }); setSelectedStaffId(''); },
         onError: (err: any) => setErrorMessage(err.response?.data?.message || "Không thể gán nhân viên.")
     });
 
     const { mutateAsync: removeStaffMutation } = useMutation({
-        mutationFn: async (staffId: string) => { return await api.post('/organizer/staff/remove', { staff_id: staffId, show_id: showId }); },
+        mutationFn: async (staffId: string) => { return await api.post(`/organizer/shows/${showId}/remove-staff`, { staff_id: staffId, show_id: showId }); },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['organizer-staffs-list'] }),
         onError: (err: any) => setErrorMessage(err.response?.data?.message || "Không thể rút nhân viên.")
     });

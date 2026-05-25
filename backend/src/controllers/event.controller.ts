@@ -49,7 +49,7 @@ export const getEvents = async (req: Request, res: Response) => {
         const options = {
             page: parseInt(page as string) || 1,
             limit: 10,
-            sort: { date: 1 }
+            sort: { start_date: 1 }
         };
         const events = await Event.paginate(filter, options);
         res.status(200).json(events);
@@ -316,7 +316,7 @@ export const searchEventsPublic = async (req: Request, res: Response) => {
             findQuery._id = { $in: allowedEventIds };
         }
 
-        let sortOption: any = { createdAt: -1 };
+        let sortOption: any = { created_at: -1 };
         if (sort === 'upcoming') {
             sortOption = { start_date: 1 };
         }

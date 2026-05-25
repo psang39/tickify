@@ -1,43 +1,54 @@
 import { Check } from "lucide-react";
+
 const steps = [
-    { id: 1, label: "Location & Date" },
-    { id: 2, label: "Seat" },
-    { id: 3, label: "Order Overview" },
-    { id: 4, label: "Payment" },
-    { id: 5, label: "Download" },
+  { id: 1, label: "Vị trí & thời gian" },
+  { id: 2, label: "Chọn ghế" },
+  { id: 3, label: "Xác nhận vé" },
+  { id: 4, label: "Thanh toán" },
+  { id: 5, label: "Nhận vé" },
 ];
+
 export const BookingStepper = ({ currentStep = 2 }) => {
-    return (
-        <div className="w-full py-6">
-            <div className="flex items-center justify-between max-w-4xl mx-auto">
-                {steps.map((step, index) => (
-                    <div key={step.id} className="flex flex-col items-center relative flex-1">
-                        {index !== 0 && (
-                            <div
-                                className={`absolute right-1/2 top-4 w-full h-[2px] -translate-y-1/2 z-0 
-                ${step.id <= currentStep ? "bg-primary" : "bg-neutral-dark"}`}
-                            />
-                        )}
-                        <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center z-10 text-sm font-bold transition-all
-              ${step.id < currentStep
-                                    ? "bg-primary text-white"
-                                    : step.id === currentStep
-                                        ? "bg-secondary text-white ring-4 ring-secondary/20"
-                                        : "bg-neutral-dark text-gray-400"
-                                }`}
-                        >
-                            {step.id < currentStep ? <Check size={16} strokeWidth={3} /> : step.id}
-                        </div>
-                        <span
-                            className={`mt-3 text-xs font-medium 
-              ${step.id === currentStep ? "text-primary font-bold" : "text-gray-500"}`}
-                        >
-                            {step.label}
-                        </span>
-                    </div>
-                ))}
+  return (
+    <div className="w-full py-6">
+      <div className="flex items-center justify-between max-w-5xl mx-auto">
+        {steps.map((step, index) => {
+          const isDone = step.id < currentStep;
+          const isActive = step.id === currentStep;
+
+          return (
+            <div key={step.id} className="flex flex-col items-center relative flex-1">
+              {index !== 0 && (
+                <div
+                  className={`absolute right-1/2 top-4 h-[2px] w-full -translate-y-1/2 z-0 ${
+                    step.id <= currentStep ? "bg-pink-500" : "bg-slate-300"
+                  }`}
+                />
+              )}
+
+              <div
+                className={`z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all ${
+                  isDone
+                    ? "bg-emerald-500 text-white"
+                    : isActive
+                      ? "bg-pink-600 text-white ring-4 ring-pink-100"
+                      : "bg-slate-300 text-slate-600"
+                }`}
+              >
+                {isDone ? <Check size={16} strokeWidth={3} /> : step.id}
+              </div>
+
+              <span
+                className={`mt-3 text-center text-xs font-medium sm:text-sm ${
+                  isActive ? "font-bold text-pink-600" : "text-slate-500"
+                }`}
+              >
+                {step.label}
+              </span>
             </div>
-        </div>
-    );
+          );
+        })}
+      </div>
+    </div>
+  );
 };

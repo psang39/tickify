@@ -10,6 +10,7 @@ import Ticket from '../models/ticket.model';
 import { orderExpirationQueue } from '../queues/orderExpiration.queue';
 import { calculateValidQuantities } from '../utils/validQuantities';
 import { formatHashToJSON } from '../utils/hashToJson';
+import { updateZoneSummaryAfterHold, updateZoneSummaryAfterRelease } from '../services/zone-summary.service';
 import Attendee from '../models/attendee.model';
 
 
@@ -228,6 +229,7 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
     const successfullyLockedSeats: string[] = [];
     const modifiedRowsForRollback: { rowLabel: string, prevString: string }[] = [];
     let zone_id = '';
+    let createdOrderId: string | null = null;
 
     try {
         const targetSeats = await Seat.find({ _id: { $in: seat_ids } });
@@ -345,6 +347,16 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
             purchaser_email: currentUser.email,
             purchaser_phone: currentUser.phone
         });
+        createdOrderId = newOrder._id.toString();
+
+        await updateZoneSummaryAfterHold({
+            eventId: event_id,
+            showId: show_id,
+            zoneId: zone_id,
+            modifiedRows: modifiedRowsForRollback,
+            lockedByTicketType: lockedByTier,
+            seatIds: seat_ids
+        });
 
         await orderExpirationQueue.add(
             `expire-${newOrder._id}`,
@@ -362,42 +374,13 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
         });
 
 
-        setTimeout(async () => {
-            try {
-                const holdingSetKey = `event:${event_id}:show:${show_id}:holding_seats`;
-                const summaryKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:summary`;
-                const updatedRowStrings = await redisClient.mGet(modifiedRowsForRollback.map(r => `event:${event_id}:show:${show_id}:zone:${zone_id}:row:${r.rowLabel}`)) as string[];
-
-                const pipeline = redisClient.multi();
-                for (const [tierId, lockedCount] of Object.entries(lockedByTier)) {
-                    pipeline.hIncrBy(summaryKey, `tier:${tierId}:count`, -lockedCount);
-                }
-
-                const updatedValidQuantities = calculateValidQuantities(updatedRowStrings);
-                pipeline.hSet(summaryKey, 'valid_quantities', JSON.stringify(updatedValidQuantities));
-                pipeline.sAdd(holdingSetKey, seat_ids);
-                await pipeline.exec();
-
-                const updatedHash = await redisClient.hGetAll(summaryKey);
-                const summaryJSON = formatHashToJSON(updatedHash);
-
-                await redisClient.publish('ZONE_SUMMARY_UPDATES', JSON.stringify({
-                    zone_id: zone_id,
-                    summary: summaryJSON
-                }));
-
-
-
-            } catch (err) {
-                console.error("Lỗi cập nhật Zone Summary:", err);
-            }
-        }, 0);
-
     } catch (error: any) {
         if (successfullyLockedSeats.length > 0 && zone_id) {
             await rollbackLocksAndRows(event_id, show_id, zone_id, user_id, successfullyLockedSeats, modifiedRowsForRollback);
-
             await redisClient.hDel(`show:${show_id}:seat_status`, successfullyLockedSeats);
+        }
+        if (createdOrderId) {
+            await Order.findByIdAndUpdate(createdOrderId, { status: 'cancelled' });
         }
         res.status(400).json({ message: error.message || 'Lỗi hệ thống nội bộ.' });
     }
@@ -443,7 +426,10 @@ export const releaseSeats = async (req: Request, res: Response): Promise<void> =
         seatsToRelease.forEach(seat => {
             if (!seatsByRow[seat.row]) seatsByRow[seat.row] = [];
             seatsByRow[seat.row].push(seat);
-            releaseByTier[seat.tier] = (releaseByTier[seat.tier] || 0) + 1;
+            const ticketTypeId = seat.ticket_type_id?.toString();
+            if (ticketTypeId) {
+                releaseByTier[ticketTypeId] = (releaseByTier[ticketTypeId] || 0) + 1;
+            }
         });
 
         const updatedRowStrings: string[] = [];
@@ -468,27 +454,17 @@ export const releaseSeats = async (req: Request, res: Response): Promise<void> =
         }
 
 
-        const summaryKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:summary`;
         const statusHashKey = `show:${show_id}:seat_status`;
-        const holdingSetKey = `event:${event_id}:show:${show_id}:holding_seats`;
+        await redisClient.hDel(statusHashKey, seatIds);
 
-        const pipeline = redisClient.multi();
-
-
-        pipeline.hDel(statusHashKey, seatIds);
-        pipeline.sRem(holdingSetKey, seatIds);
-
-
-        for (const [tierName, releasedCount] of Object.entries(releaseByTier)) {
-            pipeline.hIncrBy(summaryKey, `tier:${tierName}:count`, releasedCount);
-        }
-
-        if (updatedRowStrings.length > 0) {
-            const validQuantities = calculateValidQuantities(updatedRowStrings);
-            pipeline.hSet(summaryKey, 'valid_quantities', JSON.stringify(validQuantities));
-        }
-
-        await pipeline.exec();
+        await updateZoneSummaryAfterRelease({
+            eventId: strEventId,
+            showId: strShowId,
+            zoneId: strZoneId,
+            updatedRowStrings,
+            releasedByTicketType: releaseByTier,
+            seatIds
+        });
 
 
         for (const seatId of seatIds) {
@@ -498,12 +474,6 @@ export const releaseSeats = async (req: Request, res: Response): Promise<void> =
                 status: 'available'
             }));
         }
-
-        const updatedHash = await redisClient.hGetAll(summaryKey);
-        await redisClient.publish('ZONE_SUMMARY_UPDATES', JSON.stringify({
-            zone_id: strZoneId,
-            summary: formatHashToJSON(updatedHash)
-        }));
 
         res.status(200).json({
             message: 'Đã hủy giữ chỗ thành công.',

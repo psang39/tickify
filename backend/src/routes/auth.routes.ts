@@ -18,6 +18,7 @@ router.post('/login', [
     check('password').not().isEmpty().withMessage('Password is required')
 ], Validate, login);
 router.get('/logout', logout);
+router.post('/logout', logout);
 
 const authRoutes = router;
 export default authRoutes;

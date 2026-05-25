@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CalendarDays, BarChart3, LayoutDashboard, ChevronLeft, ChevronRight, Users } from 'lucide-react';
+import { CalendarDays, LayoutDashboard, ChevronLeft, ChevronRight, Users, History } from 'lucide-react';
 
 export default function OrganizerSidebar() {
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function OrganizerSidebar() {
         { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/organizer/dashboard' },
         { title: 'Sự kiện của tôi', icon: <CalendarDays size={20} />, path: '/organizer/events' },
         { title: 'Quản lý nhân viên', icon: <Users size={20} />, path: '/organizer/staff' },
-        { title: 'Doanh thu', icon: <BarChart3 size={20} />, path: '/organizer/revenue' },
+        { title: 'Lịch sử check-in', icon: <History size={20} />, path: '/organizer/check-ins' },
     ];
 
     return (

@@ -1,0 +1,44 @@
+import { apiFetch } from './client';
+import { AssignedShow, ScannedTicket, StaffUser } from '../types/scanner';
+
+export async function loginStaff(email: string, password: string) {
+    return apiFetch<{ token: string; user: StaffUser }>('/auth/login', {
+        auth: false,
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+    });
+}
+
+export async function getAssignedShows() {
+    return apiFetch<{ docs: AssignedShow[] }>('/staff/my-shows?limit=50');
+}
+
+export async function getShowPublicKey(showId: string) {
+    return apiFetch<{ data: { public_key: string } }>(`/staff/shows/${showId}/public-key`);
+}
+
+export async function onlineCheckIn(showId: string, qrData: string) {
+    return apiFetch<{
+        message: string;
+        status: string;
+        ticketInfo?: { ticket_id: string; check_in_time?: string };
+    }>(`/staff/shows/${showId}/check-in`, {
+        method: 'POST',
+        body: JSON.stringify({ qrData, deviceId: 'tickify-scanner-app' }),
+    });
+}
+
+export async function syncOfflineTickets(showId: string, tickets: ScannedTicket[]) {
+    return apiFetch<{
+        message: string;
+        successCount: number;
+        failedCount: number;
+        results: Array<{ ticketId: string; success: boolean; reason?: string; check_in_time?: string }>;
+    }>(`/staff/shows/${showId}/sync-checkins`, {
+        method: 'POST',
+        body: JSON.stringify({
+            tickets: tickets.map(ticket => ({ ticketId: ticket.ticketId, scannedAt: ticket.scannedAt })),
+            deviceId: 'tickify-scanner-app',
+        }),
+    });
+}

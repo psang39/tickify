@@ -10,6 +10,9 @@ import OrganizerLayout from '@/components/layout/OrganizerLayout';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import ManageUsersPage from '@/pages/admin/ManageUsersPage';
 import LoginPage from '@/pages/attendee/LoginPage';
+import RegisterPage from '@/pages/attendee/RegisterPage';
+import HomePage from '@/pages/attendee/HomePage';
+import EventDetailPage from '@/pages/attendee/EventDetailPage';
 import MockGatewayPage from '@/pages/attendee/MockGatewayPage';
 import OrderDetailPage from '@/pages/attendee/OrderDetailPage';
 import OrderHistory from '@/pages/attendee/OrderHistory';
@@ -22,6 +25,7 @@ import EventDetail from '@/pages/organizer/EventDetail';
 import EventManagement from '@/pages/organizer/EventManagement';
 import OrganizerDashboard from '@/pages/organizer/OrganizerDashboard';
 import OrganizerStaff from '@/pages/organizer/OrganizerStaff';
+import CheckInHistory from '@/pages/organizer/CheckInHistory';
 import ShowDetail from '@/pages/organizer/ShowDetail';
 import PaymentResultPage from '@/pages/attendee/PaymentResultPage';
 import SearchPage from '@/pages/attendee/SearchPage';
@@ -56,8 +60,9 @@ function App() {
         <FeedbackModalHost />
         <Routes>
           <Route element={<MainLayout />}>
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/events/:eventId" element={<EventDetailPage />} />
 
             <Route element={<ProtectedRoute allowedRoles={ADMIN_ROLES} />}>
               <Route element={<AdminLayout />}>
@@ -80,6 +85,7 @@ function App() {
               <Route element={<OrganizerLayout />}>
                 <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
                 <Route path="/organizer/staff" element={<OrganizerStaff />} />
+                <Route path="/organizer/check-ins" element={<CheckInHistory />} />
                 <Route path="/organizer/events" element={<EventManagement />} />
                 <Route path="/organizer/events/create" element={<CreateEvent />} />
                 <Route path="/organizer/events/:eventId" element={<EventDetail />} />
@@ -87,6 +93,9 @@ function App() {
               </Route>
             </Route>
           </Route>
+
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
           <Route element={<ProtectedRoute allowedRoles={ATTENDEE_ROLES} />}>
             <Route path="/queue/:showId" element={<WaitingRoomPage />} />

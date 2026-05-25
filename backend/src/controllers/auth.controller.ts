@@ -124,7 +124,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
                 first_name: user.first_name,
                 last_name: user.last_name,
                 email: user.email,
-                role: user.role.charAt(0).toUpperCase()
+                role: user.role
             }
         });
 

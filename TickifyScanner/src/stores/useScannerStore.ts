@@ -1,52 +1,97 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AssignedShow, ScannedTicket, ScanStatus, StaffUser } from '../types/scanner';
 
-// 1. Định nghĩa kiểu dữ liệu cho 1 vé đã quét
-export interface ScannedTicket {
-    ticketId: string;
-    scannedAt: string;
-}
-
-// 2. Định nghĩa cấu trúc của Store
 interface ScannerState {
-    offlineTickets: ScannedTicket[];
-    addTicket: (ticketId: string) => void;
-    removeTicket: (ticketId: string) => void;
-    clearAllTickets: () => void;
+    token: string | null;
+    user: StaffUser | null;
+    selectedShow: AssignedShow | null;
+    publicKeysByShowId: Record<string, string>;
+    scannedTickets: ScannedTicket[];
+
+    setAuth: (token: string, user: StaffUser) => void;
+    logout: () => void;
+    setSelectedShow: (show: AssignedShow | null) => void;
+    savePublicKey: (showId: string, publicKey: string) => void;
+    addScannedTicket: (input: Omit<ScannedTicket, 'scannedAt'> & { scannedAt?: string }) => ScannedTicket;
+    hasTicketInShow: (showId: string, ticketId: string) => boolean;
+    getPendingTicketsByShow: (showId: string) => ScannedTicket[];
+    markTicketSynced: (showId: string, ticketId: string, message?: string) => void;
+    markTicketFailed: (showId: string, ticketId: string, status: ScanStatus, message?: string) => void;
+    clearSyncedTickets: (showId?: string) => void;
 }
 
 export const useScannerStore = create<ScannerState>()(
     persist(
         (set, get) => ({
-            offlineTickets: [],
-            addTicket: (ticketId: string) => {
-                const currentTickets = get().offlineTickets;
-                const isExist = currentTickets.some(t => t.ticketId === ticketId);
+            token: null,
+            user: null,
+            selectedShow: null,
+            publicKeysByShowId: {},
+            scannedTickets: [],
 
-                if (!isExist) {
-                    set({
-                        offlineTickets: [
-                            ...currentTickets,
-                            { ticketId, scannedAt: new Date().toISOString() }
-                        ]
-                    });
+            setAuth: (token, user) => set({ token, user }),
+            logout: () => set({ token: null, user: null, selectedShow: null }),
+            setSelectedShow: (show) => set({ selectedShow: show }),
+            savePublicKey: (showId, publicKey) => set((state) => ({
+                publicKeysByShowId: { ...state.publicKeysByShowId, [showId]: publicKey },
+            })),
+
+            hasTicketInShow: (showId, ticketId) => get().scannedTickets.some(
+                ticket => ticket.showId === showId && ticket.ticketId === ticketId && ticket.status !== 'INVALID',
+            ),
+
+            addScannedTicket: (input) => {
+                const scannedAt = input.scannedAt || new Date().toISOString();
+                const current = get().scannedTickets;
+                const existing = current.find(ticket => ticket.showId === input.showId && ticket.ticketId === input.ticketId);
+
+                if (existing) {
+                    const duplicate: ScannedTicket = {
+                        ...existing,
+                        status: 'DUPLICATE_LOCAL',
+                        message: 'Vé này đã được quét trên thiết bị này',
+                    };
+                    set({ scannedTickets: [duplicate, ...current.filter(ticket => ticket !== existing)] });
+                    return duplicate;
                 }
+
+                const ticket: ScannedTicket = { ...input, scannedAt };
+                set({ scannedTickets: [ticket, ...current] });
+                return ticket;
             },
 
-            removeTicket: (ticketId: string) => {
-                set((state) => ({
-                    offlineTickets: state.offlineTickets.filter(t => t.ticketId !== ticketId)
-                }));
-            },
+            getPendingTicketsByShow: (showId) => get().scannedTickets.filter(
+                ticket => ticket.showId === showId && !ticket.synced && ticket.status === 'LOCAL_VALID',
+            ),
 
-            clearAllTickets: () => {
-                set({ offlineTickets: [] });
-            },
+            markTicketSynced: (showId, ticketId, message) => set((state) => ({
+                scannedTickets: state.scannedTickets.map(ticket => (
+                    ticket.showId === showId && ticket.ticketId === ticketId
+                        ? { ...ticket, synced: true, status: 'SYNCED_USED', message: message || 'Đã đồng bộ thành USED' }
+                        : ticket
+                )),
+            })),
+
+            markTicketFailed: (showId, ticketId, status, message) => set((state) => ({
+                scannedTickets: state.scannedTickets.map(ticket => (
+                    ticket.showId === showId && ticket.ticketId === ticketId
+                        ? { ...ticket, status, message: message || ticket.message }
+                        : ticket
+                )),
+            })),
+
+            clearSyncedTickets: (showId) => set((state) => ({
+                scannedTickets: state.scannedTickets.filter(ticket => {
+                    if (showId && ticket.showId !== showId) return true;
+                    return !ticket.synced;
+                }),
+            })),
         }),
         {
-            name: 'tickify-scanner-storage', // Tên key lưu trong ổ cứng điện thoại
-            storage: createJSONStorage(() => AsyncStorage), // Sử dụng AsyncStorage
-        }
-    )
+            name: 'tickify-scanner-storage',
+            storage: createJSONStorage(() => AsyncStorage),
+        },
+    ),
 );

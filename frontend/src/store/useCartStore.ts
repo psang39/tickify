@@ -8,6 +8,7 @@ interface CartState {
     comboCount: number;
     setComboCount: (count: number) => void;
     toggleSeat: (seat: ISeat, rowMap: Map<string, ISeat[]>) => void;
+    removeSeat: (seatId: string) => void;
     clearCart: () => void;
 }
 export const buildSeatMapCache = (allSeats: ISeat[]) => { // Thay any[] bằng ISeat[] nếu bạn dùng interface
@@ -130,6 +131,13 @@ export const useCartStore = create<CartState>((set, get) => ({
         // Trước đó bạn gọi set() 2 lần liên tiếp với logic giống hệt nhau gây thừa thãi.
         set({ selectedSeats: [...selectedSeats, ...newSeats] });
     },
+
+    removeSeat: (seatId) =>
+        set((state) => ({
+            selectedSeats: state.selectedSeats.filter(
+                (seat: any) => seat.id !== seatId && seat._id !== seatId
+            ),
+        })),
 
     clearCart: () => set({ selectedSeats: [] })
 }));

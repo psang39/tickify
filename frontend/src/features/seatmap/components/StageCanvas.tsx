@@ -147,7 +147,28 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     const [hoverStatus, setHoverStatus] = useState<'success' | 'error' | null>(null);
 
     const stageRef = useRef<Konva.Stage>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [containerSize, setContainerSize] = useState({ width: 900, height: 640 });
+
+    useEffect(() => {
+        const node = containerRef.current;
+        if (!node) return;
+
+        const updateSize = () => {
+            const rect = node.getBoundingClientRect();
+            setContainerSize({
+                width: Math.max(360, Math.floor(rect.width)),
+                height: Math.max(480, Math.floor(rect.height)),
+            });
+        };
+
+        updateSize();
+        const observer = new ResizeObserver(updateSize);
+        observer.observe(node);
+
+        return () => observer.disconnect();
+    }, []);
 
     const [stageConfig, setStageConfig] = useState({ scale: 1, x: 0, y: 0 });
     const ZOOM_THRESHOLD = 2.5;
@@ -309,8 +330,8 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     useEffect(() => {
         if (mapBounds) {
             const padding = 100;
-            const containerWidth = window.innerWidth;
-            const containerHeight = 600;
+            const containerWidth = containerSize.width;
+            const containerHeight = containerSize.height;
 
             const scaleX = containerWidth / (mapBounds.width + padding);
             const scaleY = containerHeight / (mapBounds.height + padding);
@@ -322,7 +343,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 y: containerHeight / 2 - mapBounds.centerY * optimalScale
             });
         }
-    }, [mapBounds?.minX, mapBounds?.maxX, mapBounds?.minY, mapBounds?.maxY]);
+    }, [mapBounds?.minX, mapBounds?.maxX, mapBounds?.minY, mapBounds?.maxY, containerSize.width, containerSize.height]);
     const getZoneMinPrice = (summary: any) => {
         if (!summary || !summary.tiers) return 0;
         const tierIds = Object.keys(summary.tiers);
@@ -493,10 +514,10 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         if (isZoomedIn) return;
         const box = e.target.getClientRect({ skipTransform: true });
         const padding = 60;
-        const scaleX = window.innerWidth / (box.width + padding * 2);
-        const scaleY = 600 / (box.height + padding * 2);
+        const scaleX = containerSize.width / (box.width + padding * 2);
+        const scaleY = containerSize.height / (box.height + padding * 2);
         const optimalScale = Math.min(scaleX, scaleY, 4);
-        setStageConfig({ scale: optimalScale, x: window.innerWidth / 2 - (box.x + box.width / 2) * optimalScale, y: 600 / 2 - (box.y + box.height / 2) * optimalScale });
+        setStageConfig({ scale: optimalScale, x: containerSize.width / 2 - (box.x + box.width / 2) * optimalScale, y: containerSize.height / 2 - (box.y + box.height / 2) * optimalScale });
     };
     const clearAllTooltips = useCallback(() => {
         if (timerRef.current) {
@@ -524,8 +545,8 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         const scaleBy = 1.3;
         const oldScale = stageConfig.scale;
         let newScale = Math.max(0.2, Math.min(direction === 1 ? oldScale * scaleBy : oldScale / scaleBy, 15));
-        const centerX = window.innerWidth / 2;
-        const centerY = 600 / 2;
+        const centerX = containerSize.width / 2;
+        const centerY = containerSize.height / 2;
         const mousePointTo = { x: (centerX - stageConfig.x) / oldScale, y: (centerY - stageConfig.y) / oldScale };
         setStageConfig({ scale: newScale, x: centerX - mousePointTo.x * newScale, y: centerY - mousePointTo.y * newScale });
     };
@@ -588,11 +609,11 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         ? MINIMAP_PADDING + ((MINIMAP_SIZE - MINIMAP_PADDING * 2) - mapBounds.height * minimapScale) / 2 - mapBounds.minY * minimapScale
         : 0;
     return (
-        <div className="w-full h-full relative cursor-grab active:cursor-grabbing bg-[#f8fafc] overflow-hidden">
+        <div ref={containerRef} className="w-full h-full relative cursor-grab active:cursor-grabbing bg-transparent overflow-hidden">
             <Stage
                 ref={stageRef}
-                width={window.innerWidth}
-                height={600}
+                width={containerSize.width}
+                height={containerSize.height}
                 onWheel={handleWheel}
                 draggable={true}
                 x={stageConfig.x}
@@ -702,8 +723,8 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                             <Rect
                                 x={minimapX + (-stageConfig.x / stageConfig.scale) * minimapScale}
                                 y={minimapY + (-stageConfig.y / stageConfig.scale) * minimapScale}
-                                width={(window.innerWidth / stageConfig.scale) * minimapScale}
-                                height={(600 / stageConfig.scale) * minimapScale}
+                                width={(containerSize.width / stageConfig.scale) * minimapScale}
+                                height={(containerSize.height / stageConfig.scale) * minimapScale}
                                 stroke="#ef4444"
                                 strokeWidth={2}
                                 cornerRadius={2}

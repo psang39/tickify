@@ -12,7 +12,7 @@ export const SuccessModal = ({ message, onClose }: SuccessModalProps) => {
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-neutral-dark/40 backdrop-blur-sm px-4">
             <div className="w-full max-w-sm rounded-3xl border border-neutral-base/10 bg-white p-8 flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-200">
-                <div className="w-full rounded-full bg-primary px-4 py-3 font-semibold text-white hover:opacity-90 transition">
+                <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center text-success mb-2">
                     <CheckCircle2 size={32} />
                 </div>
                 <h3 className="text-2xl font-bold text-neutral-dark text-center">Thao tác thành công</h3>

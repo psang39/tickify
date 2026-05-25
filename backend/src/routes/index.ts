@@ -14,6 +14,7 @@ import venueRoutes from './venue.routes';
 import waitingRoomRouter from './waiting-room.routes';
 import webhookRouter from './webhook.routes';
 import zoneRouter from './zone.routes';
+import staffRouter from './staff.routes';
 import { Verify, verifyRoles } from '../middleware/auth.middleware';
 
 const router = Express.Router();
@@ -40,5 +41,6 @@ router.use('/venues', venueRoutes);
 router.use('/zones', zoneRouter);
 router.use('/payments', paymentRouter);
 router.use('/webhooks', webhookRouter);
+router.use('/staff', staffRouter);
 
 export default router;
