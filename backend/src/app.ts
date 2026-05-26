@@ -9,9 +9,15 @@ import router from './routes/index';
 const app = Express();
 
 app.use(cookieParser());
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
-    .split(',')
-    .map(origin => origin.trim());
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'http://localhost:3000',
+    ...(process.env.FRONTEND_URL || '')
+        .split(',')
+        .map(origin => origin.trim())
+        .filter(Boolean),
+];
 
 app.use(cors({
     origin: (origin, callback) => {

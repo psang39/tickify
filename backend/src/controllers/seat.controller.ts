@@ -30,7 +30,7 @@ export const getShowLayoutMinified = async (req: Request, res: Response) => {
 export const getSeatsByShow = async (req: Request, res: Response) => {
     try {
         const { show_id } = req.params;
-        const show = await Show.findById(show_id);
+        const show = await Show.findById(show_id).select('status').lean();
         if (!show) {
             return res.status(404).json({ message: "Show not found" });
         }

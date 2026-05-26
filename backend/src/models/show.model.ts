@@ -24,6 +24,14 @@ const ShowSchema = new mongoose.Schema<IShow>({
     encrypted_private_key: { type: String, required: true, unique: true }
 });
 
+
+
+// Indexes for public event detail, show list, waiting room and seatmap lookups.
+ShowSchema.index({ event_id: 1, status: 1, start_time: 1 });
+ShowSchema.index({ status: 1, start_time: 1 });
+ShowSchema.index({ venue_id: 1, status: 1 });
+ShowSchema.index({ organizer_id: 1, start_time: -1 });
+
 ShowSchema.plugin(paginate);
 ShowSchema.virtual('time_state').get(function () {
     const now = new Date();

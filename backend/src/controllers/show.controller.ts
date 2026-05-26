@@ -146,7 +146,7 @@ export const getShowsByEvent = async (req: Request, res: Response) => {
     try {
         const { event_id } = req.params;
         const { page, limit, start_time, end_time, status } = req.query;
-        const event = await Event.findById(event_id);
+        const event = await Event.findById(event_id).select('status').lean();
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
@@ -166,10 +166,11 @@ export const getShowsByEvent = async (req: Request, res: Response) => {
 
         const options = {
             page: parseInt(page as string) || 1,
-            limit: parseInt(limit as string) || 10,
+            limit: Math.min(parseInt(limit as string) || 10, 50),
             sort: { start_time: 1 },
             populate: { path: 'venue_id', select: 'name address city latitude longitude capacity' },
-            select: '-stadium_map_svg -encrypted_private_key'
+            select: '-stadium_map_svg -encrypted_private_key',
+            lean: true
         };
         const shows = await Show.paginate(filter, options);
         res.status(200).json(shows);
@@ -228,7 +229,7 @@ export const getShowById = async (req: Request, res: Response) => {
 
 
         const summaryPromises = zones.map(zone => {
-            const summaryKey = `event:${show.event_id._id}:show:${show._id.toString()}:zone:${zone._id.toString()}:summary`; console.log("Đang tìm key:", summaryKey);
+            const summaryKey = `event:${(show.event_id as any)._id}:show:${show._id.toString()}:zone:${zone._id.toString()}:summary`;
             return redisClient.hGetAll(summaryKey);
         });
 
@@ -236,8 +237,6 @@ export const getShowById = async (req: Request, res: Response) => {
 
         zones.forEach((zone, index) => {
             const rawHash = rawSummaries[index];
-            console.log("Dữ liệu thô lấy từ Redis:", rawHash); // <--- XEM CÓ RỖNG KHÔNG
-            // Gọi hàm util để bóc tách, cực gọn!
             if (rawHash && Object.keys(rawHash).length > 0) {
                 zoneSummariesDict[zone._id.toString()] = formatHashToJSON(rawHash);
             } else {
