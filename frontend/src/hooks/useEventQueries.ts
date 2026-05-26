@@ -5,7 +5,6 @@ import { useFeedbackStore } from '@/store/useFeedbackStore';
 // 1. HOOK LẤY DANH SÁCH (Thay cho fetchEvents)
 export const useOrganizerEvents = (page = 1, limit = 10) => {
     return useQuery({
-        // Nếu page đổi, TanStack tự động gọi lại API
         queryKey: ['organizer-events', page],
         queryFn: async () => {
             const response = await api.get(`/organizer/events?page=${page}&limit=${limit}`);
@@ -14,7 +13,6 @@ export const useOrganizerEvents = (page = 1, limit = 10) => {
     });
 };
 
-// 2. HOOK TẠO SỰ KIỆN MỚI (Thay cho createEvent)
 export const useCreateEvent = () => {
     const queryClient = useQueryClient();
 

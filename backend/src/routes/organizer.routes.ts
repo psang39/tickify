@@ -1,9 +1,9 @@
 import { getOrganizerEvents, createEvent, getOrganizerEventById, publishEvent, unpublishEvent, deleteEvent, cancelEvent, updateEvent } from "../controllers/event.controller";
-import { createTicketType } from "../controllers/ticket-type.controller";
 import { getOrganizerShowsByEvent, publishShow, unpublishShow, cancelShow, createShow } from "../controllers/show.controller";
 import { getOrganizerShowById } from "../controllers/show.controller";
 import { streamAdminDashboard } from "../controllers/organizer-sse.controller";
 import { createStaffAccount, getOrganizerStaffs, assignStaffToShow, removeStaffFromShow, getOrganizerDashboard, getOrganizerAnalyticsDashboard, getOrganizerCheckInHistory, getOrganizerStaffDetail } from "../controllers/organizer.controller";
+import { getTicketTypesByShow, getTicketTypeById, updateTicketType, deleteTicketType } from "../controllers/ticket-type.controller";
 import express from 'express';
 const organizerRouter = express.Router();
 
@@ -12,7 +12,6 @@ organizerRouter.post('/events', createEvent);
 organizerRouter.get('/events/:event_id', getOrganizerEventById)
 organizerRouter.post('/events/:event_id/shows', createShow);
 organizerRouter.get('/events/:event_id/shows', getOrganizerShowsByEvent);
-organizerRouter.post('/events/:event_id/ticket-types', createTicketType);
 organizerRouter.get('/shows/:show_id', getOrganizerShowById);
 organizerRouter.post('/shows/:show_id/publish', publishShow);
 organizerRouter.post('/shows/:show_id/unpublish', unpublishShow);
@@ -29,6 +28,11 @@ organizerRouter.post('/shows/:show_id/remove-staff', removeStaffFromShow);
 organizerRouter.get('/dashboard', getOrganizerAnalyticsDashboard);
 organizerRouter.get('/dashboard/legacy', getOrganizerDashboard);
 organizerRouter.get('/check-ins', getOrganizerCheckInHistory);
+organizerRouter.get('/events/:event_id/sse/dashboard/:show_id', streamAdminDashboard);
 organizerRouter.get('/sse/dashboard/:show_id', streamAdminDashboard);
 organizerRouter.put('/events/:event_id', updateEvent);
+organizerRouter.get("/shows/:show_id/ticket-types", getTicketTypesByShow);
+organizerRouter.get("/shows/:show_id/ticket-types/:ticketTypeId", getTicketTypeById);
+organizerRouter.put("/shows/:show_id/ticket-types/:ticketTypeId", updateTicketType);
+organizerRouter.delete("/shows/:show_id/ticket-types/:ticketTypeId", deleteTicketType);
 export default organizerRouter;

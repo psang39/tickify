@@ -543,9 +543,7 @@ export default function TicketBookingPage() {
     return Math.max(1000000, ...(prices.length ? prices : [0]));
   }, [ticketTypeDictionary]);
 
-  // ==========================================
-  // RENDER NỘI DUNG TỪNG BƯỚC
-  // ==========================================
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:

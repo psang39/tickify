@@ -9,8 +9,28 @@ import { useFeedbackStore } from '@/store/useFeedbackStore';
 import {
     ArrowLeft, Save, X, MapPin, Calendar, CheckCircle2,
     UploadCloud, EyeOff, Globe, Ban, Info, Clock, Ticket,
-    Users, Trash2, Radio, Activity
+    Users, Radio, Activity, Pencil, Loader2
 } from 'lucide-react';
+
+type TicketTypeForm = {
+    name: string;
+    price: string;
+    target_tier: string;
+    total_quantity: string;
+    is_limited_promo: boolean;
+    sale_start: string;
+    sale_end: string;
+};
+
+const emptyTicketTypeForm: TicketTypeForm = {
+    name: '',
+    price: '',
+    target_tier: '',
+    total_quantity: '',
+    is_limited_promo: false,
+    sale_start: '',
+    sale_end: ''
+};
 
 export default function ShowDetail() {
     const { eventId, showId } = useParams();
@@ -21,6 +41,8 @@ export default function ShowDetail() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { showSuccess, showError } = useFeedbackStore();
     const [selectedStaffId, setSelectedStaffId] = useState<string>(''); // State quản lý ô select staff
+    const [ticketTypeForm, setTicketTypeForm] = useState<TicketTypeForm>(emptyTicketTypeForm);
+    const [editingTicketTypeId, setEditingTicketTypeId] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -37,7 +59,6 @@ export default function ShowDetail() {
     const [venueSearch, setVenueSearch] = useState('');
     const [isVenueDropdownOpen, setIsVenueDropdownOpen] = useState(false);
 
-    // STATE CHO PHÂN HỆ INLINE VENUE CREATION
     const [isCreatingNewVenue, setIsCreatingNewVenue] = useState(false);
     const [newVenueForm, setNewVenueForm] = useState({
         name: '',
@@ -55,9 +76,7 @@ export default function ShowDetail() {
         status: 'Đang kết nối...'
     });
 
-    // ==========================================
-    // 2. KẾT NỐI REAL-TIME SSE (CHỈ CHẠY KHI MỞ TAB LIVE)
-    // ==========================================
+
     useEffect(() => {
         if (!showId || activeTab !== 'LIVE') return;
 
@@ -74,7 +93,7 @@ export default function ShowDetail() {
                     holdingSeats: data.holding_seats || 0,
                     totalRevenue: data.total_revenue || 0,
                     ticketsSoldLastMinute: data.tickets_sold || 0,
-                    status: 'Live 🔴'
+                    status: 'Live'
                 });
             } catch (error) {
                 console.error("Lỗi phân tích dữ liệu SSE:", error);
@@ -85,15 +104,11 @@ export default function ShowDetail() {
             setLiveMonitor(prev => ({ ...prev, status: 'Mất kết nối ⚪' }));
         };
 
-        // Dọn dẹp, ngắt kết nối ngay lập tức khi chuyển tab hoặc đóng trang để tiết kiệm tài nguyên
         return () => {
             eventSource.close();
         };
     }, [showId, activeTab]);
 
-    // ==========================================
-    // 3. TANSTACK QUERY - FETCH DATA
-    // ==========================================
     const { data: showData, isLoading: isLoadingShow } = useQuery({
         queryKey: ['organizer-show-detail', showId],
         queryFn: async () => {
@@ -102,6 +117,18 @@ export default function ShowDetail() {
         },
         enabled: !!showId
     });
+
+
+
+    const { data: ticketTypesData = [], isLoading: isLoadingTicketTypes } = useQuery({
+        queryKey: ['organizer-show-ticket-types', showId],
+        queryFn: async () => {
+            const response = await api.get(`/organizer/shows/${showId}/ticket-types`);
+            return response.data?.data || response.data || [];
+        },
+        enabled: !!showId
+    });
+    const ticketTypes = Array.isArray(ticketTypesData) ? ticketTypesData : [];
 
     const { data: venuesData = [] } = useQuery({
         queryKey: ['venues', venueSearch],
@@ -154,10 +181,6 @@ export default function ShowDetail() {
             if (info.venue_id?.name) setVenueSearch(info.venue_id.name);
         }
     }, [showData]);
-
-    // ==========================================
-    // 4. MUTATIONS MANAGEMENT
-    // ==========================================
 
     // MUTATION: ĐỀ XUẤT VENUE MỚI TẠI CHỖ TỪ ORGANIZER
     const { mutateAsync: suggestVenueMutation, isPending: isSuggestingVenue } = useMutation({
@@ -217,6 +240,74 @@ export default function ShowDetail() {
         onError: (err: any) => setErrorMessage(err.response?.data?.message || "Không thể rút nhân viên.")
     });
 
+
+
+    const invalidateTicketTypes = () => {
+        queryClient.invalidateQueries({ queryKey: ['organizer-show-ticket-types', showId] });
+        queryClient.invalidateQueries({ queryKey: ['organizer-show-detail', showId] });
+    };
+
+    const resetTicketTypeForm = () => {
+        setTicketTypeForm(emptyTicketTypeForm);
+        setEditingTicketTypeId(null);
+    };
+
+    const buildTicketTypePayload = () => ({
+        name: ticketTypeForm.name.trim(),
+        price: Number(ticketTypeForm.price),
+        target_tier: ticketTypeForm.target_tier.trim() || undefined,
+        total_quantity: ticketTypeForm.total_quantity === '' ? null : Number(ticketTypeForm.total_quantity),
+        is_limited_promo: ticketTypeForm.is_limited_promo,
+        sale_start: ticketTypeForm.sale_start || undefined,
+        sale_end: ticketTypeForm.sale_end || undefined
+    });
+
+    const { mutateAsync: updateTicketTypeMutation, isPending: isUpdatingTicketType } = useMutation({
+        mutationFn: async ({ ticketTypeId, payload }: { ticketTypeId: string; payload: any }) => (
+            await api.put(`/organizer/shows/${showId}/ticket-types/${ticketTypeId}`, payload)
+        ).data,
+        onSuccess: () => {
+            invalidateTicketTypes();
+            resetTicketTypeForm();
+            showSuccess('Đã cập nhật loại vé.');
+        },
+        onError: (err: any) => setErrorMessage(err.response?.data?.message || 'Không thể cập nhật loại vé.')
+    });
+
+    const handleSubmitTicketType = async () => {
+        if (currentStatus === 'published' || currentStatus === 'cancelled') {
+            setErrorMessage('Vui lòng tạm dừng bán vé trước khi chỉnh loại vé.');
+            return;
+        }
+        if (!ticketTypeForm.name.trim() || Number(ticketTypeForm.price) <= 0) {
+            setErrorMessage('Tên loại vé và giá vé phải hợp lệ.');
+            return;
+        }
+        if (ticketTypeForm.total_quantity && Number(ticketTypeForm.total_quantity) < 0) {
+            setErrorMessage('Số lượng giới hạn không được âm.');
+            return;
+        }
+        if (!editingTicketTypeId) {
+            setErrorMessage('Loại vé được sinh từ SVG/show controller. Vui lòng chọn một loại vé trong danh sách để chỉnh sửa.');
+            return;
+        }
+        const payload = buildTicketTypePayload();
+        await updateTicketTypeMutation({ ticketTypeId: editingTicketTypeId, payload });
+    };
+
+    const startEditTicketType = (ticketType: any) => {
+        setEditingTicketTypeId(ticketType._id);
+        setTicketTypeForm({
+            name: ticketType.name || '',
+            price: ticketType.price?.toString() || '',
+            target_tier: ticketType.target_tier || '',
+            total_quantity: ticketType.total_quantity === null || ticketType.total_quantity === undefined ? '' : ticketType.total_quantity.toString(),
+            is_limited_promo: Boolean(ticketType.is_limited_promo),
+            sale_start: formatDateTimeLocal(ticketType.sale_start),
+            sale_end: formatDateTimeLocal(ticketType.sale_end)
+        });
+    };
+
     const handleUpdateShow = async () => {
         if (!formData.start_time || !formData.end_time || !formData.sale_start || !formData.sale_end || !formData.venue_id) {
             setErrorMessage("Vui lòng điền đầy đủ thông tin và địa điểm.");
@@ -237,12 +328,13 @@ export default function ShowDetail() {
     };
 
     const filteredVenues = venues.filter((v: any) => v.name.toLowerCase().includes(venueSearch.toLowerCase()));
-    const isAnyActionPending = isUpdating || isPublishing || isUnpublishing || isCancelling || isSuggestingVenue;
+    const isTicketTypePending = isUpdatingTicketType;
+    const isTicketTypeLocked = currentStatus === 'published' || currentStatus === 'cancelled';
+    const isAnyActionPending = isUpdating || isPublishing || isUnpublishing || isCancelling || isSuggestingVenue || isTicketTypePending;
 
     if (isLoadingShow) return <LoadingOverlay isVisible={true} message="Đang tải cấu hình Show..." />;
     if (!showData) return <div className="min-h-screen flex items-center justify-center font-bold text-red-500">Không tìm thấy dữ liệu đêm diễn!</div>;
 
-    // Tìm xem venue hiện tại có được verify không
     const currentVenueData = venues.find((v: any) => v._id === formData.venue_id);
     const isVenueVerified = currentVenueData ? currentVenueData.is_verified : true;
 
@@ -272,7 +364,7 @@ export default function ShowDetail() {
                         onClick={() => setActiveTab('CONFIG')}
                         className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'CONFIG' ? 'bg-white text-primary' : 'text-slate-500 hover:text-slate-800'}`}
                     >
-                        <Info size={14} /> Cấu hình & Nhân sự
+                        <Info size={14} /> Cấu hình, Vé & Nhân sự
                     </button>
                     <button
                         onClick={() => setActiveTab('LIVE')}
@@ -306,7 +398,6 @@ export default function ShowDetail() {
                             </div>
                         )}
 
-                        {/* HIỂN THỊ CẢNH BÁO NẾU VENUE LIÊN KẾT CHƯA ĐƯỢC ADMIN VERIFY */}
                         {currentStatus === 'draft' && formData.venue_id && isVenueVerified === false && (
                             <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-start gap-2.5 text-xs font-medium animate-in fade-in">
                                 <Info size={16} className="shrink-0 mt-0.5 text-amber-600" />
@@ -358,6 +449,175 @@ export default function ShowDetail() {
                                 </div>
                             </div>
                         </div>
+
+                        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 border-b border-slate-50 pb-3">
+                                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Ticket className="text-primary" size={18} /> Loại vé & giá bán</h2>
+                                <div className="text-[11px] font-medium text-slate-400">
+                                    {ticketTypes.length} loại vé đang cấu hình
+                                </div>
+                            </div>
+
+                            {isTicketTypeLocked && (
+                                <div className="mb-4 bg-slate-50 border border-slate-200 text-slate-600 p-3 rounded-xl flex items-start gap-2 text-xs font-medium">
+                                    <Info size={15} className="shrink-0 mt-0.5" />
+                                    <span>Show đang mở bán hoặc đã hủy nên không thể chỉnh giá vé. Hãy tạm dừng bán trước khi thay đổi cấu hình vé.</span>
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+                                <div className="lg:col-span-2 bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                            {editingTicketTypeId ? 'Chỉnh loại vé' : 'Thêm loại vé'}
+                                        </h3>
+                                        {editingTicketTypeId && (
+                                            <button type="button" onClick={resetTicketTypeForm} className="text-[11px] font-bold text-slate-400 hover:text-slate-700">
+                                                Hủy sửa
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tên loại vé *</label>
+                                        <input
+                                            type="text"
+                                            disabled={isTicketTypeLocked}
+                                            className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
+                                            placeholder="VD: Vé thường, VIP, Early Bird"
+                                            value={ticketTypeForm.name}
+                                            onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, name: e.target.value })}
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Giá vé *</label>
+                                            <input
+                                                type="number"
+                                                min={0}
+                                                disabled={isTicketTypeLocked}
+                                                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
+                                                placeholder="500000"
+                                                value={ticketTypeForm.price}
+                                                onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, price: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hạng zone</label>
+                                            <input
+                                                type="text"
+                                                disabled={isTicketTypeLocked}
+                                                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
+                                                placeholder="VIP/A/B"
+                                                value={ticketTypeForm.target_tier}
+                                                onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, target_tier: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Số lượng giới hạn</label>
+                                        <input
+                                            type="number"
+                                            min={0}
+                                            disabled={isTicketTypeLocked}
+                                            className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
+                                            placeholder="Để trống nếu lấy theo sức chứa zone"
+                                            value={ticketTypeForm.total_quantity}
+                                            onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, total_quantity: e.target.value })}
+                                        />
+                                    </div>
+
+                                    <label className="flex items-center gap-2 text-xs font-bold text-slate-600 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox"
+                                            disabled={isTicketTypeLocked}
+                                            checked={ticketTypeForm.is_limited_promo}
+                                            onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, is_limited_promo: e.target.checked })}
+                                        />
+                                        Vé khuyến mãi / mở bán giới hạn
+                                    </label>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Mở bán riêng</label>
+                                            <input
+                                                type="datetime-local"
+                                                disabled={isTicketTypeLocked}
+                                                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-medium outline-none focus:border-primary disabled:opacity-60"
+                                                value={ticketTypeForm.sale_start}
+                                                onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, sale_start: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Đóng bán riêng</label>
+                                            <input
+                                                type="datetime-local"
+                                                disabled={isTicketTypeLocked}
+                                                className="w-full bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-medium outline-none focus:border-primary disabled:opacity-60"
+                                                value={ticketTypeForm.sale_end}
+                                                onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, sale_end: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        type="button"
+                                        disabled={isTicketTypeLocked || isTicketTypePending}
+                                        onClick={handleSubmitTicketType}
+                                        className="w-full bg-primary hover:opacity-90 text-white font-bold text-xs rounded-lg border-none"
+                                    >
+                                        {isTicketTypePending ? <Loader2 size={14} className="mr-1 animate-spin" /> : <Save size={14} className="mr-1" />}
+                                        {editingTicketTypeId ? 'Lưu loại vé' : 'Chọn loại vé để chỉnh'}
+                                    </Button>
+                                </div>
+
+                                <div className="lg:col-span-3 space-y-3">
+                                    {isLoadingTicketTypes ? (
+                                        <div className="p-6 border border-dashed border-slate-200 rounded-xl text-center text-xs font-bold text-slate-400">Đang tải loại vé...</div>
+                                    ) : ticketTypes.length === 0 ? (
+                                        <div className="p-6 border border-dashed border-slate-200 rounded-xl text-center text-xs font-bold text-slate-400">Chưa có loại vé nào. Hãy upload SVG/tạo show để hệ thống sinh loại vé tương ứng.</div>
+                                    ) : (
+                                        ticketTypes.map((ticketType: any) => (
+                                            <div key={ticketType._id} className="border border-slate-100 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-primary/20 transition-colors">
+                                                <div className="space-y-1 min-w-0">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <h4 className="font-bold text-sm text-slate-800 truncate">{ticketType.name}</h4>
+                                                        {ticketType.is_limited_promo && <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100 text-[10px] font-bold">Promo</span>}
+                                                        {ticketType.target_tier && <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold">Tier {ticketType.target_tier}</span>}
+                                                    </div>
+                                                    <div className="text-xs text-slate-500 font-medium">
+                                                        <span className="font-bold text-primary">{Number(ticketType.price || 0).toLocaleString('vi-VN')}đ</span>
+                                                        <span className="mx-2 text-slate-300">•</span>
+                                                        SL: {ticketType.total_quantity ?? 'Theo zone'}
+                                                        <span className="mx-2 text-slate-300">•</span>
+                                                        Đã bán: {ticketType.sold_quantity || 0}
+                                                    </div>
+                                                    {(ticketType.sale_start || ticketType.sale_end) && (
+                                                        <div className="text-[11px] text-slate-400">
+                                                            Khung bán riêng: {ticketType.sale_start ? new Date(ticketType.sale_start).toLocaleString('vi-VN') : 'Không giới hạn'} → {ticketType.sale_end ? new Date(ticketType.sale_end).toLocaleString('vi-VN') : 'Không giới hạn'}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        disabled={isTicketTypeLocked || isTicketTypePending}
+                                                        onClick={() => startEditTicketType(ticketType)}
+                                                        className="h-8 px-3 rounded-full text-xs font-bold border-slate-200"
+                                                    >
+                                                        <Pencil size={13} className="mr-1" /> Sửa
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* CỘT PHẢI: VENUE, MAP SVG & QUẢN LÝ NHÂN SỰ TRỰC CA */}
@@ -385,7 +645,7 @@ export default function ShowDetail() {
                                         />
                                         {isVenueDropdownOpen && !['published', 'cancelled'].includes(currentStatus) && (
                                             <div className="absolute z-30 w-full mt-1 bg-white border border-slate-200 rounded-lg max-h-48 overflow-y-auto bg-white">
-                                                {venues.map((venue: any) => (
+                                                {filteredVenues.map((venue: any) => (
                                                     <div key={venue._id} className="px-3 py-2.5 hover:bg-slate-50 cursor-pointer border-b border-gray-50 text-xs" onMouseDown={() => { setFormData({ ...formData, venue_id: venue._id }); setVenueSearch(venue.name); setIsVenueDropdownOpen(false); }}>
                                                         <div className="font-semibold text-gray-800">{venue.name} ({venue.city || 'Chưa rõ thành phố'})</div>
                                                         <div className="text-[10px] text-gray-400 mt-0.5 truncate">{venue.address}</div>
@@ -416,7 +676,6 @@ export default function ShowDetail() {
                                     )}
                                 </div>
                             ) : (
-                                /* CHẾ ĐỘ 2: FORM INLINE ĐỀ XUẤT ĐỊA ĐIỂM MỚI */
                                 <div className="space-y-4 animate-in fade-in duration-200">
                                     <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Đề xuất địa điểm mới</span>
@@ -507,7 +766,7 @@ export default function ShowDetail() {
                                 {formData.stadium_map_svg ? (
                                     <div className="flex flex-col items-center py-2">
                                         <CheckCircle2 size={20} className="text-emerald-600 mb-1" />
-                                        <span className="text-xs font-bold text-slate-700">Đã nhận diện tệp mặt bằng</span>
+                                        <span className="text-xs font-bold text-slate-700">Đã nhận diện file SVG</span>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center py-2 opacity-50">
@@ -523,7 +782,6 @@ export default function ShowDetail() {
                             </div>
                         </div>
 
-                        {/* PHÂN HỆ QUẢN LÝ NHÂN SỰ TRỰC CA (KIỂM SOÁT VÉ ĐÊM DIỄN) */}
                         <div className="bg-white rounded-2xl p-6 border border-gray-100 space-y-4">
                             <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2"><img src="" alt="" /><Users size={16} className="text-primary" /> Nhân viên điều phối ca</h3>
 
@@ -594,9 +852,6 @@ export default function ShowDetail() {
                 </div>
             )}
 
-            {/* ================================================================= */}
-            {/* TAB 2: GIÁM SÁT THỜI GIAN THỰC (LIVE MONITOR VIA REDIS/SSE)       */}
-            {/* ================================================================= */}
             {activeTab === 'LIVE' && (
                 <div className="w-full max-w-4xl mx-auto px-6 lg:px-12 mt-8 space-y-6 animate-in fade-in duration-150">
 
@@ -649,16 +904,13 @@ export default function ShowDetail() {
                 </div>
             )}
 
-            {/* BAR ĐIỀU KHIỂN DƯỚI ĐÁY TRANG */}
             <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50">
                 <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
 
-                    {/* BÊN TRÁI: ACTIONS THAY ĐỔI TRẠNG THÁI SHOW CỦA BACKEND */}
                     <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
                         {currentStatus === 'draft' && (
                             <Button
                                 type="button"
-                                // 🌟 TỰ ĐỘNG KHÓA NÚT MỞ BÁN NẾU ĐỊA ĐIỂM CHƯA ĐƯỢC ADMIN PHÊ DUYỆT (isVenueVerified === false)
                                 disabled={isAnyActionPending || !formData.venue_id || isVenueVerified === false}
                                 onClick={async () => {
                                     if (window.confirm("Xác nhận mở bán công khai show diễn này? Hệ thống sẽ kích hoạt phân tán dữ liệu thời gian thực.")) {

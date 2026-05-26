@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient';
@@ -9,7 +9,7 @@ import { useFeedbackStore } from '@/store/useFeedbackStore';
 import {
     UploadCloud, Search, CheckCircle2, Plus, Trash2, Ticket,
     CalendarClock, Tag, Settings, ListVideo, Save, ArrowLeft,
-    Image as ImageIcon, MapPin, Calendar, Info, Edit3, X, EyeOff, Globe, Ban, Move, Mic2, Check
+    Image as ImageIcon, Calendar, Info, Edit3, X, EyeOff, Globe, Ban, Move, Mic2, Check
 } from 'lucide-react';
 
 interface TicketTypeForm {
@@ -34,16 +34,9 @@ export default function EventDetail() {
     const { eventId } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const location = useLocation();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { showSuccess, showError } = useFeedbackStore();
-
-    // ĐIỀU HƯỚNG TABS
     const [activeTab, setActiveTab] = useState<'INFO' | 'SHOWS'>('INFO');
-
-    // ==========================================
-    // DATA CỦA TAB 1: THÔNG TIN SỰ KIỆN (EVENT)
-    // ==========================================
     const [eventFormData, setEventFormData] = useState({
         name: '', description: '', genre: 'Pop / Concert', artists: '', poster_url: '', banner_url: '', banner_offset_y: 50,
         start_date: '', end_date: ''
@@ -156,9 +149,6 @@ export default function EventDetail() {
         await updateEventMutation(eventFormData);
     };
 
-    // ==========================================
-    // DATA CỦA TAB 2: QUẢN LÝ SHOWS
-    // ==========================================
     const [showForm, setShowForm] = useState(false);
     const [ticketTypes, setTicketTypes] = useState<TicketTypeForm[]>([]);
     const [showData, setShowData] = useState({
@@ -168,13 +158,11 @@ export default function EventDetail() {
 
     const [venueSearch, setVenueSearch] = useState('');
     const [isVenueDropdownOpen, setIsVenueDropdownOpen] = useState(false);
-
-    // STATE BỔ SUNG CHO PHÂN HỆ INLINE VENUE CREATION TRONG BIỂU MẪU TẠO SHOW MỚI
     const [isCreatingNewVenue, setIsCreatingNewVenue] = useState(false);
     const [newVenueForm, setNewVenueForm] = useState({
         name: '',
         address: '',
-        city: '', // Đã có trường thành phố bắt buộc
+        city: '',
         latitude: '',
         longitude: ''
     });
@@ -188,7 +176,6 @@ export default function EventDetail() {
         enabled: !!eventId
     });
 
-    // ✨ NÂNG CẤP: useQuery cào dữ liệu địa điểm đồng bộ theo cơ chế Search-driven thực tế
     const { data: venuesData = [] } = useQuery({
         queryKey: ['venues', venueSearch],
         queryFn: async () => {
@@ -204,7 +191,6 @@ export default function EventDetail() {
     });
     const venues = Array.isArray(venuesData) ? venuesData : [];
 
-    // ✨ MUTATION MỚI: Đề xuất nhanh Địa điểm chứa thành phố từ biểu mẫu tạo Show
     const { mutateAsync: suggestVenueMutation, isPending: isSuggestingVenue } = useMutation({
         mutationFn: async (newVenuePayload: any) => {
             const response = await api.post('/organizer/venues', newVenuePayload);
@@ -307,7 +293,7 @@ export default function EventDetail() {
         }
     };
 
-    // Vì dữ liệu đã được cào trực tiếp từ Backend theo chữ đã gõ nên gán thẳng để map dữ liệu
+
     const filteredVenues = venues;
     const isInfoTab = activeTab === 'INFO';
     const isAnyActionPending = isUpdatingEvent || isPublishingEvent || isUnpublishingEvent || isCancellingEvent || isSuggestingVenue;
@@ -326,8 +312,6 @@ export default function EventDetail() {
             >
                 <ArrowLeft size={24} />
             </button>
-
-            {/* BANNER KHU VỰC TRÊN CÙNG */}
             <div
                 className={`relative w-full h-[300px] md:h-[450px] bg-gray-900 overflow-hidden select-none transition-all ${isRepositioning ? (dragState.isDragging ? 'cursor-grabbing' : 'cursor-grab') : (isInfoTab && currentStatus === 'draft' ? 'group' : '')}`}
                 onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}
@@ -387,7 +371,7 @@ export default function EventDetail() {
                             </div>
 
                             <div className="flex items-center gap-2 px-3 py-1.5 border border-white/20 rounded-md bg-black/40 text-white backdrop-blur-md text-xs font-bold uppercase tracking-wider select-none">
-                                <span>Mặt bằng:</span>
+                                <span>Trạng thái:</span>
                                 {currentStatus === 'draft' && <span className="text-slate-300 flex items-center gap-1"><EyeOff size={12} /> Bản nháp</span>}
                                 {currentStatus === 'published' && <span className="text-green-400 flex items-center gap-1"><Globe size={12} /> Công khai</span>}
                                 {currentStatus === 'cancelled' && <span className="text-red-400 flex items-center gap-1"><Ban size={12} /> Đã hủy</span>}

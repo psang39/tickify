@@ -73,8 +73,8 @@ export const addClient = (res: Response, show_id: string) => {
     });
 };
 
-export const addAdminClient = (res: Response, show_id: string) => {
-    startAdminDashboardThrottler(show_id);
+export const addAdminClient = (res: Response, show_id: string, event_id: string) => {
+    startAdminDashboardThrottler(event_id, show_id);
 
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',

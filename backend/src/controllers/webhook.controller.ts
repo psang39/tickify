@@ -31,9 +31,20 @@ export const handleMockPaymentWebhook = async (req: Request, res: Response): Pro
             return;
         }
 
+        // Không hủy đơn ngay khi thanh toán fail. Giữ pending để user retry trong thời gian giữ chỗ.
         if (status !== 'SUCCESS') {
-            await Order.findByIdAndUpdate(order_id, { status: 'cancelled' });
-            res.status(200).json({ message: 'OK' });
+            if (new Date() > new Date(order.cancellation_deadline)) {
+                order.status = 'cancelled';
+                await order.save();
+            }
+
+            // Không tạo Payment confirmed/failed ở đây để tránh conflict nếu Payment.order_id đang unique.
+            // Nếu muốn lưu lịch sử từng lần thử, nên tạo model riêng PaymentAttempt.
+
+            res.status(200).json({
+                message: 'Payment failed, order is still retryable if not expired',
+                canRetry: order.status === 'pending'
+            });
             return;
         }
 
@@ -44,6 +55,13 @@ export const handleMockPaymentWebhook = async (req: Request, res: Response): Pro
 
         if (order.status !== 'pending') {
             res.status(409).json({ message: `Order is not pending. Current status: ${order.status}` });
+            return;
+        }
+
+        if (new Date() > new Date(order.cancellation_deadline)) {
+            order.status = 'cancelled';
+            await order.save();
+            res.status(409).json({ message: 'Order expired' });
             return;
         }
 
@@ -77,7 +95,10 @@ export const handleMockPaymentWebhook = async (req: Request, res: Response): Pro
         await payment.save();
         await order.save();
 
-        const seatsToConfirm = await Seat.find({ _id: { $in: seatIds } }).select('_id row col_index zone_id ticket_type_id').lean();
+        const seatsToConfirm = await Seat.find({ _id: { $in: seatIds } })
+            .select('_id row col_index zone_id ticket_type_id')
+            .lean();
+
         await Seat.updateMany(
             { _id: { $in: seatIds } },
             { $set: { status: 'sold' } }

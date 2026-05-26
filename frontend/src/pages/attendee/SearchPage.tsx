@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient';
-import { Search, MapPin, SlidersHorizontal, Calendar, Music, ArrowUpDown, Tag, ImageIcon } from 'lucide-react';
+import { Search, MapPin, SlidersHorizontal, Calendar, Music, ArrowUpDown, ImageIcon } from 'lucide-react';
 
 export default function SearchPage() {
     const navigate = useNavigate();

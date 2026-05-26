@@ -1,6 +1,6 @@
 import { Ticket, Calendar, MapPin, Check } from 'lucide-react';
 import { CheckoutCountdown } from './CheckoutCountdown';
-import { Button } from '@/components/ui/button';
+
 // Khai báo Props cho Component
 interface EventInfoHeaderProps {
     showInfo: any;
@@ -11,12 +11,10 @@ interface EventInfoHeaderProps {
     onBack: () => void;
 }
 
-export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, orderData, onBack }: EventInfoHeaderProps) => {
-    // Xử lý bóc tách ngày, tháng, năm từ chuỗi thời gian
+export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, orderData }: EventInfoHeaderProps) => {
     const startDate = showInfo?.start_time ? new Date(showInfo.start_time) : null;
     const day = startDate ? startDate.getDate().toString().padStart(2, '0') : '--';
 
-    // Bạn có thể đổi 'vi-VN' thành 'en-US' nếu muốn hiển thị tiếng Anh (như "June")
     const month = startDate ? startDate.toLocaleString('vi-VN', { month: 'short' }) : '---';
     const year = startDate ? startDate.getFullYear() : '----';
 
@@ -27,7 +25,6 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
     return (
         <div className="flex w-full bg-white rounded-2xl border border-slate-200 overflow-hidden mt-8 mb-6">
 
-            {/* 🟢 CỘT TRÁI: Khối màu xanh đặc trưng (Chứa Ngày Tháng) */}
             <div className="bg-[#2d3092] text-white w-32 shrink-0 flex flex-col items-center justify-center py-8 gap-1">
                 <span className="text-4xl font-bold">{day}</span>
                 <span className="text-xl font-medium capitalize">{month}</span>
@@ -37,10 +34,8 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
                 </div>
             </div>
 
-            {/* 🟡 CỘT PHẢI: Thông tin sự kiện và Các nút hành động */}
             <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center p-6 lg:px-8 gap-6 bg-white">
 
-                {/* Phần thông tin chi tiết */}
                 <div className="flex flex-col gap-4">
                     <h1 className="text-2xl font-bold text-slate-800">
                         {isLoadingShow ? "Đang tải sự kiện..." : showInfo?.name}
@@ -64,10 +59,8 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
                     </div>
                 </div>
 
-                {/* Phần Countdown & Đổi ngày */}
                 <div className="flex flex-col items-end gap-6 self-stretch justify-between">
 
-                    {/* Bọc component CheckoutCountdown trong một khung xám giống thiết kế */}
                     {currentStep < 5 && (
                         <div className="text-right">
                             <CheckoutCountdown

@@ -21,15 +21,12 @@ export default function CreateEvent() {
         start_date: '',
         end_date: '',
         poster_url: '',
-        banner_url: 'https://images.unsplash.com/photo-1540039155733-56f1c327262c?q=80&w=1920&auto=format&fit=crop',
-        banner_offset_y: 50, // Mặc định là 50% (Căn giữa)
-        status: 'draft', // Luôn ép chặt trạng thái là 'draft' khi tạo mới
+        banner_url: '',
+        banner_offset_y: 50,
+        status: 'draft',
         organizer_id: user?.id || ''
     });
 
-    // ==========================================
-    // LOGIC KÉO THẢ ẢNH BÌA (DRAG & DROP)
-    // ==========================================
     const [isRepositioning, setIsRepositioning] = useState(false);
     const [dragState, setDragState] = useState({ isDragging: false, startY: 0 });
 
@@ -102,9 +99,6 @@ export default function CreateEvent() {
                 <ArrowLeft size={24} />
             </button>
 
-            {/* ========================================== */}
-            {/* 1. KHU VỰC BANNER TRÀN VIỀN (FULL-BLEED)    */}
-            {/* ========================================== */}
             <div
                 className={`relative w-full h-[300px] md:h-[400px] bg-gray-900 overflow-hidden select-none transition-all ${isRepositioning ? (dragState.isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'group'}`}
                 onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}
@@ -128,7 +122,6 @@ export default function CreateEvent() {
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none transition-opacity duration-300" style={{ opacity: isRepositioning ? 0 : 1 }}></div>
 
-                {/* THANH ĐIỀU KHIỂN BANNER */}
                 <div className="absolute top-6 right-6 z-20 flex gap-2">
                     {isRepositioning ? (
                         <div className="flex gap-2 bg-black/60 p-1.5 rounded-lg backdrop-blur-md animate-in fade-in">
@@ -150,7 +143,6 @@ export default function CreateEvent() {
                     )}
                 </div>
 
-                {/* TEXT TRÊN BANNER */}
                 <div className={`absolute bottom-8 left-0 w-full px-6 lg:px-12 flex justify-center transition-all duration-300 ${isRepositioning ? 'opacity-20 pointer-events-none blur-sm' : 'opacity-100'}`}>
                     <div className="w-full max-w-6xl flex flex-col justify-end gap-2">
                         <div className="bg-white/20 backdrop-blur-md text-white px-1 py-0.5 rounded-full font-semibold border border-white/30 flex items-center w-fit focus-within:bg-white/40 transition-all">
@@ -179,10 +171,8 @@ export default function CreateEvent() {
                 </div>
             </div>
 
-            {/* CÁC PHẦN DƯỚI (Description, Thời gian, Poster) */}
             <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 mt-10 grid grid-cols-1 xl:grid-cols-3 gap-8">
                 <div className="xl:col-span-2 space-y-8">
-                    {/* Description */}
                     <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 relative group/desc">
                         <div className="absolute top-6 right-6 text-gray-300 opacity-0 group-hover/desc:opacity-100"><Edit3 size={18} /></div>
                         <h2 className="text-xl font-bold text-secondary mb-3">Giới thiệu sự kiện</h2>
@@ -193,7 +183,6 @@ export default function CreateEvent() {
                         />
                     </div>
 
-                    {/* Thời gian */}
                     <div>
                         <h2 className="text-xl font-bold text-secondary mb-3 flex items-center gap-2">
                             <Calendar className="text-primary" size={20} /> Thiết lập thời gian chung
@@ -212,7 +201,6 @@ export default function CreateEvent() {
                     </div>
                 </div>
 
-                {/* Poster */}
                 <div className="space-y-6">
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col h-full">
                         <h3 className="font-bold text-lg mb-1 text-secondary flex items-center gap-2">Ảnh Poster (Dọc)</h3>
@@ -239,9 +227,6 @@ export default function CreateEvent() {
                 </div>
             </div>
 
-            {/* ========================================== */}
-            {/* 3. THANH CÔNG CỤ NỔI (ĐỒNG BỘ FLAT & CHỈ LƯU DRAFT) */}
-            {/* ========================================== */}
             <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50">
                 <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
                     <div>

@@ -1,6 +1,44 @@
 import { create } from 'zustand';
-import type { ISeat } from '@/types/seat.types'
 import { useFeedbackStore } from '@/store/useFeedbackStore';
+
+type SeatStatus =
+    | 'available'
+    | 'held'
+    | 'sold'
+    | 'locked'
+    | 'unavailable'
+    | 0
+    | 1
+    | 2
+    | 3;
+
+interface ISeat {
+    _id?: string;
+    id: string;
+
+    show_id?: string;
+    zone_id: string;
+    ticket_type_id?: string;
+
+    row?: string;
+    seat_number?: string;
+    col_index?: number;
+
+    x?: number;
+    y?: number;
+
+    status: SeatStatus;
+
+    tier?: string;
+    price?: number;
+
+    is_standing?: boolean;
+
+    createdAt?: string;
+    updatedAt?: string;
+
+    [key: string]: any;
+}
 
 interface CartState {
     selectedSeats: ISeat[];

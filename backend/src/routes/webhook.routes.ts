@@ -1,4 +1,3 @@
-// file: src/routes/webhook.routes.ts
 import express from 'express';
 import { handleMockPaymentWebhook } from '../controllers/webhook.controller';
 

@@ -224,7 +224,7 @@ export const getShowById = async (req: Request, res: Response) => {
             .select('_id name path_data overall_map_svg_id capacity is_standing ticket_type_id')
             .lean();
         const zoneSummariesDict: Record<string, any> = {};
-        const ticketTypes = await TicketType.find({ show_id: show_id }).select('_id price').lean();
+        const ticketTypes = await TicketType.find({ show_id: show_id }).sort({ price: 1, name: 1 }).lean();
 
 
         const summaryPromises = zones.map(zone => {
@@ -251,6 +251,7 @@ export const getShowById = async (req: Request, res: Response) => {
         res.status(200).json({
             show_info: show,
             zones: zones,
+            ticket_types: ticketTypes,
             zone_summaries: zoneSummariesDict
         });
 
@@ -280,12 +281,18 @@ export const getOrganizerShowById = async (req: Request, res: Response) => {
         const zones = await Zone.find({ show_id })
             .select('_id name path_data overall_map_svg_id capacity is_standing ticket_type_id')
             .lean();
+
+        const ticketTypes = await TicketType.find({ show_id })
+            .sort({ price: 1, name: 1 })
+            .lean();
+
         const zoneSummariesDict: Record<string, any> = {};
 
 
         res.status(200).json({
             show_info: show,
             zones: zones,
+            ticket_types: ticketTypes,
             zone_summaries: zoneSummariesDict
         });
 
@@ -313,6 +320,9 @@ export const updateShow = async (req: Request, res: Response) => {
             });
         }
 
+        // ticket_types ở đây chỉ dùng cho flow upload/generate seatmap.
+        // Chỉnh giá/tên/thông tin bán vé của ticket-type đã sinh nên đi qua ticket-type.controller.updateTicketType,
+        // để không regenerate toàn bộ seatmap một cách không cần thiết.
         const isSeatmapUpdate = Boolean(stadium_map_svg || ticket_types);
         if (isSeatmapUpdate) {
             const hasBlockingOrders = await hasBlockingOrdersForShow(show_id);

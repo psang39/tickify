@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { CalendarDays, FileEdit, Globe, Lock, Plus, Search, Sparkles } from 'lucide-react';
+import { CalendarDays, FileEdit, Globe, Lock, Plus, Search } from 'lucide-react';
 import { api } from '@/lib/axiosClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -140,7 +140,7 @@ export default function EventManagement() {
                 <CardHeader className="border-b border-slate-100 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
                         <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
-                            <Sparkles size={18} /> Danh sách sự kiện
+                            Danh sách sự kiện
                         </CardTitle>
                         <p className="text-sm text-slate-500 mt-1">
                             Chọn một sự kiện để quản lý show, sơ đồ ghế, publish/unpublish và các cấu hình bán vé.
