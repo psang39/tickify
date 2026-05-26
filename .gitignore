@@ -8,3 +8,6 @@ frontendnew.zip
 backendnew.zip
 backend/backend.zip
 dist/
+backend/.env.example
+frontend/.env.example
+.gitignore
