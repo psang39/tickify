@@ -10,5 +10,6 @@ export interface IZone extends Document {
     color: string, // Màu sắc đại diện cho Zone
     capacity: number,
     is_standing: boolean,
+    ticket_type_id?: string,
     layout_map: string // URL or path to the layout map image
 }

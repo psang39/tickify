@@ -15,14 +15,6 @@ eventRouter.post('/', Verify, verifyRoles(['admin', 'organizer']), [
 ], Validate, createEvent);
 
 
-eventRouter.post('/:event_id/shows', Verify, verifyRoles(['admin', 'organizer']), [
-    body('name').notEmpty().withMessage('Show name is required'),
-    body('start_time').notEmpty().withMessage('Start time is required').isISO8601().toDate(),
-    body('end_time').notEmpty().withMessage('End time is required').isISO8601().toDate(),
-    body('venue_id').notEmpty().withMessage('Venue ID is required'),
-    Validate
-], createShow);
-
 
 eventRouter.get('/:event_id/shows', getShowsByEvent);
 

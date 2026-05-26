@@ -1,6 +1,6 @@
 import { getOrganizerEvents, createEvent, getOrganizerEventById, publishEvent, unpublishEvent, deleteEvent, cancelEvent, updateEvent } from "../controllers/event.controller";
 import { createTicketType } from "../controllers/ticket-type.controller";
-import { getOrganizerShowsByEvent, publishShow, unpublishShow, cancelShow } from "../controllers/show.controller";
+import { getOrganizerShowsByEvent, publishShow, unpublishShow, cancelShow, createShow } from "../controllers/show.controller";
 import { getOrganizerShowById } from "../controllers/show.controller";
 import { streamAdminDashboard } from "../controllers/organizer-sse.controller";
 import { createStaffAccount, getOrganizerStaffs, assignStaffToShow, removeStaffFromShow, getOrganizerDashboard, getOrganizerAnalyticsDashboard, getOrganizerCheckInHistory, getOrganizerStaffDetail } from "../controllers/organizer.controller";
@@ -10,6 +10,7 @@ const organizerRouter = express.Router();
 organizerRouter.get('/events', getOrganizerEvents);
 organizerRouter.post('/events', createEvent);
 organizerRouter.get('/events/:event_id', getOrganizerEventById)
+organizerRouter.post('/events/:event_id/shows', createShow);
 organizerRouter.get('/events/:event_id/shows', getOrganizerShowsByEvent);
 organizerRouter.post('/events/:event_id/ticket-types', createTicketType);
 organizerRouter.get('/shows/:show_id', getOrganizerShowById);

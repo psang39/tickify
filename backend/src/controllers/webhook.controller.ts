@@ -77,12 +77,34 @@ export const handleMockPaymentWebhook = async (req: Request, res: Response): Pro
         await payment.save();
         await order.save();
 
+        const seatsToConfirm = await Seat.find({ _id: { $in: seatIds } }).select('_id row col_index zone_id ticket_type_id').lean();
         await Seat.updateMany(
             { _id: { $in: seatIds } },
             { $set: { status: 'sold' } }
         );
 
         const pipeline = redisClient.multi();
+        const seatsByZoneRow: Record<string, any[]> = {};
+        for (const seat of seatsToConfirm as any[]) {
+            const key = `${seat.zone_id.toString()}::${seat.row}`;
+            if (!seatsByZoneRow[key]) seatsByZoneRow[key] = [];
+            seatsByZoneRow[key].push(seat);
+        }
+
+        for (const [zoneRowKey, rowSeats] of Object.entries(seatsByZoneRow)) {
+            const [zoneId, rowLabel] = zoneRowKey.split('::');
+            const rowKey = `event:${eventId}:show:${showId}:zone:${zoneId}:row:${rowLabel}`;
+            const rowStr = await redisClient.get(rowKey);
+            if (rowStr) {
+                const chars = rowStr.split('');
+                for (const seat of rowSeats as any[]) {
+                    const index = Number(seat.col_index) - 1;
+                    if (index >= 0 && index < chars.length) chars[index] = 'S';
+                }
+                pipeline.set(rowKey, chars.join(''));
+            }
+        }
+
         for (const seatId of seatIds) {
             pipeline.hSet(statusHashKey, seatId, 'sold');
             pipeline.sRem(holdingSetKey, seatId);

@@ -31,7 +31,7 @@ const releaseSeatsLuaScript = `
     local numSeatsToRelease = #ARGV
     for i = 1, numSeatsToRelease do
         local colIndex = tonumber(ARGV[i])
-        local luaIndex = colIndex + 1
+        local luaIndex = colIndex
         if chars[luaIndex] == 'H' then
             chars[luaIndex] = 'O'
         end
@@ -98,7 +98,8 @@ const worker = new Worker('order-expiration', async (job: Job) => {
             seatsToRelease.forEach(seat => {
                 if (!seatsByRow[seat.row]) seatsByRow[seat.row] = [];
                 seatsByRow[seat.row].push(seat);
-                releaseByTier[seat.tier] = (releaseByTier[seat.tier] || 0) + 1;
+                const ticketTypeId = seat.ticket_type_id?.toString?.();
+                if (ticketTypeId) releaseByTier[ticketTypeId] = (releaseByTier[ticketTypeId] || 0) + 1;
             });
 
             const updatedRowStrings: string[] = [];
@@ -125,7 +126,7 @@ const worker = new Worker('order-expiration', async (job: Job) => {
 
 
             const summaryKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:summary`;
-            const statusHashKey = `event:${event_id}:show:${show_id}:seat_status`;
+            const statusHashKey = `show:${show_id}:seat_status`;
 
             const pipeline = redisClient.multi();
 

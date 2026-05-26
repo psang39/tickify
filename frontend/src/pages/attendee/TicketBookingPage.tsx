@@ -29,7 +29,7 @@ export default function TicketBookingPage() {
   const { showId } = useParams();
   const [orderData, setOrderData] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { selectedSeats, comboCount, setComboCount, clearCart, removeSeat } =
+  const { selectedSeats, comboCount, setComboCount, clearCart, removeSeat, setStandingZoneQuantity } =
     useCartStore() as any;
   const [currentStep, setCurrentStep] = useState(2);
   const [liveSeatsData, setLiveSeatsData] = useState<any[]>([]);
@@ -43,6 +43,7 @@ export default function TicketBookingPage() {
     "combo" | "price" | "ticketType"
   >("combo");
   const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false);
+  const [activeStandingZoneId, setActiveStandingZoneId] = useState<string | null>(null);
 
   const [purchaserInfo, setPurchaserInfo] = useState({
     fullName: "",
@@ -213,6 +214,34 @@ export default function TicketBookingPage() {
     });
     return dict;
   }, [zonesData]);
+
+  const standingZones = useMemo(() => {
+    return zonesData.filter((zone: any) => zone.is_standing);
+  }, [zonesData]);
+
+  const selectedCountByStandingZone = useMemo(() => {
+    return selectedSeats.reduce((acc: Record<string, number>, seat: any) => {
+      const zoneId = String(seat.zone_id || '');
+      if (zoneDictionary[zoneId]?.is_standing) {
+        acc[zoneId] = (acc[zoneId] || 0) + 1;
+      }
+      return acc;
+    }, {});
+  }, [selectedSeats, zoneDictionary]);
+
+  const getAvailableStandingSeats = (zoneId: string) => {
+    const selectedIds = new Set(selectedSeats.map((seat: any) => String(seat._id || seat.id)));
+    return liveSeatsData
+      .filter((seat: any) => String(seat.zone_id) === String(zoneId))
+      .filter((seat: any) => seat.status === 'available' || seat.status === 1 || selectedIds.has(String(seat._id || seat.id)))
+      .sort((a: any, b: any) => Number(a.col_index || 0) - Number(b.col_index || 0));
+  };
+
+  const updateStandingQuantity = (zone: any, nextQuantity: number) => {
+    const normalizedQuantity = Math.max(0, Math.min(4, nextQuantity));
+    setActiveStandingZoneId(zone._id);
+    setStandingZoneQuantity(zone._id, getAvailableStandingSeats(zone._id), normalizedQuantity);
+  };
 
   const ticketTypeDictionary = useMemo(() => {
     const dict: Record<string, any> = {};
@@ -568,6 +597,7 @@ export default function TicketBookingPage() {
                     zoneSummaries={zoneSummaries}
                     ticketTypeDictionary={ticketTypeDictionary}
                     zoneDictionary={zoneDictionary}
+                    onStandingZoneClick={(zone: any) => updateStandingQuantity(zone, (selectedCountByStandingZone[zone._id] || 0) + 1)}
                   />
                 </div>
 
@@ -631,7 +661,6 @@ export default function TicketBookingPage() {
                           <option value={2}>2 vé liền kề</option>
                           <option value={3}>3 vé liền kề</option>
                           <option value={4}>4 vé liền kề</option>
-                          <option value={5}>5 vé liền kề</option>
                         </select>
                       </div>
                     )}
@@ -746,6 +775,42 @@ export default function TicketBookingPage() {
                       </div>
                     )}
 
+                    {standingZones.length > 0 && (
+                      <div className="mt-6 border-t border-slate-100 pt-5">
+                        <div className="mb-3">
+                          <p className="text-base font-bold text-slate-800">Vé GA / Standing</p>
+                          <p className="text-sm text-slate-500 mt-1">Nhấn khu GA trên sơ đồ hoặc dùng nút tăng/giảm bên dưới.</p>
+                        </div>
+                        <div className="space-y-3">
+                          {standingZones.map((zone: any) => {
+                            const zoneId = zone._id;
+                            const summary = zoneSummaries?.[zoneId];
+                            const zoneTicketTypeId = zone.ticket_type_id || summary?.ticket_type_id || Object.keys(summary?.tiers || {})[0];
+                            const ticketType = ticketTypeDictionary[zoneTicketTypeId];
+                            const selectedCount = selectedCountByStandingZone[zoneId] || 0;
+                            const availableCount = Object.values(summary?.tiers || {}).reduce((acc: number, tier: any) => acc + Number(tier?.count || 0), 0);
+                            const isActive = activeStandingZoneId === zoneId;
+                            return (
+                              <div key={zoneId} className={`rounded-2xl border p-4 transition-colors ${isActive ? "border-primary bg-primary/5" : "border-slate-200 bg-white"}`}>
+                                <div className="mb-3 flex items-start justify-between gap-3">
+                                  <div>
+                                    <p className="text-sm font-bold text-slate-900">{zone.name}</p>
+                                    <p className="text-xs text-slate-500">Còn {availableCount} vé · {ticketType?.name || "GA"}</p>
+                                  </div>
+                                  <p className="text-sm font-black text-pink-600">{Number(ticketType?.price || 0).toLocaleString("vi-VN")} đ</p>
+                                </div>
+                                <div className="flex items-center justify-between gap-3">
+                                  <Button type="button" variant="outline" className="h-9 w-9 rounded-full p-0" onClick={() => updateStandingQuantity(zone, selectedCount - 1)} disabled={selectedCount <= 0}>-</Button>
+                                  <div className="min-w-[96px] rounded-xl bg-slate-50 px-4 py-2 text-center text-sm font-bold text-slate-800">{selectedCount} vé</div>
+                                  <Button type="button" variant="outline" className="h-9 w-9 rounded-full p-0" onClick={() => updateStandingQuantity(zone, selectedCount + 1)} disabled={selectedSeats.length >= 4 || selectedCount >= 4 || availableCount <= selectedCount}>+</Button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="mt-6 border-t border-slate-100 pt-5">
                       <div className="mb-3 flex items-center justify-between">
                         <p className="text-base font-bold text-slate-800">
@@ -758,7 +823,7 @@ export default function TicketBookingPage() {
 
                       {selectedSeats.length === 0 ? (
                         <div className="rounded-2xl border border-dashed border-slate-200 p-4 text-center text-sm text-slate-500">
-                          Chọn ghế trực tiếp trên sơ đồ.
+                          Chọn ghế trên sơ đồ hoặc tăng số lượng vé GA.
                         </div>
                       ) : (
                         <div className="max-h-[220px] space-y-2 overflow-y-auto pr-1">
@@ -777,8 +842,9 @@ export default function TicketBookingPage() {
                                     {typeName}
                                   </p>
                                   <p className="truncate text-xs text-slate-500">
-                                    Hàng {seat.row}, ghế{" "}
-                                    {seat.seat_number || seat.col_index}
+                                    {zoneDictionary[seat.zone_id]?.is_standing
+                                      ? `Khu ${zoneDictionary[seat.zone_id]?.name || "GA"} · Vé đứng`
+                                      : <>Hàng {seat.row}, ghế {seat.seat_number || seat.col_index}</>}
                                   </p>
                                 </div>
                                 <button
@@ -849,8 +915,9 @@ export default function TicketBookingPage() {
                       </div>
                       <div>
                         <p className="text-sm text-slate-500">
-                          Khu: {zoneDictionary[seat.zone_id]?.name || "Unknown"}
-                          , Hàng: {seat.row}, Cột: {seat.col_index}
+                          {zoneDictionary[seat.zone_id]?.is_standing
+                            ? `Khu: ${zoneDictionary[seat.zone_id]?.name || "GA"} · Vé đứng`
+                            : `Khu: ${zoneDictionary[seat.zone_id]?.name || "Unknown"}, Hàng: ${seat.row}, Cột: ${seat.col_index}`}
                         </p>
                       </div>
                     </div>

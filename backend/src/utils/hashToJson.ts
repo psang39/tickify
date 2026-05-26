@@ -9,6 +9,8 @@ export const formatHashToJSON = (hash: Record<string, string>) => {
     }
     return {
         valid_quantities: hash.valid_quantities ? JSON.parse(hash.valid_quantities) : {},
+        is_standing: hash.is_standing === 'true',
+        ticket_type_id: hash.ticket_type_id || null,
         tiers: tiers
     };
 };

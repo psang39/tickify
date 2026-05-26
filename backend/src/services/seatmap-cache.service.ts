@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import mongoose, { ClientSession, Types } from 'mongoose';
+import mongoose, { ClientSession } from 'mongoose';
 import Show from '../models/show.model';
 import Zone from '../models/zone.model';
 import Seat from '../models/seat.model';
@@ -9,12 +9,28 @@ import redisClient from '../utils/redisClient';
 import { calculateValidQuantities } from '../utils/validQuantities';
 
 const SHOW_CACHE_TTL_SECONDS = 86400;
+const STANDING_ROW_LABEL = 'GA';
+const STANDING_ALIASES = ['GA', 'GENERALADMISSION', 'GENERAL_ADMISSION', 'STANDING', 'STAND', 'FLOOR', 'PIT', 'GADUNG'];
 
 type TicketTypeInput = {
     name: string;
     price: number;
     target_tier: string;
+    total_quantity?: number | null;
     [key: string]: any;
+};
+
+type ParsedSeat = {
+    seat_number_val: number;
+    x: number;
+    y: number;
+    tier: string;
+};
+
+type ParsedZoneData = {
+    rowsMap: Map<string, ParsedSeat[]>;
+    isStanding: boolean;
+    standingTier: string | null;
 };
 
 const normalizeId = (value: any): string => value?._id?.toString?.() || value?.toString?.() || String(value);
@@ -27,6 +43,61 @@ const parseJsonIfNeeded = <T>(value: unknown, fallback: T): T => {
     } catch {
         return fallback;
     }
+};
+
+const normalizeToken = (value?: string | null) => String(value || '')
+    .replace(/^Type-/i, '')
+    .replace(/^type-/i, '')
+    .replace(/^zone_/i, '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toUpperCase();
+
+export const isStandingToken = (value?: string | null) => {
+    const normalized = normalizeToken(value);
+    if (!normalized) return false;
+    return STANDING_ALIASES.some(alias => normalized === alias || normalized.includes(alias));
+};
+
+const getTypeNameFromTypeId = (typeId: string) => {
+    const raw = typeId.replace(/^Type-/i, '').trim();
+    const firstSegment = raw.split(/[-_\s]/)[0];
+    return (firstSegment || raw || 'DEFAULT').toUpperCase();
+};
+
+const findTicketTypeByTier = (ticketTypes: any[], tier?: string | null) => {
+    if (!tier) return null;
+    const normalizedTier = normalizeToken(tier);
+    return ticketTypes.find(ticketType => normalizeToken(ticketType.target_tier) === normalizedTier) || null;
+};
+
+const findStandingTicketType = (ticketTypes: any[], preferredTier?: string | null) => {
+    const preferred = findTicketTypeByTier(ticketTypes, preferredTier);
+    if (preferred) return preferred;
+    return ticketTypes.find(ticketType => isStandingToken(ticketType.target_tier) || isStandingToken(ticketType.name)) || null;
+};
+
+const buildStandingSeats = (params: {
+    zone: any;
+    ticketType: any;
+    eventId: any;
+    showId: any;
+    capacity: number;
+}) => {
+    const { zone, ticketType, eventId, showId, capacity } = params;
+    return Array.from({ length: capacity }, (_, index) => {
+        const colIndex = index + 1;
+        return {
+            zone_id: zone._id,
+            event_id: eventId,
+            show_id: showId,
+            tier: ticketType?.target_tier || STANDING_ROW_LABEL,
+            row: STANDING_ROW_LABEL,
+            col_index: colIndex,
+            seat_number: `${STANDING_ROW_LABEL}-${('0000' + colIndex).slice(-4)}`,
+            status: 'available',
+            ticket_type_id: ticketType?._id || null
+        };
+    });
 };
 
 export const parseMapAssetsFromSvg = (stadiumMapSvg?: string) => {
@@ -60,22 +131,23 @@ export const purgeShowRedisCache = async (showId: string) => {
     if (!show) return;
 
     const zones = await Zone.find({ show_id: showId }).select('_id').lean();
-    const seats = await Seat.find({ show_id: showId }).select('_id').lean();
+    const seats = await Seat.find({ show_id: showId }).select('_id row zone_id').lean();
     const pipeline = redisClient.multi();
     const eventId = normalizeId(show.event_id);
 
     for (const zone of zones) {
         const zoneId = normalizeId(zone._id);
         pipeline.del(`event:${eventId}:show:${showId}:zone:${zoneId}:summary`);
-
-        const zoneSeats = await Seat.find({ show_id: showId, zone_id: zone._id }).select('row').lean();
-        const rows = Array.from(new Set(zoneSeats.map((seat: any) => seat.row).filter(Boolean)));
+        const rows = Array.from(new Set((seats as any[])
+            .filter(seat => normalizeId(seat.zone_id) === zoneId)
+            .map(seat => seat.row)
+            .filter(Boolean)));
         for (const rowLabel of rows) {
             pipeline.del(`event:${eventId}:show:${showId}:zone:${zoneId}:row:${rowLabel}`);
         }
     }
 
-    for (const seat of seats) {
+    for (const seat of seats as any[]) {
         pipeline.del(`event:${eventId}:show:${showId}:seat:${normalizeId(seat._id)}:lock`);
     }
 
@@ -110,7 +182,8 @@ export const rebuildShowRedisCache = async (showId: string) => {
             id: normalizeId(ticketType._id),
             name: ticketType.name,
             price: ticketType.price,
-            target_tier: ticketType.target_tier
+            target_tier: ticketType.target_tier,
+            total_quantity: ticketType.total_quantity ?? null
         })))
     );
 
@@ -137,6 +210,8 @@ export const rebuildShowRedisCache = async (showId: string) => {
         }
 
         pipeline.del(summaryKey);
+        pipeline.hSet(summaryKey, 'is_standing', zone.is_standing ? 'true' : 'false');
+        if (zone.ticket_type_id) pipeline.hSet(summaryKey, 'ticket_type_id', normalizeId(zone.ticket_type_id));
 
         for (const [rowLabel, rowSeats] of Object.entries(seatsByRow)) {
             rowSeats.sort((a, b) => Number(a.col_index) - Number(b.col_index));
@@ -166,7 +241,7 @@ export const rebuildShowRedisCache = async (showId: string) => {
             pipeline.set(`event:${eventId}:show:${showId}:zone:${zoneId}:row:${rowLabel}`, rowString);
         }
 
-        pipeline.hSet(summaryKey, 'valid_quantities', JSON.stringify(calculateValidQuantities(rowStrings)));
+        pipeline.hSet(summaryKey, 'valid_quantities', JSON.stringify(zone.is_standing ? { 1: true, 2: true, 3: true, 4: true } : calculateValidQuantities(rowStrings)));
 
         for (const ticketType of ticketTypes as any[]) {
             const ticketTypeId = normalizeId(ticketType._id);
@@ -176,6 +251,75 @@ export const rebuildShowRedisCache = async (showId: string) => {
     }
 
     await pipeline.exec();
+};
+
+const parseZonesFromSvg = (stadiumMapSvg: string) => {
+    const $ = cheerio.load(stadiumMapSvg, { xmlMode: true });
+    const zones: Array<{
+        svgId: string;
+        name: string;
+        pathData: string;
+        parsedData: ParsedZoneData;
+    }> = [];
+
+    $('g[id^="zone_"]').each((_, zoneGroup) => {
+        const svgId = $(zoneGroup).attr('id');
+        if (!svgId) return;
+
+        const formattedName = svgId.replace('zone_', '').replace(/_/g, ' ');
+        let pathElement = $(zoneGroup).find('[id^="zone_area"]').first();
+        if (pathElement.length === 0) pathElement = $(zoneGroup).find('path').first();
+        const pathData = pathElement.attr('d') || '';
+        const rowsMap = new Map<string, ParsedSeat[]>();
+        const zoneLooksStanding = isStandingToken(svgId) || isStandingToken(formattedName);
+        let standingTier: string | null = zoneLooksStanding ? 'GA' : null;
+        let hasSeatNodes = false;
+
+        $(zoneGroup).find('g[id^="Type-"]').each((_, typeGroup) => {
+            const typeId = $(typeGroup).attr('id') || '';
+            const typeName = getTypeNameFromTypeId(typeId);
+            if (isStandingToken(typeId) || isStandingToken(typeName)) {
+                standingTier = typeName || standingTier || 'GA';
+            }
+
+            $(typeGroup).find('g[id*="row-" i], g[id*="Row-"]').each((__, rowGroup) => {
+                const rowIdAttr = $(rowGroup).attr('id') || '';
+                const matchRow = rowIdAttr.match(/row-([a-zA-Z0-9]+)/i);
+                if (!matchRow) return;
+
+                const rowName = matchRow[1].toUpperCase();
+                if (!rowsMap.has(rowName)) rowsMap.set(rowName, []);
+
+                $(rowGroup).find('g[id*="seat-" i], g[id*="Seat-"]').each((___, seatGroup: any) => {
+                    const seatIdAttr = $(seatGroup).attr('id') || '';
+                    const matchSeat = seatIdAttr.match(/seat-([a-zA-Z0-9]+)/i);
+                    if (!matchSeat) return;
+
+                    const seatNumber = parseInt(matchSeat[1], 10);
+                    const circle = $(seatGroup).find('circle').first();
+                    if (Number.isNaN(seatNumber) || circle.length === 0) return;
+
+                    hasSeatNodes = true;
+                    rowsMap.get(rowName)!.push({
+                        seat_number_val: seatNumber,
+                        x: parseFloat(circle.attr('cx') || '0'),
+                        y: parseFloat(circle.attr('cy') || '0'),
+                        tier: typeName
+                    });
+                });
+            });
+        });
+
+        const isStanding = Boolean(zoneLooksStanding || (standingTier && isStandingToken(standingTier)));
+        zones.push({
+            svgId,
+            name: formattedName,
+            pathData,
+            parsedData: { rowsMap, isStanding, standingTier: standingTier || null }
+        });
+    });
+
+    return zones;
 };
 
 export const regenerateSeatmapFromSvg = async (params: {
@@ -206,79 +350,57 @@ export const regenerateSeatmapFromSvg = async (params: {
     const ticketTypesFromDb = await TicketType.find({ show_id: showId }).session(session || null);
     const tierToTicketType = new Map<string, any>();
     for (const ticketType of ticketTypesFromDb as any[]) {
-        tierToTicketType.set(String(ticketType.target_tier).toUpperCase(), ticketType);
+        tierToTicketType.set(normalizeToken(ticketType.target_tier), ticketType);
     }
 
     await Seat.deleteMany({ show_id: showId }).session(session || null);
     await Zone.deleteMany({ show_id: showId }).session(session || null);
 
-    const $ = cheerio.load(stadiumMapSvg, { xmlMode: true });
-    const zoneDrafts: any[] = [];
-    const parsedZonesData: Array<{ rowsMap: Map<string, any[]> }> = [];
-
-    $('g[id^="zone_"]').each((_, zoneGroup) => {
-        const svgId = $(zoneGroup).attr('id');
-        if (!svgId) return;
-
-        const formattedName = svgId.replace('zone_', '').replace(/_/g, ' ');
-        let pathElement = $(zoneGroup).find('[id^="zone_area"]').first();
-        if (pathElement.length === 0) pathElement = $(zoneGroup).find('path').first();
-        const pathData = pathElement.attr('d') || '';
-        const rowsMap = new Map<string, any[]>();
-
-        $(zoneGroup).find('g[id^="Type-"]').each((_, typeGroup) => {
-            const typeId = $(typeGroup).attr('id') || '';
-            const typeName = typeId.replace(/^Type-/, '').split(/[-_]/)[0].toUpperCase();
-
-            $(typeGroup).find('g[id*="row-" i], g[id*="Row-"]').each((__, rowGroup) => {
-                const rowIdAttr = $(rowGroup).attr('id') || '';
-                const matchRow = rowIdAttr.match(/row-([a-zA-Z0-9]+)/i);
-                if (!matchRow) return;
-
-                const rowName = matchRow[1].toUpperCase();
-                if (!rowsMap.has(rowName)) rowsMap.set(rowName, []);
-
-                $(rowGroup).find('g[id*="seat-" i], g[id*="Seat-"]').each((___, seatGroup: any) => {
-                    const seatIdAttr = $(seatGroup).attr('id') || '';
-                    const matchSeat = seatIdAttr.match(/seat-([a-zA-Z0-9]+)/i);
-                    if (!matchSeat) return;
-
-                    const seatNumber = parseInt(matchSeat[1], 10);
-                    const circle = $(seatGroup).find('circle').first();
-                    if (Number.isNaN(seatNumber) || circle.length === 0) return;
-
-                    rowsMap.get(rowName)!.push({
-                        seat_number_val: seatNumber,
-                        x: parseFloat(circle.attr('cx') || '0'),
-                        y: parseFloat(circle.attr('cy') || '0'),
-                        tier: typeName
-                    });
-                });
-            });
-        });
-
-        zoneDrafts.push({
+    const parsedZones = parseZonesFromSvg(stadiumMapSvg);
+    const zoneDrafts = parsedZones.map(zone => {
+        const standingTicketType = zone.parsedData.isStanding
+            ? findStandingTicketType(ticketTypesFromDb as any[], zone.parsedData.standingTier)
+            : null;
+        return {
             event_id: show.event_id,
             show_id: show._id,
-            name: formattedName,
-            overall_map_svg_id: svgId,
-            path_data: pathData,
-            capacity: 0
-        });
-        parsedZonesData.push({ rowsMap });
+            name: zone.name,
+            overall_map_svg_id: zone.svgId,
+            path_data: zone.pathData,
+            capacity: 0,
+            is_standing: zone.parsedData.isStanding,
+            ticket_type_id: standingTicketType?._id || undefined
+        };
     });
 
     const createdZones = await Zone.insertMany(zoneDrafts, { session });
     const seatsToInsert: any[] = [];
 
     createdZones.forEach((zone: any, index) => {
-        const { rowsMap } = parsedZonesData[index];
+        const { rowsMap, isStanding, standingTier } = parsedZones[index].parsedData;
         let capacity = 0;
+
+        if (isStanding) {
+            const ticketType = findStandingTicketType(ticketTypesFromDb as any[], standingTier);
+            capacity = Number(ticketType?.total_quantity || 0);
+            zone.capacity = capacity;
+            zone.ticket_type_id = ticketType?._id || zone.ticket_type_id;
+            if (capacity > 0) {
+                seatsToInsert.push(...buildStandingSeats({
+                    zone,
+                    ticketType,
+                    eventId: show.event_id,
+                    showId: show._id,
+                    capacity
+                }));
+            }
+            return;
+        }
 
         for (const [rowName, circles] of rowsMap.entries()) {
             circles.sort((a, b) => a.seat_number_val - b.seat_number_val);
             for (const circle of circles) {
-                const ticketType = tierToTicketType.get(String(circle.tier).toUpperCase());
+                const ticketType = tierToTicketType.get(normalizeToken(circle.tier));
                 seatsToInsert.push({
                     zone_id: zone._id,
                     event_id: show.event_id,

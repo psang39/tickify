@@ -5,7 +5,7 @@ import Seat from '../models/seat.model';
 import TicketType from '../models/ticket-type.model';
 import Order from '../models/order.model';
 import Venue from '../models/venue.model';
-import { rebuildShowRedisCache, purgeShowRedisCache, hasBlockingOrdersForShow, regenerateSeatmapWithTransaction, parseMapAssetsFromSvg } from '../services/seatmap-cache.service';
+import { rebuildShowRedisCache, purgeShowRedisCache, hasBlockingOrdersForShow, regenerateSeatmapWithTransaction, regenerateSeatmapFromSvg, parseMapAssetsFromSvg } from '../services/seatmap-cache.service';
 import * as cheerio from 'cheerio';
 import { Request, Response } from 'express';
 import redisClient from '../utils/redisClient';
@@ -17,66 +17,63 @@ import { generateRSAKeyPair, encryptPrivateKey } from '../utils/cryptoUtils';
 export const createShow = async (req: Request, res: Response) => {
     const session = await mongoose.startSession();
     session.startTransaction();
+
     try {
         const event_id = req.params.event_id as string;
         const organizer_id = req.user!.id;
         const {
-            name, description, start_time, end_time, venue_id,
-            sale_start, sale_end, stadium_map_svg, ticket_types
+            name,
+            description,
+            start_time,
+            end_time,
+            venue_id,
+            sale_start,
+            sale_end,
+            stadium_map_svg,
+            ticket_types
         } = req.body;
-        console.log(`User ${organizer_id} đang tạo show cho event ${event_id}: ${name}`);
+
         if (!event_id || !name || !start_time || !end_time || !venue_id || !organizer_id || !sale_start || !sale_end) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({ message: "Missing required fields" });
         }
-        if (start_time > end_time) {
-            return res.status(400).json({ message: "End time must be later than start time" }
-            );
+
+        if (new Date(start_time) > new Date(end_time)) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ message: "End time must be later than start time" });
         }
-        if (sale_start > sale_end) {
+
+        if (new Date(sale_start) > new Date(sale_end)) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({ message: "Sale end time must be later than sale start time" });
         }
 
-
-        let tier_pricing: Record<string, number> = {};
-        if (req.body.tier_pricing) {
-            try {
-                tier_pricing = typeof req.body.tier_pricing === 'string'
-                    ? JSON.parse(req.body.tier_pricing)
-                    : req.body.tier_pricing;
-            } catch (e) {
-                return res.status(400).json({ message: "tier_pricing phải là JSON hợp lệ" });
-            }
-        }
-        const event = await Event.findOne({ _id: event_id, organizer_id: organizer_id });
+        const event = await Event.findOne({ _id: event_id, organizer_id }).session(session);
         if (!event) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(403).json({ message: "Bạn không có quyền tạo show cho sự kiện này" });
         }
-        if (start_time < event.start_date) {
+
+        if (new Date(start_time) < new Date(event.start_date)) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({ message: "Show start time must be within event duration" });
         }
-        if (end_time > event.end_date) {
+
+        if (new Date(end_time) > new Date(event.end_date)) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({ message: "Show end time must be within event duration" });
         }
 
-        const mapAssets: any[] = [];
-        if (stadium_map_svg) {
-            const $ = cheerio.load(stadium_map_svg, { xmlMode: true });
-            $('[id^="asset_"]').each((_, element) => {
-                const assetId = $(element).attr('id')!;
-                let pathElement = $(element).is('path') ? $(element) : $(element).find('path').first();
-                const pathData = pathElement.attr('d') || "";
-                if (pathData) {
-                    mapAssets.push({
-                        asset_id: assetId,
-                        path_data: pathData
-                    });
-                }
-            });
-        }
         const { publicKey, privateKey } = generateRSAKeyPair();
         const encryptedPrivateKey = encryptPrivateKey(privateKey);
 
-        const newShow = new Show({
+        const [savedShow] = await Show.create([{
             event_id,
             name,
             description,
@@ -87,168 +84,60 @@ export const createShow = async (req: Request, res: Response) => {
             venue_id,
             organizer_id,
             stadium_map_svg,
-            map_assets: mapAssets,
+            map_assets: parseMapAssetsFromSvg(stadium_map_svg),
             public_key: publicKey,
             encrypted_private_key: encryptedPrivateKey
-        });
-        const savedShow = await newShow.save();
-        const createdTicketTypes = [] as any[];
-        if (ticket_types && ticket_types.length > 0) {
-            for (const ttData of ticket_types) {
-                const ticketType = new TicketType({
-                    ...ttData,
-                    event_id: event_id,
-                    show_id: savedShow._id,
-                });
-                await ticketType.save({ session });
-                createdTicketTypes.push(ticketType);
+        }], { session });
+
+        let parsedTicketTypes = ticket_types || [];
+        if (typeof parsedTicketTypes === 'string') {
+            try {
+                parsedTicketTypes = JSON.parse(parsedTicketTypes);
+            } catch {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(400).json({ message: "ticket_types phải là JSON hợp lệ" });
             }
         }
-        const ticketTypesCache = createdTicketTypes.map(tt => ({
-            id: tt._id,
-            name: tt.name,
-            price: tt.price,
 
-        }));
+        if (Array.isArray(parsedTicketTypes) && parsedTicketTypes.length > 0) {
+            await TicketType.insertMany(
+                parsedTicketTypes.map((ticketType: any) => ({
+                    ...ticketType,
+                    price: Number(ticketType.price || 0),
+                    total_quantity: ticketType.total_quantity === '' || ticketType.total_quantity === undefined
+                        ? null
+                        : ticketType.total_quantity,
+                    event_id,
+                    show_id: savedShow._id
+                })),
+                { session }
+            );
+        }
 
-
-        await redisClient.set(`show:${savedShow._id}:ticket_types`, JSON.stringify(ticketTypesCache));
-        const tierToTicketTypeIdMap: Record<string, any> = {};
-        createdTicketTypes.forEach(tt => {
-            tierToTicketTypeIdMap[tt.target_tier.toUpperCase()] = tt._id;
-        });
-        let createdZones: any[] = [];
-        let totalSeatsGenerated = 0;
-        const pipeline = redisClient.multi();
-        pipeline.set(`event:${event_id}:show:${savedShow._id}:sale_start`, savedShow.sale_start.toISOString());
-        pipeline.set(`event:${event_id}:show:${savedShow._id}:sale_end`, savedShow.sale_end.toISOString());
+        let seatmapResult: any = { zones: [], total_seats_generated: 0 };
         if (stadium_map_svg) {
-            const $ = cheerio.load(stadium_map_svg, { xmlMode: true });
-            const zoneDrafts: any[] = [];
-            const parsedZonesData: {
-                rowsMap: Map<string, any[]>;
-                tiersData: Record<string, { count: number }>
-            }[] = [];
-            $('g[id^="zone_"]').each((_, zoneGroup) => {
-                const svgId = $(zoneGroup).attr('id')!;
-                const formattedName = svgId.replace('zone_', '').replace(/_/g, ' ');
-                let pathElement = $(zoneGroup).find('[id^="zone_area"]').first();
-                if (pathElement.length === 0) pathElement = $(zoneGroup).find('path').first();
-                const pathData = pathElement.attr('d') || "";
-                const rowsMap = new Map<string, any[]>();
-                const tiersData: Record<string, { count: number }> = {};
-                $(zoneGroup).find('g[id^="Type-"]').each((_, typeGroup) => {
-                    const typeId = $(typeGroup).attr('id') || '';
-                    const typeName = typeId.replace(/^Type-/, '').split(/[-_]/)[0].toUpperCase();
-
-                    if (!tiersData[tierToTicketTypeIdMap[typeName]]) tiersData[tierToTicketTypeIdMap[typeName]] = { count: 0 };
-                    $(typeGroup).find('g[id*="row-" i], g[id*="Row-"]').each((_, rowGroup) => {
-                        const rowIdAttr = $(rowGroup).attr('id') || '';
-                        const matchRow = rowIdAttr.match(/row-([a-zA-Z0-9]+)/i);
-                        if (!matchRow) return;
-                        const rowName = matchRow[1].toUpperCase();
-                        if (!rowsMap.has(rowName)) rowsMap.set(rowName, []);
-                        $(rowGroup).find('g[id*="seat-" i], g[id*="Seat-"]').each((_, seatGroup: any) => {
-                            const seatIdAttr = $(seatGroup).attr('id') || '';
-                            const matchSeat = seatIdAttr.match(/seat-([a-zA-Z0-9]+)/i);
-                            if (!matchSeat) return;
-                            const seatIdStr = matchSeat[1];
-                            const seatNumber = parseInt(seatIdStr, 10);
-                            const circle = $(seatGroup).find('circle').first();
-                            if (!isNaN(seatNumber) && circle.length > 0) {
-                                rowsMap.get(rowName)!.push({
-                                    seat_number_val: seatNumber,
-                                    x: parseFloat(circle.attr('cx') || '0'),
-                                    y: parseFloat(circle.attr('cy') || '0'),
-                                    tier: typeName
-                                });
-                                tiersData[tierToTicketTypeIdMap[typeName]].count++;
-                            }
-                        });
-                    });
-                });
-                zoneDrafts.push({
-                    event_id: event_id,
-                    show_id: savedShow._id,
-                    name: formattedName,
-                    overall_map_svg_id: svgId,
-                    path_data: pathData,
-                    capacity: 0,
-                });
-                parsedZonesData.push({ rowsMap, tiersData });
+            seatmapResult = await regenerateSeatmapFromSvg({
+                showId: savedShow._id.toString(),
+                stadiumMapSvg: stadium_map_svg,
+                session
             });
-            if (zoneDrafts.length > 0) {
-                createdZones = await Zone.insertMany(zoneDrafts, { session });
-                const seatsToInsert: any[] = [];
-                createdZones.forEach((dbZone, index) => {
-                    const { rowsMap, tiersData } = parsedZonesData[index];
-                    let zoneCapacity = 0;
-                    const rowStringsForRedis: Record<string, string> = {};
-                    for (const [rowName, circles] of rowsMap.entries()) {
-                        circles.sort((a, b) => a.seat_number_val - b.seat_number_val);
-                        const maxSeatNumber = circles[circles.length - 1]?.seat_number_val || 0;
-                        const redisRowArray = Array(maxSeatNumber).fill('X');
-                        circles.forEach((circle) => {
-                            const colIndex = circle.seat_number_val;
-                            redisRowArray[colIndex - 1] = 'O';
-                            const matchTicketTypeId = tierToTicketTypeIdMap[circle.tier.toUpperCase()];
-                            seatsToInsert.push({
-                                zone_id: dbZone._id,
-                                event_id: event_id,
-                                show_id: savedShow._id,
-                                tier: circle.tier,
-                                row: rowName,
-                                col_index: colIndex,
-                                seat_number: `${rowName}-${colIndex}`,
-                                x: circle.x,
-                                y: circle.y,
-                                status: 'available',
-                                ticket_type_id: matchTicketTypeId ? matchTicketTypeId : null
-                            });
-                            zoneCapacity++;
-                        });
-                        rowStringsForRedis[rowName] = redisRowArray.join('');
-                    }
-                    dbZone.capacity = zoneCapacity;
-                    const summaryKey = `event:${event_id}:show:${savedShow._id}:zone:${dbZone._id}:summary`;
-                    for (const [rowLabel, rowStr] of Object.entries(rowStringsForRedis)) {
-                        const rowKey = `event:${event_id}:show:${savedShow._id}:zone:${dbZone._id}:row:${rowLabel}`;
-                        pipeline.set(rowKey, rowStr);
-                    }
-                    const allRowStrings = Object.values(rowStringsForRedis);
-                    if (allRowStrings.length > 0) {
-                        const validQuantities = calculateValidQuantities(allRowStrings);
-                        pipeline.hSet(summaryKey, 'valid_quantities', JSON.stringify(validQuantities));
-                    }
-                    for (const [tierId, data] of Object.entries(tiersData)) {
-                        if (data.count > 0) {
-                            pipeline.hSet(summaryKey, `tier:${tierId}:count`, String(data.count));
-                            const price = tier_pricing[tierId] ?? 0;
-                            pipeline.hSet(summaryKey, `tier:${tierId}:price`, String(price));
-                        }
-                    }
-                });
-                if (seatsToInsert.length > 0) {
-                    const insertedSeats = await Seat.insertMany(seatsToInsert, { session });
-                    totalSeatsGenerated = seatsToInsert.length;
-                    await Promise.all(createdZones.map(z => z.save()));
-                    const staticLayoutCacheKey = `show:${savedShow._id}:seats_static_layout`;
-                    pipeline.set(staticLayoutCacheKey, JSON.stringify(insertedSeats), {
-                        EX: 86400
-                    });
-                }
-            }
         }
-        await pipeline.exec();
+
+        await session.commitTransaction();
+        session.endSession();
+
+        await rebuildShowRedisCache(savedShow._id.toString());
+
         res.status(201).json({
             message: "Tạo Show, quét sơ đồ và khởi tạo Seatmap thành công!",
             show: savedShow,
-            auto_generated_zones: createdZones,
-            total_seats_generated: totalSeatsGenerated
+            auto_generated_zones: seatmapResult.zones,
+            total_seats_generated: seatmapResult.total_seats_generated
         });
-        await session.commitTransaction();
-        session.endSession();
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error("Lỗi khi tạo show toàn diện:", error);
         res.status(500).json({ message: "Lỗi hệ thống khi khởi tạo Show", error });
     }
@@ -332,7 +221,7 @@ export const getShowById = async (req: Request, res: Response) => {
         }
 
         const zones = await Zone.find({ show_id })
-            .select('_id name path_data overall_map_svg_id capacity')
+            .select('_id name path_data overall_map_svg_id capacity is_standing ticket_type_id')
             .lean();
         const zoneSummariesDict: Record<string, any> = {};
         const ticketTypes = await TicketType.find({ show_id: show_id }).select('_id price').lean();
@@ -389,7 +278,7 @@ export const getOrganizerShowById = async (req: Request, res: Response) => {
 
 
         const zones = await Zone.find({ show_id })
-            .select('_id name path_data overall_map_svg_id capacity')
+            .select('_id name path_data overall_map_svg_id capacity is_standing ticket_type_id')
             .lean();
         const zoneSummariesDict: Record<string, any> = {};
 

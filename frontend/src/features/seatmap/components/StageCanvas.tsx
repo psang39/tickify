@@ -11,6 +11,7 @@ interface StageCanvasProps {
     zoneSummaries?: Record<string, any>;
     ticketTypeDictionary: Record<string, any>;
     zoneDictionary?: Record<string, any>;
+    onStandingZoneClick?: (zone: any) => void;
 }
 
 export const buildSeatMapCache = (allSeats: any[]) => {
@@ -130,7 +131,8 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     seatsData,
     ticketTypeDictionary,
     zoneSummaries = {},
-    zoneDictionary = {}
+    zoneDictionary = {},
+    onStandingZoneClick
 }) => {
     const { selectedSeats, toggleSeat, comboCount } = useCartStore();
 
@@ -174,8 +176,12 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     const ZOOM_THRESHOLD = 2.5;
     const isZoomedIn = stageConfig.scale >= ZOOM_THRESHOLD;
 
+    const drawableSeatsData = useMemo(() => {
+        return seatsData.filter((seat: any) => !zoneDictionary[String(seat.zone_id)]?.is_standing);
+    }, [seatsData, zoneDictionary]);
+
     const normalizedSeatsData = useMemo(() => {
-        return seatsData.map((s, index) => {
+        return drawableSeatsData.map((s, index) => {
             const uniqueId = s._id || `seat-${s.zone_id || 'zone'}-${s.row}-${s.col_index}-${index}`;
 
             return {
@@ -184,7 +190,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 _id: s._id
             };
         });
-    }, [seatsData]);
+    }, [drawableSeatsData]);
 
     const rowMapCache = useMemo(() => buildSeatMapCache(normalizedSeatsData), [normalizedSeatsData]);
 
@@ -230,12 +236,12 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         const boundsList: any[] = [];
 
         // 1. Bounds từ seats
-        if (seatsData.length > 0) {
-            const xs = seatsData
+        if (drawableSeatsData.length > 0) {
+            const xs = drawableSeatsData
                 .map(s => Number(s.x))
                 .filter(Number.isFinite);
 
-            const ys = seatsData
+            const ys = drawableSeatsData
                 .map(s => Number(s.y))
                 .filter(Number.isFinite);
 
@@ -283,7 +289,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             }
 
             // Fallback nếu zone không có path hợp lệ
-            const seatsInZone = seatsData.filter(s => s.zone_id === zone._id);
+            const seatsInZone = drawableSeatsData.filter(s => s.zone_id === zone._id);
 
             if (seatsInZone.length === 0) return null;
 
@@ -325,7 +331,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             zoneLabels: zLabels,
             assetLabels: aLabels,
         };
-    }, [seatsData, zonesData, mapAssets]);
+    }, [drawableSeatsData, zonesData, mapAssets]);
 
     useEffect(() => {
         if (mapBounds) {
@@ -510,8 +516,12 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         toggleSeat(seat, rowMapCache);
     }, [rowMapCache, toggleSeat]);
 
-    const handleZoneClick = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    const handleZoneClick = (e: KonvaEventObject<MouseEvent | TouchEvent>, zone?: any) => {
         if (isZoomedIn) return;
+        if (zone?.is_standing) {
+            onStandingZoneClick?.(zone);
+            return;
+        }
         const box = e.target.getClientRect({ skipTransform: true });
         const padding = 60;
         const scaleX = containerSize.width / (box.width + padding * 2);
@@ -662,12 +672,12 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                                 opacity={isZoomedIn ? 0.3 : 0.8}
                                 perfectDrawEnabled={false}
                                 listening={!isZoomedIn}
-                                onClick={handleZoneClick}
-                                onTap={handleZoneClick}
+                                onClick={(e) => handleZoneClick(e, zone)}
+                                onTap={(e) => handleZoneClick(e, zone)}
                                 onMouseEnter={(e) => {
                                     const stage = e.target.getStage();
                                     if (stage && !isZoomedIn) {
-                                        stage.container().style.cursor = 'zoom-in';
+                                        stage.container().style.cursor = zone.is_standing ? 'pointer' : 'zoom-in';
                                         (e.target as Konva.Path).opacity(1);
                                         handleZoneMouseEnter(e, zone);
                                     }
@@ -693,7 +703,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                             y={lbl.y - 18}
                             width={300}
                             height={36}
-                            text={lbl.name}
+                            text={zoneDictionary[lbl.id]?.is_standing ? `${lbl.name} · GA` : lbl.name}
                             fontSize={25}
                             fill="#41444b"
                             fontStyle="bold"

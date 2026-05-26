@@ -9,6 +9,7 @@ interface CartState {
     setComboCount: (count: number) => void;
     toggleSeat: (seat: ISeat, rowMap: Map<string, ISeat[]>) => void;
     removeSeat: (seatId: string) => void;
+    setStandingZoneQuantity: (zoneId: string, availableSeats: ISeat[], quantity: number) => void;
     clearCart: () => void;
 }
 export const buildSeatMapCache = (allSeats: ISeat[]) => { // Thay any[] bằng ISeat[] nếu bạn dùng interface
@@ -106,6 +107,12 @@ export const useCartStore = create<CartState>((set, get) => ({
             return;
         }
 
+        const hasDifferentZone = selectedSeats.some((selected: any) => String(selected.zone_id) !== String(seat.zone_id));
+        if (hasDifferentZone) {
+            useFeedbackStore.getState().showError('Đơn hàng hiện chỉ hỗ trợ chọn vé trong cùng một khu. Vui lòng xóa vé đã chọn trước khi đổi khu.');
+            return;
+        }
+
         // 2. Logic CHỌN CỤM
         const cluster = findCluster(seat, comboCount, allSeats);
         if (cluster.length === 0) {
@@ -138,6 +145,40 @@ export const useCartStore = create<CartState>((set, get) => ({
                 (seat: any) => seat.id !== seatId && seat._id !== seatId
             ),
         })),
+
+    setStandingZoneQuantity: (zoneId, availableSeats, quantity) => {
+        const { selectedSeats, maxTickets } = get();
+        const normalizedQuantity = Math.max(0, Math.min(quantity, maxTickets));
+        const otherSeats = selectedSeats.filter((seat: any) => String(seat.zone_id) !== String(zoneId));
+        const shouldReplaceOtherZones = otherSeats.length > 0 && normalizedQuantity > 0;
+        const baseSeats = shouldReplaceOtherZones ? [] : otherSeats;
+
+        if (shouldReplaceOtherZones) {
+            useFeedbackStore.getState().showError('Đơn hàng hiện chỉ hỗ trợ chọn vé trong cùng một khu. Hệ thống đã chuyển sang khu GA bạn vừa chọn.');
+        }
+
+        if (baseSeats.length + normalizedQuantity > maxTickets) {
+            useFeedbackStore.getState().showError(`Bạn chỉ được mua tối đa ${maxTickets} vé!`);
+            return;
+        }
+
+        const pickedStandingSeats = availableSeats
+            .filter((seat: any) => seat.status === 'available' || seat.status === 1 || selectedSeats.some((selected: any) => selected._id === seat._id || selected.id === seat.id))
+            .sort((a: any, b: any) => Number(a.col_index || 0) - Number(b.col_index || 0))
+            .slice(0, normalizedQuantity)
+            .map((seat: any) => ({
+                ...seat,
+                id: seat.id || seat._id,
+                is_standing: true,
+            }));
+
+        if (pickedStandingSeats.length < normalizedQuantity) {
+            useFeedbackStore.getState().showError('Khu vực này không còn đủ vé GA.');
+            return;
+        }
+
+        set({ selectedSeats: [...baseSeats, ...pickedStandingSeats] });
+    },
 
     clearCart: () => set({ selectedSeats: [] })
 }));

@@ -23,6 +23,13 @@ interface TicketTypeForm {
     sale_end: string;
 }
 
+const STANDING_TIER_ALIASES = ['GA', 'STANDING', 'FLOOR', 'PIT', 'GENERALADMISSION', 'GENERAL_ADMISSION'];
+const normalizeTierToken = (value: string) => value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+const isStandingTier = (value: string) => {
+    const normalized = normalizeTierToken(value || '');
+    return STANDING_TIER_ALIASES.some(alias => normalized === normalizeTierToken(alias) || normalized.includes(normalizeTierToken(alias)));
+};
+
 export default function EventDetail() {
     const { eventId } = useParams();
     const navigate = useNavigate();
@@ -217,7 +224,7 @@ export default function EventDetail() {
     });
 
     const { mutateAsync: createShow } = useMutation({
-        mutationFn: async (newShowData: any) => { return (await api.post(`/events/${eventId}/shows`, newShowData)).data; }
+        mutationFn: async (newShowData: any) => { return (await api.post(`organizer/events/${eventId}/shows`, newShowData)).data; }
     });
 
     const [isSubmittingShow, setIsSubmittingShow] = useState(false);
@@ -239,14 +246,30 @@ export default function EventDetail() {
                     const elements = doc.querySelectorAll('[id*="Type-"], [class*="Type-"], [data-type]');
                     const foundTiers = new Set<string>();
                     elements.forEach(el => {
-                        const matchId = (el.id || '').match(/type-([a-zA-Z0-9]+)/i);
-                        const matchCls = (el.getAttribute('class') || '').match(/type-([a-zA-Z0-9]+)/i);
-                        if (matchId) foundTiers.add(matchId[1].toUpperCase());
-                        else if (matchCls) foundTiers.add(matchCls[1].toUpperCase());
+                        const matchId = (el.id || '').match(/type-([a-zA-Z0-9_-]+)/i);
+                        const matchCls = (el.getAttribute('class') || '').match(/type-([a-zA-Z0-9_-]+)/i);
+                        const dataType = el.getAttribute('data-type');
+                        if (matchId) foundTiers.add(matchId[1].split(/[-_]/)[0].toUpperCase());
+                        else if (matchCls) foundTiers.add(matchCls[1].split(/[-_]/)[0].toUpperCase());
+                        else if (dataType) foundTiers.add(dataType.toUpperCase());
                     });
+
+                    const zoneElements = doc.querySelectorAll('[id^="zone_"]');
+                    zoneElements.forEach(el => {
+                        const zoneId = el.id || '';
+                        if (isStandingTier(zoneId)) foundTiers.add('GA');
+                    });
+
                     if (foundTiers.size > 0) {
                         const newTicketTypes: TicketTypeForm[] = Array.from(foundTiers).map(tier => ({
-                            name: `Vé ${tier}`, target_tier: tier, description: `Quyền lợi vé ${tier}`, price: '', is_limited_promo: false, total_quantity: '', sale_start: showData.sale_start || '', sale_end: showData.sale_end || ''
+                            name: isStandingTier(tier) ? 'Vé GA / Standing' : `Vé ${tier}`,
+                            target_tier: isStandingTier(tier) ? 'GA' : tier,
+                            description: isStandingTier(tier) ? 'Vé vào khu đứng/General Admission' : `Quyền lợi vé ${tier}`,
+                            price: '',
+                            is_limited_promo: false,
+                            total_quantity: isStandingTier(tier) ? 100 : '',
+                            sale_start: showData.sale_start || '',
+                            sale_end: showData.sale_end || ''
                         }));
                         setTicketTypes(newTicketTypes);
                     } else {
@@ -593,7 +616,7 @@ export default function EventDetail() {
                                     <div className="xl:col-span-4 border-2 border-dashed border-gray-200 bg-slate-50/50 hover:bg-slate-50 p-8 rounded-2xl text-center h-full flex flex-col justify-center">
                                         <UploadCloud size={40} className="mx-auto text-primary mb-3" />
                                         <h3 className="text-base font-bold text-gray-900 mb-1">Sơ đồ ghế (Seat Map)</h3>
-                                        <p className="text-sm text-gray-500 mb-6 mx-auto">Tải lên SVG có ID định dạng <code className="bg-white px-1 border rounded">type-VIP</code> để tự động quét Hạng Vé.</p>
+                                        <p className="text-sm text-gray-500 mb-6 mx-auto">Tải lên SVG có ID <code className="bg-white px-1 border rounded">Type-VIP</code>; khu <code className="bg-white px-1 border rounded">zone_GA</code>, <code className="bg-white px-1 border rounded">zone_standing</code> hoặc <code className="bg-white px-1 border rounded">zone_floor</code> sẽ được nhận diện là vé đứng.</p>
                                         <label className="inline-flex items-center justify-center bg-white border border-gray-200 text-slate-700 px-6 py-2.5 rounded-full font-semibold cursor-pointer hover:bg-slate-50 transition-all text-xs">
                                             <span>Chọn File SVG</span>
                                             <input type="file" accept=".svg" className="hidden" onChange={handleSVGUpload} />
@@ -628,6 +651,9 @@ export default function EventDetail() {
                                                             <Tag size={14} className="text-slate-500" />
                                                             <span className="text-xs font-bold text-slate-600 uppercase">Mã Hạng (Tier):</span>
                                                             <span className="text-xs font-black text-primary font-mono bg-white px-2 py-0.5 rounded border border-primary/20">{ticket.target_tier}</span>
+                                                            {isStandingTier(ticket.target_tier) && (
+                                                                <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">GA / Standing</span>
+                                                            )}
                                                         </div>
 
                                                         <div className="grid grid-cols-12 gap-4 mb-3">
@@ -645,8 +671,8 @@ export default function EventDetail() {
                                                                     value={ticket.price} onChange={e => { const arr = [...ticketTypes]; arr[index].price = e.target.value ? Number(e.target.value) : ''; setTicketTypes(arr); }} />
                                                             </div>
                                                             <div className="col-span-4">
-                                                                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">SL Giới hạn</label>
-                                                                <input type="number" min="1" placeholder="Theo số ghế" className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50"
+                                                                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{isStandingTier(ticket.target_tier) ? 'Sức chứa GA' : 'SL Giới hạn'}</label>
+                                                                <input type="number" min="1" placeholder={isStandingTier(ticket.target_tier) ? 'VD: 500' : 'Theo số ghế'} className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50"
                                                                     value={ticket.total_quantity} onChange={e => { const arr = [...ticketTypes]; arr[index].total_quantity = e.target.value ? Number(e.target.value) : ''; setTicketTypes(arr); }} />
                                                             </div>
                                                             <div className="col-span-3 flex items-center pt-5">

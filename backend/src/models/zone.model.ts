@@ -10,6 +10,7 @@ const ZoneSchema = new Mongoose.Schema<IZone>({
     color: { type: String, default: '#3498db' }, // Màu sắc đại diện cho Zone
     capacity: { type: Number, required: true },
     is_standing: { type: Boolean, default: false },
+    ticket_type_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'TicketType' },
     path_data: { type: String } // URL or path to the layout map image
 });
 

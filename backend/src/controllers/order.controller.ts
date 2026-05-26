@@ -78,44 +78,95 @@ const holdSeatsLuaScript = `
     return "OK"
 `;
 
+const holdStandingSeatsLuaScript = `
+    local rowKey = KEYS[1]
+    local userCountKey = KEYS[2]
+    local lockTTL = tonumber(ARGV[1])
+    local userId = ARGV[2]
+    local numSeats = #KEYS - 2
+    local currentHeldCount = tonumber(redis.call('GET', userCountKey) or 0)
+
+    if currentHeldCount + numSeats > 4 then
+        return redis.error_reply("EXCEED_MAX_TICKETS_LIMIT")
+    end
+
+    local rowStr = redis.call('GET', rowKey)
+    if not rowStr then
+        return redis.error_reply("ROW_NOT_FOUND")
+    end
+
+    local chars = {}
+    for i = 1, #rowStr do
+        chars[i] = rowStr:sub(i, i)
+    end
+
+    for i = 1, numSeats do
+        local seatColIndex = tonumber(ARGV[2 + i])
+        if chars[seatColIndex] ~= 'O' then
+            return redis.error_reply("SEAT_UNAVAILABLE")
+        end
+        chars[seatColIndex] = 'H'
+    end
+
+    redis.call('SET', rowKey, table.concat(chars))
+
+    for i = 3, #KEYS do
+        redis.call('SET', KEYS[i], userId, 'EX', lockTTL)
+    end
+
+    redis.call('INCRBY', userCountKey, numSeats)
+    redis.call('EXPIRE', userCountKey, lockTTL)
+
+    return "OK"
+`;
+
 const rollbackLuaScript = `
     local userCountKey = KEYS[1]
     local userId = ARGV[1]
-    local numSeats = tonumber(ARGV[2])
+    local numSeats = tonumber(ARGV[2]) or 0
 
-    -- 1. GIẢI PHÓNG GHẾ ĐÃ KHÓA
-    -- Lặp qua các key ghế. Vẫn giữ logic cực tốt của bạn: Chỉ xóa nếu đúng là của user này.
+    -- KEYS layout:
+    -- KEYS[1] = user held_count key
+    -- KEYS[2..numSeats+1] = seat lock keys
+    -- KEYS[numSeats+2..end] = row keys cần restore
+
+    -- 1. Giải phóng lock ghế, chỉ xóa nếu lock đúng là của user này.
     for i = 1, numSeats do
-    local lockKey = KEYS[i + 1] 
-    if redis.call("GET", lockKey) == userId then
-        redis.call("DEL", lockKey)
+        local lockKey = KEYS[i + 1]
+        if lockKey and redis.call("GET", lockKey) == userId then
+            redis.call("DEL", lockKey)
+        end
     end
-end
-    
 
-    -- 2. KHÔI PHỤC LẠI CHUỖI CÁC HÀNG (ROW)
-    -- Lấy tổng số KEYS trừ đi số ghế sẽ ra số lượng hàng cần khôi phục
-  local numRows = #KEYS - (numSeats + 1)
-for i = 1, numRows do
-    local rowKey = KEYS[numSeats + 1 + i]
-    local prevString = ARGV[2 + i]
-    
-    -- Ghi đè lại trạng thái cũ
-    redis.call("SET", rowKey, prevString)
-end
-
-  local currentCount = tonumber(redis.call("GET", userCountKey) or "0")
-
-if currentCount > 0 then
-    -- Thêm 1 lớp bảo vệ: Tránh trường hợp trừ lố thành số âm
-    if currentCount >= numSeats then
-        redis.call("DECRBY", userCountKey, numSeats)
-    else
-        redis.call("SET", userCountKey, 0)
+    -- 2. Khôi phục lại row string cũ.
+    local numRows = #KEYS - (numSeats + 1)
+    for i = 1, numRows do
+        local rowKey = KEYS[numSeats + 1 + i]
+        local prevString = ARGV[2 + i]
+        if rowKey and prevString then
+            redis.call("SET", rowKey, prevString)
+        end
     end
-end
 
-return "OK"
+    -- 3. Trừ held_count an toàn. Nếu key đang chứa dữ liệu rác/non-number thì xem như 0.
+    local rawCount = redis.call("GET", userCountKey)
+    local currentCount = tonumber(rawCount) or 0
+
+    if currentCount > 0 and numSeats > 0 then
+        if currentCount >= numSeats then
+            local nextCount = currentCount - numSeats
+            if nextCount > 0 then
+                redis.call("SET", userCountKey, nextCount)
+                redis.call("EXPIRE", userCountKey, tonumber(ARGV[3]) or 600)
+            else
+                redis.call("DEL", userCountKey)
+            end
+        else
+            redis.call("DEL", userCountKey)
+        end
+    end
+
+    return "OK"
 `;
 const releaseSeatsLuaScript = `
     local rowKey = KEYS[1]
@@ -173,10 +224,16 @@ export const rollbackLocksAndRows = async (
         return;
     }
 
-    const keys: string[] = [];
+    const keys: string[] = [
+        `event:${event_id}:show:${show_id}:user:${user_id}:held_count`
+    ];
 
 
-    const args: string[] = [user_id, locked_seat_ids.length.toString()];
+    const args: string[] = [
+        user_id,
+        locked_seat_ids.length.toString(),
+        HOLD_DURATION_SECONDS.toString()
+    ];
 
 
     for (const seat_id of locked_seat_ids) {
@@ -239,6 +296,17 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
         }
 
         zone_id = targetSeats[0].zone_id.toString();
+        const hasMixedZone = targetSeats.some(seat => seat.zone_id.toString() !== zone_id);
+        if (hasMixedZone) {
+            res.status(400).json({ message: 'Mỗi lần giữ chỗ chỉ được chọn vé trong cùng một khu vực.' });
+            return;
+        }
+
+        const selectedZone = await Zone.findById(zone_id).lean();
+        if (!selectedZone) {
+            res.status(404).json({ message: 'Không tìm thấy khu vực của vé.' });
+            return;
+        }
 
         const seatsByRow: { [key: string]: typeof targetSeats } = {};
         const lockedByTier: Record<string, number> = {};
@@ -264,7 +332,7 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
             });
 
             try {
-                await redisClient.eval(holdSeatsLuaScript, { keys, arguments: args });
+                await redisClient.eval(selectedZone.is_standing ? holdStandingSeatsLuaScript : holdSeatsLuaScript, { keys, arguments: args });
 
                 seatsInRow.forEach(s => successfullyLockedSeats.push(s._id.toString()));
                 if (typeof prevRowString === 'string') {
@@ -282,6 +350,9 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
                 }
                 if (errMsg.includes("ROW_NOT_FOUND")) {
                     res.status(500).json({ message: 'Dữ liệu sơ đồ ghế chưa được khởi tạo.' }); return;
+                }
+                if (errMsg.includes("EXCEED_MAX_TICKETS_LIMIT")) {
+                    res.status(400).json({ message: 'Bạn chỉ có thể giữ tối đa 4 vé cho một suất chiếu.' }); return;
                 }
                 console.error("Lỗi giữ ghế:", error);
                 res.status(500).json({ message: 'Lỗi hệ thống khi giữ ghế.' }); return;
@@ -304,12 +375,14 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
                 status: 'holding'
             }));
         }
+        const uniqueSeatIds = [...new Set(seat_ids.map(String))];
+        const uniqueTicketTypeIds = [...new Set(ticket_type_ids.map(String))];
 
 
-        const seatsFromDb = await Seat.find({ _id: { $in: seat_ids } });
-        const ticketTypesFromDb = await TicketType.find({ _id: { $in: ticket_type_ids } }) as any[];
+        const seatsFromDb = await Seat.find({ _id: { $in: uniqueSeatIds } });
+        const ticketTypesFromDb = await TicketType.find({ _id: { $in: uniqueTicketTypeIds } }) as any[];
 
-        if (seatsFromDb.length !== seat_ids.length || ticketTypesFromDb.length !== ticket_type_ids.length) {
+        if (seatsFromDb.length !== uniqueSeatIds.length || ticketTypesFromDb.length !== uniqueTicketTypeIds.length) {
             throw new Error('Có ghế hoặc loại vé không tồn tại trong hệ thống.');
         }
 
@@ -320,8 +393,13 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
             const seat = seatsFromDb.find(s => s._id.toString() === item.seat_id);
             const selectedTicketType = ticketTypesFromDb.find(t => t._id.toString() === item.ticket_type_id);
             if (!selectedTicketType) throw new Error('Loại vé bạn chọn không tồn tại.');
-            if (seat!.tier !== selectedTicketType.target_tier) {
+            const seatTier = String(seat!.tier || '').toUpperCase();
+            const ticketTier = String(selectedTicketType.target_tier || '').toUpperCase();
+            if (!selectedZone.is_standing && seatTier !== ticketTier) {
                 throw new Error(`Ghế hạng ${seat!.tier} không khớp với vé.`);
+            }
+            if (selectedZone.is_standing && seat!.ticket_type_id?.toString() !== selectedTicketType._id.toString()) {
+                throw new Error('Vé GA không khớp với khu vực standing đã chọn.');
             }
 
             totalPrice += selectedTicketType.price;
