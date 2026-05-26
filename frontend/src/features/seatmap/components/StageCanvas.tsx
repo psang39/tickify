@@ -73,28 +73,23 @@ const SeatNode = React.memo(({
 }: any) => {
     const isAvailable = seat.status === 'available' || seat.status === 1;
 
-    let seatColor = "#cbd5e1";
-    let strokeColor = "#94a3b8";
+    let seatColor = "#9ca3af";
 
     if (isAvailable) {
         seatColor = "#ffffff";
-        strokeColor = "#3b82f6";
         if (isHovered && hoverStatus === 'success') {
             seatColor = "#bfdbfe";
         }
         if (isHovered && hoverStatus === 'error') {
             seatColor = "#fecaca";
-            strokeColor = "#ef4444";
         }
     }
 
     if (isSelected) {
         if (!isAvailable) {
-            seatColor = "#ef4444";
-            strokeColor = "#7f1d1d";
+            seatColor = "#7b8190";
         } else {
-            seatColor = "#ec4899";
-            strokeColor = "#be185d";
+            seatColor = "#ec008c";
         }
     }
 
@@ -104,12 +99,10 @@ const SeatNode = React.memo(({
             y={seat.y}
             radius={1.2}
             fill={seatColor}
-            stroke={strokeColor}
-            strokeWidth={0.2}
-            opacity={isAvailable && !isMatchingCombo && !isSelected ? 0.2 : 1}
+            opacity={isAvailable && !isMatchingCombo && !isSelected ? 0.28 : 1}
             perfectDrawEnabled={false}
             listening={isZoomedIn}
-            hitStrokeWidth={1.2}
+            hitStrokeWidth={2}
             onClick={() => onClick(seat)}
             onTap={() => onClick(seat)}
             onMouseEnter={(e) => onMouseEnter(e, seat, isAvailable)}
@@ -173,7 +166,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     }, []);
 
     const [stageConfig, setStageConfig] = useState({ scale: 1, x: 0, y: 0 });
-    const ZOOM_THRESHOLD = 2.5;
+    const ZOOM_THRESHOLD = 1.5;
     const isZoomedIn = stageConfig.scale >= ZOOM_THRESHOLD;
 
     const drawableSeatsData = useMemo(() => {
@@ -362,16 +355,22 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     };
     const getZoneColor = useCallback((zoneId: string) => {
         const summary = zoneSummaries[zoneId];
+        const secondaryColor = "#4651C9";
 
-        if (!summary || !summary.tiers) return { fill: "#bfdbfe", stroke: "#3b82f6" };
+        if (!summary || !summary.tiers) {
+            return { fill: secondaryColor };
+        }
 
         const totalAvailable = Object.values(summary.tiers).reduce(
             (acc: number, tier: any) => acc + (tier.count || 0),
             0
         );
-        if (totalAvailable <= 0) return { fill: "#e2e8f0", stroke: "#94a3b8" }; // Hết vé
-        if (totalAvailable < 50) return { fill: "#fef08a", stroke: "#eab308" }; // Sắp hết
-        return { fill: "#bfdbfe", stroke: "#3b82f6" }; // Còn nhiều vé
+
+        if (totalAvailable <= 0) {
+            return { fill: "#C1C1CA" };
+        }
+
+        return { fill: secondaryColor };
     }, [zoneSummaries]);
 
     const handleZoneMouseEnter = (e: any, zone: any) => {
@@ -427,7 +426,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
 
         if (isAvailable) {
             const stage = e.target.getStage();
-            if (stage) stage.container().style.cursor = 'pointer';
+            if (stage) stage.container().style.cursor = 'default';
         }
 
 
@@ -499,7 +498,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     const handleMouseLeave = useCallback((e?: any) => {
         if (e) {
             const stage = e.target?.getStage();
-            if (stage) stage.container().style.cursor = 'grab';
+            if (stage) stage.container().style.cursor = 'default';
         }
 
         if (timerRef.current) {
@@ -542,7 +541,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
 
         const stage = stageRef.current;
         if (stage) {
-            stage.container().style.cursor = 'grab';
+            stage.container().style.cursor = 'default';
         }
     }, []);
     useEffect(() => {
@@ -619,7 +618,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         ? MINIMAP_PADDING + ((MINIMAP_SIZE - MINIMAP_PADDING * 2) - mapBounds.height * minimapScale) / 2 - mapBounds.minY * minimapScale
         : 0;
     return (
-        <div ref={containerRef} className="w-full h-full relative cursor-grab active:cursor-grabbing bg-transparent overflow-hidden">
+        <div ref={containerRef} className="w-full h-full relative cursor-default bg-white overflow-hidden">
             <Stage
                 ref={stageRef}
                 width={containerSize.width}
@@ -638,7 +637,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             >
                 <Layer>
                     {mapAssets.map((asset, idx) => (
-                        <Path key={`asset-${idx}`} data={asset.path_data} fill="#334155" stroke="#0f172a" strokeWidth={1} />
+                        <Path key={`asset-${idx}`} data={asset.path_data} fill="#334155" />
                     ))}
                     {assetLabels.map((lbl: any, idx) => (
                         <Text
@@ -667,9 +666,8 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                                 key={`zone-${idx}`}
                                 data={zone.path_data || zone.layout_map}
                                 fill={colors.fill}
-                                stroke={isZoomedIn ? "#cbd5e1" : colors.stroke}
                                 strokeWidth={1 / stageConfig.scale}
-                                opacity={isZoomedIn ? 0.3 : 0.8}
+                                opacity={isZoomedIn ? 0.9 : 0.96}
                                 perfectDrawEnabled={false}
                                 listening={!isZoomedIn}
                                 onClick={(e) => handleZoneClick(e, zone)}
@@ -677,7 +675,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                                 onMouseEnter={(e) => {
                                     const stage = e.target.getStage();
                                     if (stage && !isZoomedIn) {
-                                        stage.container().style.cursor = zone.is_standing ? 'pointer' : 'zoom-in';
+                                        stage.container().style.cursor = 'default';
                                         (e.target as Konva.Path).opacity(1);
                                         handleZoneMouseEnter(e, zone);
                                     }
@@ -687,8 +685,8 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                                 onMouseLeave={(e) => {
                                     const stage = e.target.getStage();
                                     if (stage) {
-                                        stage.container().style.cursor = 'grab';
-                                        (e.target as Konva.Path).opacity(0.8);
+                                        stage.container().style.cursor = 'default';
+                                        (e.target as Konva.Path).opacity(0.96);
                                         handleZoneMouseLeave();
                                     }
                                 }}
@@ -705,7 +703,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                             height={36}
                             text={zoneDictionary[lbl.id]?.is_standing ? `${lbl.name} · GA` : lbl.name}
                             fontSize={25}
-                            fill="#41444b"
+                            fill="#ffffff"
                             fontStyle="bold"
                             align="center"
                             verticalAlign="middle"
@@ -727,7 +725,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                             {zonesData.map((zone, idx) => {
                                 const colors = getZoneColor(zone._id);
                                 return (
-                                    <Path key={`mini-zone-${idx}`} data={zone.path_data || zone.layout_map} fill={colors.fill} stroke={colors.stroke} strokeWidth={2} x={minimapX} y={minimapY} scaleX={minimapScale} scaleY={minimapScale} />
+                                    <Path key={`mini-zone-${idx}`} data={zone.path_data || zone.layout_map} fill={colors.fill} strokeWidth={2} x={minimapX} y={minimapY} scaleX={minimapScale} scaleY={minimapScale} />
                                 );
                             })}
                             <Rect

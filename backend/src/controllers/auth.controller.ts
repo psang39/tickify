@@ -79,6 +79,27 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ error: 'Lỗi máy chủ nội bộ' });
     }
 };
+const buildAuthUserPayload = async (user: IUser) => {
+    const baseUser: any = {
+        _id: user._id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
+        role: user.role,
+    };
+
+    if (user.role === "Organizer") {
+        const organizer = await Organizer.findById(user._id);
+
+        baseUser.company_name = organizer?.company_name || "";
+        baseUser.tax_id = organizer?.tax_id || "";
+        baseUser.is_verified = organizer?.is_verified === true;
+        baseUser.organizer_id = organizer?._id;
+    }
+
+    return baseUser;
+};
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -104,7 +125,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         const options = {
-            maxAge: 20 * 60 * 1000,
+            maxAge: 30 * 60 * 1000,
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? "none" as const : "lax" as const,
@@ -113,19 +134,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         const token = user.generateAccessJWT();
 
         res.cookie("SessionID", token, options);
+        const authUser = await buildAuthUserPayload(user);
 
 
         res.status(200).json({
             status: "success",
             message: "You have successfully logged in.",
             token: token,
-            user: {
-                id: user._id,
-                first_name: user.first_name,
-                last_name: user.last_name,
-                email: user.email,
-                role: user.role
-            }
+            user: authUser
         });
 
     } catch (error) {

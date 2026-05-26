@@ -20,12 +20,36 @@ const getEventVenueText = (event: any) => {
     return venue.name || venue.venue_name || venue.address || 'Địa điểm đang cập nhật';
 };
 
+const SkeletonLine = ({ className = '' }: { className?: string }) => (
+    <div className={`animate-pulse rounded-full bg-slate-200 ${className}`} />
+);
+
+const EventCardSkeleton = () => (
+    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+        <div className="h-40 animate-pulse bg-slate-200" />
+        <div className="space-y-3 p-4">
+            <SkeletonLine className="h-3 w-20" />
+            <SkeletonLine className="h-4 w-4/5" />
+            <SkeletonLine className="h-3 w-full" />
+            <SkeletonLine className="h-3 w-2/3" />
+        </div>
+    </div>
+);
+
+const GenreSkeleton = () => (
+    <div className="rounded-2xl border border-slate-100 bg-white px-5 py-6">
+        <SkeletonLine className="h-3 w-20" />
+        <SkeletonLine className="mt-3 h-6 w-28" />
+    </div>
+);
+
 export default function HomePage() {
     const navigate = useNavigate();
     const [keyword, setKeyword] = useState('');
-    const { data: newestEvents = [], isLoading } = usePublicEvents({ limit: 8, sort: 'newest' });
-    const { data: upcomingEvents = [] } = usePublicEvents({ limit: 8, sort: 'upcoming' });
+    const { data: newestEvents = [], isLoading: isNewestLoading } = usePublicEvents({ limit: 8, sort: 'newest' });
+    const { data: upcomingEvents = [], isLoading: isUpcomingLoading } = usePublicEvents({ limit: 8, sort: 'upcoming' });
 
+    const isPageLoading = isNewestLoading || isUpcomingLoading;
     const visibleUpcomingEvents = upcomingEvents.length ? upcomingEvents : newestEvents;
     const heroEvent = useMemo(() => visibleUpcomingEvents?.[0] || newestEvents?.[0], [newestEvents, visibleUpcomingEvents]);
     const featureImage = heroEvent?.banner_url || heroEvent?.poster_url || heroImage;
@@ -53,15 +77,35 @@ export default function HomePage() {
                         </span>
 
                         <div>
-                            <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-slate-900 md:text-5xl">
-                                {heroEvent?.name || 'Khám phá sự kiện bạn yêu thích'}
-                            </h1>
-                            <p className="mt-4 max-w-lg text-sm leading-7 text-slate-500">
-                                {heroEvent?.description || 'Tìm kiếm sự kiện, xem lịch diễn, chọn show phù hợp và đặt vé nhanh chóng trên Tickify.'}
-                            </p>
+                            {isPageLoading ? (
+                                <div className="space-y-4">
+                                    <SkeletonLine className="h-11 w-full max-w-xl md:h-14" />
+                                    <SkeletonLine className="h-11 w-4/5 max-w-lg md:h-14" />
+                                    <div className="space-y-2 pt-2">
+                                        <SkeletonLine className="h-4 w-full max-w-lg" />
+                                        <SkeletonLine className="h-4 w-5/6 max-w-md" />
+                                        <SkeletonLine className="h-4 w-2/3 max-w-sm" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-slate-900 md:text-5xl">
+                                        {heroEvent?.name || 'Khám phá sự kiện bạn yêu thích'}
+                                    </h1>
+                                    <p className="mt-4 max-w-lg text-sm leading-7 text-slate-500">
+                                        {heroEvent?.description || 'Tìm kiếm sự kiện, xem lịch diễn, chọn show phù hợp và đặt vé nhanh chóng trên Tickify.'}
+                                    </p>
+                                </>
+                            )}
                         </div>
 
-                        {heroEvent && (
+                        {isPageLoading ? (
+                            <div className="flex flex-wrap gap-3">
+                                <SkeletonLine className="h-10 w-36 bg-white" />
+                                <SkeletonLine className="h-10 w-44 bg-white" />
+                                <SkeletonLine className="h-10 w-28 bg-white" />
+                            </div>
+                        ) : heroEvent ? (
                             <div className="flex flex-wrap gap-3 text-sm text-slate-600">
                                 <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold shadow-sm">
                                     <Calendar size={16} className="text-[#FF0082]" /> {formatDate(heroEvent.start_date)}
@@ -75,18 +119,20 @@ export default function HomePage() {
                                     </span>
                                 )}
                             </div>
-                        )}
+                        ) : null}
 
                         <div className="flex flex-wrap items-center gap-3">
                             <button
                                 onClick={() => heroEvent ? navigate(`/events/${heroEvent._id}`) : navigate('/search')}
-                                className="rounded-xl bg-[#FF0082] px-7 py-3 text-sm font-bold text-white transition hover:bg-pink-700"
+                                disabled={isPageLoading}
+                                className="rounded-xl bg-[#FF0082] px-7 py-3 text-sm font-bold text-white transition hover:bg-pink-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                             >
                                 Xem chi tiết
                             </button>
                             <button
                                 onClick={() => navigate('/search')}
-                                className="rounded-xl border border-slate-200 bg-white px-7 py-3 text-sm font-bold text-slate-700 transition hover:border-[#4C4DCC] hover:text-[#4C4DCC]"
+                                disabled={isPageLoading}
+                                className="rounded-xl border border-slate-200 bg-white px-7 py-3 text-sm font-bold text-slate-700 transition hover:border-[#4C4DCC] hover:text-[#4C4DCC] disabled:cursor-not-allowed disabled:text-slate-300"
                             >
                                 Khám phá thêm
                             </button>
@@ -94,14 +140,32 @@ export default function HomePage() {
                     </div>
 
                     <div className="relative h-[360px] overflow-hidden rounded-[28px] bg-slate-200 lg:h-[440px]">
-                        <img src={featureImage} alt={heroEvent?.name || 'Sự kiện Tickify'} className="h-full w-full object-cover" />
+                        {isPageLoading ? (
+                            <div className="h-full w-full animate-pulse bg-slate-300" />
+                        ) : (
+                            <img src={featureImage} alt={heroEvent?.name || 'Sự kiện Tickify'} className="h-full w-full object-cover" />
+                        )}
+
                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-6 text-white">
                             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-pink-200">Sự kiện nổi bật</p>
-                            <h2 className="mt-2 text-2xl font-black">{heroEvent?.name || 'Tickify Event'}</h2>
-                            <div className="mt-3 flex flex-wrap gap-4 text-xs font-semibold text-white/90">
-                                <span className="flex items-center gap-1"><Calendar size={14} />{formatDate(heroEvent?.start_date)}</span>
-                                {heroEvent?.genre && <span className="flex items-center gap-1"><Music2 size={14} />{heroEvent.genre}</span>}
-                            </div>
+
+                            {isPageLoading ? (
+                                <div className="mt-3 space-y-3">
+                                    <SkeletonLine className="h-7 w-3/4 bg-white/30" />
+                                    <div className="flex gap-4">
+                                        <SkeletonLine className="h-4 w-28 bg-white/25" />
+                                        <SkeletonLine className="h-4 w-24 bg-white/25" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <h2 className="mt-2 text-2xl font-black">{heroEvent?.name || 'Tickify Event'}</h2>
+                                    <div className="mt-3 flex flex-wrap gap-4 text-xs font-semibold text-white/90">
+                                        <span className="flex items-center gap-1"><Calendar size={14} />{formatDate(heroEvent?.start_date)}</span>
+                                        {heroEvent?.genre && <span className="flex items-center gap-1"><Music2 size={14} />{heroEvent.genre}</span>}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -130,9 +194,9 @@ export default function HomePage() {
                     <Link to="/search?sort=upcoming" className="text-sm font-semibold text-slate-600 hover:text-[#FF0082]">Xem tất cả</Link>
                 </div>
 
-                {isLoading ? (
+                {isPageLoading ? (
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                        {[1, 2, 3, 4].map((item) => <div key={item} className="h-64 animate-pulse rounded-2xl bg-slate-100" />)}
+                        {Array.from({ length: 4 }).map((_, index) => <EventCardSkeleton key={index} />)}
                     </div>
                 ) : visibleUpcomingEvents.length ? (
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -145,28 +209,35 @@ export default function HomePage() {
                 )}
             </section>
 
-            {genres.length > 0 && (
+            {(isPageLoading || genres.length > 0) && (
                 <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
                     <div className="mb-5 flex items-center justify-between">
                         <h2 className="text-xl font-bold text-slate-900">Khám phá theo thể loại</h2>
                         <Link to="/search" className="text-sm font-semibold text-slate-600 hover:text-[#FF0082]">Xem thêm</Link>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-                        {genres.map((genre) => (
-                            <button
-                                key={genre}
-                                onClick={() => navigate(`/search?genre=${encodeURIComponent(genre)}`)}
-                                className="rounded-2xl border border-slate-200 bg-white px-5 py-6 text-left transition hover:border-[#FF0082] hover:shadow-md"
-                            >
-                                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Thể loại</span>
-                                <span className="mt-2 block text-lg font-black text-slate-900">{genre}</span>
-                            </button>
-                        ))}
-                    </div>
+
+                    {isPageLoading ? (
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+                            {Array.from({ length: 5 }).map((_, index) => <GenreSkeleton key={index} />)}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+                            {genres.map((genre) => (
+                                <button
+                                    key={genre}
+                                    onClick={() => navigate(`/search?genre=${encodeURIComponent(genre)}`)}
+                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-6 text-left transition hover:border-[#FF0082] hover:shadow-md"
+                                >
+                                    <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Thể loại</span>
+                                    <span className="mt-2 block text-lg font-black text-slate-900">{genre}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </section>
             )}
 
-            {newestEvents.length > 0 && (
+            {(isPageLoading || newestEvents.length > 0) && (
                 <section className="bg-[#23232D] py-12 text-white">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mb-6 flex items-end justify-between">
@@ -176,18 +247,35 @@ export default function HomePage() {
                             </div>
                             <Link to="/search" className="text-xs font-bold text-white/70 hover:text-white">Khám phá tất cả</Link>
                         </div>
-                        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                            {newestEvents.slice(0, 3).map((event: any) => (
-                                <article key={event._id} onClick={() => navigate(`/events/${event._id}`)} className="cursor-pointer overflow-hidden rounded-2xl bg-white text-slate-900">
-                                    <img src={event.banner_url || event.poster_url || heroImage} alt={event.name} className="h-40 w-full object-cover" />
-                                    <div className="p-4">
-                                        <p className="text-[11px] font-semibold text-slate-400">{event.genre || 'Sự kiện'}</p>
-                                        <h3 className="mt-1 line-clamp-2 text-sm font-bold">{event.name}</h3>
-                                        <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">{event.description || 'Thông tin sự kiện sẽ được cập nhật trong thời gian tới.'}</p>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
+
+                        {isPageLoading ? (
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                                {Array.from({ length: 3 }).map((_, index) => (
+                                    <article key={index} className="overflow-hidden rounded-2xl bg-white text-slate-900">
+                                        <div className="h-40 animate-pulse bg-slate-300" />
+                                        <div className="space-y-3 p-4">
+                                            <SkeletonLine className="h-3 w-20" />
+                                            <SkeletonLine className="h-4 w-4/5" />
+                                            <SkeletonLine className="h-3 w-full" />
+                                            <SkeletonLine className="h-3 w-2/3" />
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                                {newestEvents.slice(0, 3).map((event: any) => (
+                                    <article key={event._id} onClick={() => navigate(`/events/${event._id}`)} className="cursor-pointer overflow-hidden rounded-2xl bg-white text-slate-900">
+                                        <img src={event.banner_url || event.poster_url || heroImage} alt={event.name} className="h-40 w-full object-cover" />
+                                        <div className="p-4">
+                                            <p className="text-[11px] font-semibold text-slate-400">{event.genre || 'Sự kiện'}</p>
+                                            <h3 className="mt-1 line-clamp-2 text-sm font-bold">{event.name}</h3>
+                                            <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">{event.description || 'Thông tin sự kiện sẽ được cập nhật trong thời gian tới.'}</p>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </section>
             )}

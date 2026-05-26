@@ -9,7 +9,7 @@ adminRouter.use(Verify, verifyRoles(['Admin']));
 adminRouter.get('/dashboard', getSystemDashboard);
 adminRouter.get('/users', getAllUsers);
 adminRouter.get('/organizers/pending', getPendingOrganizers);
-adminRouter.patch('/organizers/:userId/verify', verifyOrganizer);
+adminRouter.put('/organizers/:userId/verify', verifyOrganizer);
 adminRouter.delete('/organizers/:userId/reject', rejectOrganizer);
 adminRouter.get('/venues', getVenues);
 adminRouter.put('/venues/:venue_id/verify', verifyVenue);

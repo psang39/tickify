@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/useAuthStore';
 import {
     AlertTriangle,
     Building2,
@@ -13,6 +14,7 @@ import {
 export default function AdminLayout() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { logout } = useAuthStore();
     const currentPath = location.pathname;
 
     return (
@@ -64,7 +66,8 @@ export default function AdminLayout() {
                         </div>
 
                         <div className="border-t border-slate-100 p-5">
-                            <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:bg-red-50 hover:text-red-500">
+                            <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:bg-red-50 hover:text-red-500"
+                                onClick={() => { if (window.confirm("Xác nhận đăng xuất khỏi hệ thống?")) logout(); }}>
                                 <LogOut size={18} />
                                 <span>Đăng xuất</span>
                             </button>
@@ -115,11 +118,10 @@ function SidebarLink({
         <button
             type="button"
             onClick={onClick}
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all ${
-                active
-                    ? 'bg-primary/10 text-primary shadow-sm'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-            }`}
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all ${active
+                ? 'bg-primary/10 text-primary shadow-sm'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                }`}
         >
             <span className={active ? 'text-primary' : 'text-slate-400'}>{icon}</span>
             <span>{label}</span>

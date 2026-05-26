@@ -62,7 +62,7 @@ export const createPaymentUrl = async (req: Request, res: Response): Promise<voi
 
 const postMockIpnWithRetry = async (payload: any) => {
     const maxAttemptsPerUrl = 3;
-    const url = `${BACKEND_URL}:${PORT}/api/v1/webhooks/payment-result`;
+    const url = `${BACKEND_URL}/api/v1/webhooks/payment-result`;
     for (let attempt = 1; attempt <= maxAttemptsPerUrl; attempt++) {
         try {
             await axios.post(url, payload, { timeout: 5000 });
@@ -73,10 +73,9 @@ const postMockIpnWithRetry = async (payload: any) => {
             const message = err.response?.data?.message || err.message;
             console.error(
                 `[Mock Gateway] IPN thất bại cho ${payload.order_id} ` +
-                `(url=${BACKEND_URL}/api/v1/webhooks/mock-gateway, attempt=${attempt}/${maxAttemptsPerUrl}, status=${statusCode || 'NO_RESPONSE'}): ${message}`
+                `${BACKEND_URL}/api/v1/webhooks/mock-gateway, attempt=${attempt}/${maxAttemptsPerUrl}, status=${statusCode || 'NO_RESPONSE'}): ${message}`
             );
 
-            // 404 thường là sai route. Không retry cùng URL nữa, chuyển sang URL fallback.
             if (statusCode === 404) break;
 
             if (attempt < maxAttemptsPerUrl) {

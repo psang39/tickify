@@ -8,6 +8,12 @@ interface User {
     username: string;
     email: string;
     role: 'Organizer' | 'Attendee' | 'Admin' | 'organizer' | 'attendee' | 'admin';
+    is_verified?: boolean;
+    company_name?: string;
+    tax_id?: string;
+    phone?: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 interface AuthState {

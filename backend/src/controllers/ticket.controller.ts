@@ -29,9 +29,6 @@ export const getMyTickets = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        if (user.id !== user_id) {
-            return res.status(403).json({ message: 'Unauthorized to view tickets' });
-        }
 
         const tickets = await Ticket.find({ user_id, order_id })
             .populate('ticket_type_id')

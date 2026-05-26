@@ -80,7 +80,9 @@ function App() {
               </Route>
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={ORGANIZER_ROLES} />}>
+            <Route element={<ProtectedRoute allowedRoles={ORGANIZER_ROLES}
+              requireVerifiedOrganizer
+            />}>
               <Route element={<OrganizerLayout />}>
                 <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
                 <Route path="/organizer/staff" element={<OrganizerStaff />} />

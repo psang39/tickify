@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, QrCode, Ticket, Users, AlertTriangle } from 'lucide-react';
+import { DollarSign, QrCode, Ticket, Users, AlertTriangle, LockKeyhole, Clock3 } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart } from 'recharts';
 import { api } from '@/lib/axiosClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +50,7 @@ export default function OrganizerDashboard() {
     const revenueByShow = data?.revenueByShow || [];
     const ticketTypeBreakdown = data?.ticketTypeBreakdown || [];
     const recentCheckIns = data?.recentCheckIns || [];
+
 
     const checkInChartData = useMemo(() => Object.entries((data?.checkIns || {}) as Record<string, number>)
         .filter(([, count]) => Number(count) > 0)

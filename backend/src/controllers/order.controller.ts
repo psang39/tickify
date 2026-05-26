@@ -600,14 +600,29 @@ export const getOrderById = async (req: Request, res: Response) => {
         if (!attendee) {
             return res.status(404).json({ message: 'Attendee not found' });
         }
-        const order = await Order.findById(order_id);
+        const order = await Order.findById(order_id)
+            .populate('event_id', 'name')
+            .populate({
+                path: 'show_id',
+                select: 'name start_time status venue_id',
+                populate: {
+                    path: 'venue_id',
+                    model: 'Venue',
+                    select: 'name'
+                }
+            })
+            .lean();
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
         if (order.user_id.toString() !== user_id) {
             return res.status(403).json({ message: 'Unauthorized to view this order' });
         }
-        const tickets = await Ticket.find({ order_id: order._id });
+        const tickets = await Ticket.find({ user_id, order_id: order._id })
+            .populate('ticket_type_id')
+            .populate('seat_id')
+            .populate('zone_id')
+            .populate('event_id').lean();;
         res.status(200).json({ order, tickets });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching order details', error });

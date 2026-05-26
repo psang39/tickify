@@ -275,7 +275,7 @@ export default function AdminDashboard() {
                             ) : (
                                 pendingOrganizers.map((org: any) => (
                                     <tr key={org._id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-6 py-4 font-bold text-slate-800">{org.first_name} {org.last_name}</td>
+                                        <td className="px-6 py-4 font-bold text-slate-800">{org.company_name} / {org.last_name} {org.first_name}</td>
                                         <td className="px-6 py-4 text-sm font-medium text-slate-600">{org.email}</td>
                                         <td className="px-6 py-4 text-sm font-medium text-slate-500">{new Date(org.createdAt || org.created_at || Date.now()).toLocaleDateString('vi-VN')}</td>
                                         <td className="px-6 py-4 flex justify-end gap-2">

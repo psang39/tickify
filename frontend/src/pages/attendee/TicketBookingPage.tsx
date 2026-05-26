@@ -562,15 +562,15 @@ export default function TicketBookingPage() {
             <div className="mb-3 flex justify-end">
               <div className="flex items-center gap-5 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm">
                 <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm bg-slate-500 inline-block" />
+                  <span className="h-3 w-3 rounded-full bg-slate-500 inline-block" />
                   <span>Đã bán</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm bg-white border border-slate-300 inline-block" />
+                  <span className="h-3 w-3 rounded-full bg-white border border-slate-300 inline-block" />
                   <span>Còn trống</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-sm bg-pink-600 inline-block" />
+                  <span className="h-3 w-3 rounded-full bg-pink-600 inline-block" />
                   <span>Đang chọn</span>
                 </div>
               </div>
@@ -578,7 +578,7 @@ export default function TicketBookingPage() {
 
             <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
               <div className="flex flex-col xl:flex-row">
-                <div className="relative flex-1 bg-[#444bd0] h-[560px] xl:h-[640px] overflow-hidden">
+                <div className="relative flex-1 bg-white h-[560px] xl:h-[640px] overflow-hidden">
                   <div className="absolute left-6 top-5 z-10 rounded-2xl bg-white/90 px-4 py-3 shadow-sm backdrop-blur">
                     <p className="text-base font-bold text-slate-800">
                       Chọn ghế của bạn
@@ -808,84 +808,79 @@ export default function TicketBookingPage() {
                         </div>
                       </div>
                     )}
-
-                    <div className="mt-6 border-t border-slate-100 pt-5">
-                      <div className="mb-3 flex items-center justify-between">
-                        <p className="text-base font-bold text-slate-800">
-                          Ghế đã chọn
-                        </p>
-                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">
-                          {selectedSeats.length} vé
-                        </span>
-                      </div>
-
-                      {selectedSeats.length === 0 ? (
-                        <div className="rounded-2xl border border-dashed border-slate-200 p-4 text-center text-sm text-slate-500">
-                          Chọn ghế trên sơ đồ hoặc tăng số lượng vé GA.
-                        </div>
-                      ) : (
-                        <div className="max-h-[220px] space-y-2 overflow-y-auto pr-1">
-                          {selectedSeats.map((seat: any, idx: number) => {
-                            const typeId =
-                              seat.ticket_type_id?._id || seat.ticket_type_id;
-                            const typeName =
-                              ticketTypeDictionary[typeId]?.name || "Vé";
-                            return (
-                              <div
-                                key={seat._id || idx}
-                                className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-3"
-                              >
-                                <div className="min-w-0">
-                                  <p className="truncate text-sm font-semibold text-slate-800">
-                                    {typeName}
-                                  </p>
-                                  <p className="truncate text-xs text-slate-500">
-                                    {zoneDictionary[seat.zone_id]?.is_standing
-                                      ? `Khu ${zoneDictionary[seat.zone_id]?.name || "GA"} · Vé đứng`
-                                      : <>Hàng {seat.row}, ghế {seat.seat_number || seat.col_index}</>}
-                                  </p>
-                                </div>
-                                <button
-                                  onClick={() =>
-                                    removeSeat &&
-                                    removeSeat(seat._id || seat.id)
-                                  }
-                                  className="shrink-0 p-1 text-slate-400 hover:text-red-500"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
                   </div>
 
-                  <div className="border-t border-slate-200 bg-white p-5">
-                    <div className="mb-4 flex items-end justify-between gap-4">
-                      <div>
-                        <p className="text-sm text-slate-500">Tổng cộng</p>
-                        <p className="text-base font-semibold text-slate-700">
-                          {selectedSeats.length} vé
-                        </p>
+                </aside>
+              </div>
+
+              <div className="border-t border-slate-100 bg-white px-5 py-5">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0 flex-1">
+                    {selectedSeats.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-500">
+                        Chọn ghế trên sơ đồ hoặc tăng số lượng vé GA.
                       </div>
-                      <p className="text-2xl font-black text-pink-600">
+                    ) : (
+                      <div className="flex gap-3 overflow-x-auto pb-1">
+                        {selectedSeats.map((seat: any, idx: number) => {
+                          const typeId = seat.ticket_type_id?._id || seat.ticket_type_id;
+                          const typeName = ticketTypeDictionary[typeId]?.name || "Vé";
+                          const price = Number(ticketTypeDictionary[typeId]?.price || 0);
+                          const zoneName = zoneDictionary[seat.zone_id]?.name || "Khu vực";
+                          const seatLabel = zoneDictionary[seat.zone_id]?.is_standing
+                            ? `${zoneName} · Vé đứng`
+                            : `Hàng ${seat.row}, ghế ${seat.seat_number || seat.col_index}`;
+
+                          return (
+                            <div
+                              key={seat._id || seat.id || idx}
+                              className="group flex min-w-[260px] items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+                            >
+                              <div className="flex min-w-0 items-center gap-3">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-white">
+                                  {idx + 1}
+                                </span>
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-bold text-slate-800">{seatLabel}</p>
+                                  <p className="truncate text-xs text-slate-500">
+                                    {typeName} · {price.toLocaleString("vi-VN")} đ
+                                  </p>
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                aria-label="Bỏ vé đã chọn"
+                                onClick={() => removeSeat && removeSeat(seat._id || seat.id)}
+                                className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="rounded-2xl bg-slate-50 px-5 py-3 text-right">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Tổng cộng · {selectedSeats.length} vé
+                      </p>
+                      <p className="text-xl font-black text-primary">
                         {tempTotalPrice.toLocaleString("vi-VN")} đ
                       </p>
                     </div>
                     <Button
                       onClick={handleNext}
-                      disabled={
-                        selectedSeats.length === 0 ||
-                        holdSeatsMutation.isPending
-                      }
-                      className="h-12 w-full rounded-xl bg-primary text-base font-bold text-white hover:bg-primary/90"
+                      disabled={selectedSeats.length === 0 || holdSeatsMutation.isPending}
+                      className="h-12 rounded-2xl bg-primary px-10 text-base font-bold text-white hover:bg-primary/90"
                     >
                       Tiếp tục
                     </Button>
                   </div>
-                </aside>
+                </div>
               </div>
             </div>
           </div>

@@ -123,7 +123,7 @@ export default function OrganizerStaff() {
                                     ) : staffs.map((staff: any) => (
                                         <tr key={staff._id} className={`hover:bg-slate-50/70 ${selectedStaffId === staff._id ? 'bg-primary/5' : ''}`}>
                                             <td className="px-6 py-4">
-                                                <div className="font-bold text-slate-800">{staff.first_name} {staff.last_name}</div>
+                                                <div className="font-bold text-slate-800">{staff.last_name} {staff.first_name}</div>
                                                 <div className="text-xs text-slate-500 flex items-center gap-1 mt-1"><ShieldCheck size={13} /> Staff scanner</div>
                                             </td>
                                             <td className="px-6 py-4 text-slate-600">
@@ -159,7 +159,7 @@ export default function OrganizerStaff() {
                             <label className="text-xs font-bold text-slate-500 uppercase">Nhân viên</label>
                             <select value={selectedStaffId} onChange={(e) => setSelectedStaffId(e.target.value)} className="mt-1 w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-primary">
                                 <option value="">Chọn nhân viên</option>
-                                {staffs.map((staff: any) => <option key={staff._id} value={staff._id}>{staff.first_name} {staff.last_name}</option>)}
+                                {staffs.map((staff: any) => <option key={staff._id} value={staff._id}>{staff.last_name} {staff.first_name} </option>)}
                             </select>
                         </div>
                         <div>
