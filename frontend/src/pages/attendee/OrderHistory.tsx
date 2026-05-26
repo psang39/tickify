@@ -5,7 +5,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/axiosClient';
 import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 import { ErrorModal } from '@/components/shared/ErrorModal';
-import { Calendar, MapPin, ReceiptText, Clock3, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, ReceiptText, ChevronRight } from 'lucide-react';
 
 interface OrderItemDetail {
     seat_id?: string;
