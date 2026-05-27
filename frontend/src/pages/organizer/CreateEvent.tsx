@@ -27,6 +27,9 @@ export default function CreateEvent() {
         organizer_id: user?.id || ''
     });
 
+    const [bannerFile, setBannerFile] = useState<File | null>(null);
+    const [posterFile, setPosterFile] = useState<File | null>(null);
+
     const [isRepositioning, setIsRepositioning] = useState(false);
     const [dragState, setDragState] = useState({ isDragging: false, startY: 0 });
 
@@ -57,20 +60,22 @@ export default function CreateEvent() {
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'banner' | 'poster') => {
         const file = e.target.files?.[0];
-        if (file) {
-            if (!file.type.startsWith('image/')) {
-                showError("Vui lòng chỉ chọn file hình ảnh!"); return;
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result as string;
-                if (type === 'banner') {
-                    setFormData({ ...formData, banner_url: base64String, banner_offset_y: 50 });
-                } else {
-                    setFormData({ ...formData, poster_url: base64String });
-                }
-            };
-            reader.readAsDataURL(file);
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showError("Vui lòng chỉ chọn file hình ảnh!");
+            return;
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        if (type === 'banner') {
+            if (formData.banner_url.startsWith('blob:')) URL.revokeObjectURL(formData.banner_url);
+            setBannerFile(file);
+            setFormData(prev => ({ ...prev, banner_url: previewUrl, banner_offset_y: 50 }));
+        } else {
+            if (formData.poster_url.startsWith('blob:')) URL.revokeObjectURL(formData.poster_url);
+            setPosterFile(file);
+            setFormData(prev => ({ ...prev, poster_url: previewUrl }));
         }
     };
 
@@ -79,7 +84,19 @@ export default function CreateEvent() {
         if (!formData.start_date || !formData.end_date) { showError("Vui lòng thiết lập mốc ngày khai mạc và bế mạc sự kiện!"); return; }
 
         try {
-            await createEvent(formData);
+            const payload = new FormData();
+            payload.append('name', formData.name);
+            payload.append('artists', formData.artists);
+            payload.append('description', formData.description);
+            payload.append('genre', formData.genre);
+            payload.append('start_date', formData.start_date);
+            payload.append('end_date', formData.end_date);
+            payload.append('banner_offset_y', String(formData.banner_offset_y));
+            payload.append('status', formData.status);
+            if (posterFile) payload.append('poster', posterFile);
+            if (bannerFile) payload.append('banner', bannerFile);
+
+            await createEvent(payload);
             showSuccess("Tạo sự kiện bản nháp thành công.");
             navigate('/organizer/events');
         } catch (error) {

@@ -18,8 +18,7 @@ export const useEventStore = create<EventState>((set) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await api.get('/events');
-            const data = response.data?.docs || response.data?.data || response.data || [];
-            set({ events: Array.isArray(data) ? data : [], isLoading: false });
+            set({ events: response.data, isLoading: false });
         } catch (error: any) {
             set({ error: error.message, isLoading: false });
         }

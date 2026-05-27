@@ -13,11 +13,4 @@ const SeatSchema = new Mongoose.Schema<ISeat>({
     tier: { type: String },
     ticket_type_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'TicketType' }
 });
-
-// Indexes for seatmap fetch, hold/rollback, check-in and row-based seat validation.
-SeatSchema.index({ show_id: 1, zone_id: 1 });
-SeatSchema.index({ show_id: 1, status: 1 });
-SeatSchema.index({ zone_id: 1, row: 1, col_index: 1 });
-SeatSchema.index({ ticket_type_id: 1 });
-
 export default Mongoose.model('Seat', SeatSchema);

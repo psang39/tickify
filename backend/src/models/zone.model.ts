@@ -14,9 +14,4 @@ const ZoneSchema = new Mongoose.Schema<IZone>({
     path_data: { type: String } // URL or path to the layout map image
 });
 
-// Indexes for show detail, Redis summary rebuild and standing/GA ticket lookup.
-ZoneSchema.index({ show_id: 1 });
-ZoneSchema.index({ event_id: 1, show_id: 1 });
-ZoneSchema.index({ ticket_type_id: 1 });
-
 export default Mongoose.model('Zone', ZoneSchema);

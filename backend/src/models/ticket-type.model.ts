@@ -19,9 +19,4 @@ const TicketTypeSchema: Mongoose.Schema = new Mongoose.Schema<ITicketType>({
     }
 }, { timestamps: true });
 
-// Indexes for ticket type list, price filter and zone/tier lookup.
-TicketTypeSchema.index({ show_id: 1, price: 1, name: 1 });
-TicketTypeSchema.index({ event_id: 1, show_id: 1 });
-TicketTypeSchema.index({ show_id: 1, target_tier: 1 });
-
 export default Mongoose.model('TicketType', TicketTypeSchema);

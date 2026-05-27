@@ -42,6 +42,8 @@ export default function EventDetail() {
         start_date: '', end_date: ''
     });
     const [currentStatus, setCurrentStatus] = useState<'draft' | 'published' | 'cancelled'>('draft');
+    const [bannerFile, setBannerFile] = useState<File | null>(null);
+    const [posterFile, setPosterFile] = useState<File | null>(null);
 
     const [isRepositioning, setIsRepositioning] = useState(false);
     const [dragState, setDragState] = useState({ isDragging: false, startY: 0 });
@@ -61,7 +63,7 @@ export default function EventDetail() {
                 name: eventData.name || '',
                 description: eventData.description || '',
                 genre: eventData.genre || 'Pop / Concert',
-                artists: eventData.artists || '',
+                artists: Array.isArray(eventData.artists) ? eventData.artists.join(', ') : (eventData.artists || ''),
                 poster_url: eventData.poster_url || '',
                 banner_url: eventData.banner_url || '',
                 banner_offset_y: typeof eventData.banner_offset_y === 'number' ? eventData.banner_offset_y : 50,
@@ -69,6 +71,8 @@ export default function EventDetail() {
                 end_date: eventData.end_date ? new Date(eventData.end_date).toISOString().slice(0, 16) : '',
             });
             setCurrentStatus(eventData.status || 'draft');
+            setBannerFile(null);
+            setPosterFile(null);
         }
     }, [eventData]);
 
@@ -99,21 +103,22 @@ export default function EventDetail() {
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'banner' | 'poster') => {
         const file = e.target.files?.[0];
-        if (file) {
-            if (!file.type.startsWith('image/')) {
-                setErrorMessage("Định dạng tập tin không hợp lệ. Vui lòng chỉ chọn file hình ảnh.");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result as string;
-                if (type === 'banner') {
-                    setEventFormData(prev => ({ ...prev, banner_url: base64String, banner_offset_y: 50 }));
-                } else {
-                    setEventFormData(prev => ({ ...prev, poster_url: base64String }));
-                }
-            };
-            reader.readAsDataURL(file);
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            setErrorMessage("Định dạng tập tin không hợp lệ. Vui lòng chỉ chọn file hình ảnh.");
+            return;
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        if (type === 'banner') {
+            if (eventFormData.banner_url.startsWith('blob:')) URL.revokeObjectURL(eventFormData.banner_url);
+            setBannerFile(file);
+            setEventFormData(prev => ({ ...prev, banner_url: previewUrl, banner_offset_y: 50 }));
+        } else {
+            if (eventFormData.poster_url.startsWith('blob:')) URL.revokeObjectURL(eventFormData.poster_url);
+            setPosterFile(file);
+            setEventFormData(prev => ({ ...prev, poster_url: previewUrl }));
         }
     };
 
@@ -146,7 +151,17 @@ export default function EventDetail() {
             setErrorMessage("Vui lòng chọn ngày bắt đầu và ngày kết thúc cho sự kiện trước khi lưu.");
             return;
         }
-        await updateEventMutation(eventFormData);
+        const payload = new FormData();
+        payload.append('name', eventFormData.name);
+        payload.append('description', eventFormData.description);
+        payload.append('genre', eventFormData.genre);
+        payload.append('artists', eventFormData.artists);
+        payload.append('start_date', eventFormData.start_date);
+        payload.append('end_date', eventFormData.end_date);
+        payload.append('banner_offset_y', String(eventFormData.banner_offset_y));
+        if (posterFile) payload.append('poster', posterFile);
+        if (bannerFile) payload.append('banner', bannerFile);
+        await updateEventMutation(payload);
     };
 
     const [showForm, setShowForm] = useState(false);

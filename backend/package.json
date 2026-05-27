@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --exec tsx src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "migrate:event-images": "tsx src/scripts/migrateEventImages.ts"
   },
   "keywords": [],
   "author": "",

@@ -39,7 +39,6 @@ EventSchema.index({ status: 1, created_at: -1 });
 EventSchema.index({ status: 1, start_date: 1 });
 EventSchema.index({ genre: 1, status: 1 });
 EventSchema.index({ organizer_id: 1, created_at: -1 });
-
 EventSchema.plugin(paginate);
 EventSchema.set('toJSON', { virtuals: true });
 EventSchema.set('toObject', { virtuals: true });
