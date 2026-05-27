@@ -14,20 +14,42 @@ const verifyJwt = (token: string, secret: string) => {
     });
 };
 
+const normalizeJwt = (value?: string | string[] | null): string | null => {
+    const raw = Array.isArray(value) ? value[0] : value;
+    if (!raw) return null;
+
+    let token = String(raw).trim();
+
+    // Trường hợp app gửi nhầm nguyên header/cookie: "Bearer ...", "SessionID=...", hoặc "SessionID=...; Path=/".
+    token = token.replace(/^Bearer\s+/i, '').trim();
+    const sessionMatch = token.match(/(?:^|;|,|\s)SessionID=([^;,\s]+)/i);
+    if (sessionMatch?.[1]) token = sessionMatch[1].trim();
+    token = token.replace(/^SessionID=/i, '').trim();
+
+    // Loại bỏ quote nếu cookie bị encode dạng "<jwt>".
+    token = token.replace(/^['"]|['"]$/g, '').trim();
+
+    return token.split('.').length === 3 ? token : null;
+};
+
+const getAccessTokenFromRequest = (req: Request): string | null => {
+    const cookieToken = normalizeJwt(req.cookies?.SessionID);
+    if (cookieToken) return cookieToken;
+
+    const xSessionToken = normalizeJwt(req.headers['x-session-token'] as string | string[] | undefined);
+    if (xSessionToken) return xSessionToken;
+
+    const authHeader = req.headers.authorization;
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+    return normalizeJwt(bearerToken);
+};
+
 const Verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const token = req.cookies.SessionID;
+        const token = getAccessTokenFromRequest(req);
         if (!token) {
-            console.log(req.cookies.SessionID);
             return res.status(401).json({ message: "Không tìm thấy quyền truy cập hợp lệ!" });
         }
-
-        // const authHeader = req.headers.authorization;
-
-        // if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        //     return res.status(401).json({ error: "Access denied. No token provided." });
-        // }
-        // const token = authHeader.split(" ")[1];
 
         const decoded: any = await verifyJwt(token, SECRET_ACCESS_TOKEN as string);
 

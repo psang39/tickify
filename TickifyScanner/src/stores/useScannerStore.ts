@@ -3,14 +3,26 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AssignedShow, ScannedTicket, ScanStatus, StaffUser } from '../types/scanner';
 
+function normalizePersistedJwt(value?: string | null): string | null {
+    if (!value) return null;
+
+    const trimmed = value.trim();
+    const withoutBearer = trimmed.replace(/^Bearer\s+/i, '').trim();
+    const sessionMatch = withoutBearer.match(/(?:^|;|,|\s)SessionID=([^;,\s]+)/i);
+    const candidate = sessionMatch ? sessionMatch[1] : withoutBearer;
+    const token = candidate.replace(/^SessionID=/i, '').trim();
+
+    return token.split('.').length === 3 ? token : null;
+}
+
 interface ScannerState {
-    sessionCookie: string | null;
+    sessionToken: string | null;
     user: StaffUser | null;
     selectedShow: AssignedShow | null;
     publicKeysByShowId: Record<string, string>;
     scannedTickets: ScannedTicket[];
 
-    setAuth: (sessionCookie: string, user: StaffUser) => void;
+    setAuth: (sessionToken: string, user: StaffUser) => void;
     logout: () => void;
     setSelectedShow: (show: AssignedShow | null) => void;
     savePublicKey: (showId: string, publicKey: string) => void;
@@ -25,14 +37,14 @@ interface ScannerState {
 export const useScannerStore = create<ScannerState>()(
     persist(
         (set, get) => ({
-            sessionCookie: null,
+            sessionToken: null,
             user: null,
             selectedShow: null,
             publicKeysByShowId: {},
             scannedTickets: [],
 
-            setAuth: (sessionCookie, user) => set({ sessionCookie, user }),
-            logout: () => set({ sessionCookie: null, user: null, selectedShow: null }),
+            setAuth: (sessionToken, user) => set({ sessionToken: normalizePersistedJwt(sessionToken), user }),
+            logout: () => set({ sessionToken: null, user: null, selectedShow: null }),
             setSelectedShow: (show) => set({ selectedShow: show }),
             savePublicKey: (showId, publicKey) => set((state) => ({
                 publicKeysByShowId: { ...state.publicKeysByShowId, [showId]: publicKey },
@@ -92,6 +104,19 @@ export const useScannerStore = create<ScannerState>()(
         {
             name: 'tickify-scanner-storage',
             storage: createJSONStorage(() => AsyncStorage),
+            version: 2,
+            migrate: (persistedState: any) => {
+                const sessionToken = normalizePersistedJwt(
+                    persistedState?.sessionToken || persistedState?.sessionCookie || persistedState?.token,
+                );
+
+                return {
+                    ...persistedState,
+                    sessionToken,
+                    user: sessionToken ? persistedState?.user || null : null,
+                    selectedShow: sessionToken ? persistedState?.selectedShow || null : null,
+                };
+            },
         },
     ),
 );

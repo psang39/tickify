@@ -41,7 +41,7 @@ export default function LoginScreen({ navigation }: Props) {
                 return;
             }
 
-            setAuth(data.sessionCookie, data.user);
+            setAuth(data.sessionToken, data.user);
             navigation.replace('Shows');
         } catch (err: any) {
             setError(err.message || 'Đăng nhập thất bại.');

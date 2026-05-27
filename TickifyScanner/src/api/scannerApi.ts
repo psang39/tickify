@@ -1,4 +1,4 @@
-import { apiFetch, apiFetchWithResponse, getSessionCookieFromSetCookie } from './client';
+import { apiFetch, apiFetchWithResponse, getSessionTokenFromSetCookie } from './client';
 import { AssignedShow, ScannedTicket, StaffUser } from '../types/scanner';
 
 export async function loginStaff(email: string, password: string) {
@@ -9,13 +9,13 @@ export async function loginStaff(email: string, password: string) {
     });
 
     const setCookie = response.headers.get('set-cookie');
-    const sessionCookie = getSessionCookieFromSetCookie(setCookie) || (data.token ? `SessionID=${data.token}` : null);
+    const sessionToken = getSessionTokenFromSetCookie(setCookie) || getSessionTokenFromSetCookie(data.token || null);
 
-    if (!sessionCookie) {
-        throw new Error('Server không trả về SessionID cookie sau khi đăng nhập.');
+    if (!sessionToken) {
+        throw new Error('Server không trả về JWT SessionID hợp lệ sau khi đăng nhập.');
     }
 
-    return { user: data.user, sessionCookie };
+    return { user: data.user, sessionToken };
 }
 
 export async function logoutStaff() {

@@ -9,34 +9,43 @@ type JsonResponse<T> = {
     response: Response;
 };
 
-export function getSessionCookieFromSetCookie(setCookieHeader: string | null): string | null {
-    if (!setCookieHeader) return null;
+export function extractJwtFromCookieValue(value?: string | null): string | null {
+    if (!value) return null;
 
-    const sessionCookie = setCookieHeader
-        .split(/,(?=\s*SessionID=)/)
-        .map(cookie => cookie.trim())
-        .find(cookie => cookie.startsWith('SessionID='));
+    const trimmed = value.trim();
 
-    if (!sessionCookie) return null;
-    return sessionCookie.split(';')[0];
+    // Accept a raw JWT, "Bearer <jwt>", "SessionID=<jwt>", or full Set-Cookie value.
+    const withoutBearer = trimmed.replace(/^Bearer\s+/i, '').trim();
+    const sessionMatch = withoutBearer.match(/(?:^|;|,|\s)SessionID=([^;,\s]+)/i);
+    const candidate = sessionMatch ? sessionMatch[1] : withoutBearer;
+
+    const token = candidate.replace(/^SessionID=/i, '').trim();
+    return token.split('.').length === 3 ? token : null;
+}
+
+export function getSessionTokenFromSetCookie(setCookieHeader: string | null): string | null {
+    return extractJwtFromCookieValue(setCookieHeader);
 }
 
 async function requestJson<T>(path: string, options: ApiOptions = {}): Promise<JsonResponse<T>> {
-    const sessionCookie = useScannerStore.getState().sessionCookie;
+    const sessionToken = extractJwtFromCookieValue(useScannerStore.getState().sessionToken);
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         ...(options.headers as Record<string, string>),
     };
 
-    if (options.auth !== false && sessionCookie) {
-        // Backend xác thực bằng req.cookies.SessionID, không dùng Authorization Bearer nữa.
-        headers.Cookie = sessionCookie;
+    if (options.auth !== false && sessionToken) {
+        // React Native có thể giữ cookie cũ trong native cookie jar.
+        // Gửi token sạch bằng cả Cookie và X-Session-Token để backend nhận ổn định.
+        headers.Cookie = `SessionID=${sessionToken}`;
+        headers['X-Session-Token'] = sessionToken;
     }
 
     const response = await fetch(`${API_BASE_URL}${path}`, {
         ...options,
         headers,
-        credentials: 'include',
+        // Không dùng include để tránh React Native tự gửi cookie SessionID cũ/bẩn.
+        credentials: 'omit',
     });
 
     const text = await response.text();

@@ -6,7 +6,7 @@ import { IUser } from '../types/user.types';
 import { SECRET_ACCESS_TOKEN } from '../config';
 
 const UserSchema = new Mongoose.Schema<IUser>({
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     password: { type: String, required: true },
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
