@@ -5,9 +5,10 @@ import { QRCodeSVG } from 'qrcode.react';
 import * as OTPAuth from 'otpauth';
 import { api } from '@/lib/axiosClient';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ShieldAlert, Calendar, Armchair } from 'lucide-react';
+import { ArrowLeft, ShieldAlert, Calendar, Armchair, CheckCircle2, Ban, Clock3 } from 'lucide-react';
 import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 import { ErrorModal } from '@/components/shared/ErrorModal';
+import { Badge } from '@/components/ui/badge';
 
 interface TicketDetail {
     _id: string;
@@ -19,7 +20,28 @@ interface TicketDetail {
     zone_id: { _id: string; name: string };
     seat_id: { _id: string; row: string; seat_number: string };
     ticket_type_id: { _id: string; name: string; price: number };
+    status: 'VALID' | 'USED' | 'INVALID';
+    check_in_time?: string;
 }
+
+const ticketStatusConfig = {
+    VALID: {
+        label: 'Chưa sử dụng',
+        description: 'Vé còn hiệu lực. Vui lòng mở trang này tại cổng soát vé.',
+        icon: Clock3,
+    },
+    USED: {
+        label: 'Đã sử dụng',
+        description: 'Vé đã được check-in. Mã QR đã được ẩn để tránh quét lại.',
+        icon: CheckCircle2,
+    },
+    INVALID: {
+        label: 'Không hợp lệ',
+        description: 'Vé đã bị hủy hoặc không còn hiệu lực.',
+        icon: Ban,
+    },
+} as const;
+
 
 export default function TicketDetailPage() {
     const { ticketId } = useParams();
@@ -38,7 +60,9 @@ export default function TicketDetailPage() {
             return res.data?.data || res.data;
         },
         enabled: !!ticketId,
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: true,
+        // Khi khách đang mở vé ở cổng, trang sẽ tự cập nhật sau khi scanner check-in.
+        refetchInterval: 5000,
     });
 
 
@@ -50,7 +74,12 @@ export default function TicketDetailPage() {
 
 
     useEffect(() => {
-        if (!ticketDetail?.ticket_secret) return;
+        if (!ticketDetail?.ticket_secret || ticketDetail.status !== 'VALID') {
+            setTotpCode('');
+            setQrPayload('');
+            setTimeLeft(30);
+            return;
+        }
 
         const totp = new OTPAuth.TOTP({
             algorithm: 'SHA1',
@@ -96,6 +125,10 @@ export default function TicketDetailPage() {
 
     const ticketImage = ticketDetail.event_id?.banner_url || ticketDetail.event_id?.poster_url || "";
     const progressWidth = `${(timeLeft / 30) * 100}%`;
+    const ticketStatus = ticketDetail.status || 'VALID';
+    const statusConfig = ticketStatusConfig[ticketStatus] || ticketStatusConfig.VALID;
+    const StatusIcon = statusConfig.icon;
+    const isTicketUsable = ticketStatus === 'VALID';
 
     return (
         <div className="min-h-screen font-sans text-slate-900  flex flex-col items-center justify-center">
@@ -134,6 +167,10 @@ export default function TicketDetailPage() {
                             <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-tight uppercase drop-shadow-sm">
                                 {ticketDetail.event_id?.name}
                             </h2>
+                            <Badge className={`w-fit border bg-white/15 text-white hover:bg-white/15 ${isTicketUsable ? 'border-emerald-200/40' : 'border-white/25'}`}>
+                                <StatusIcon size={13} className="mr-1.5" />
+                                {statusConfig.label}
+                            </Badge>
                             <div className="space-y-1.5 text-white/90 text-sm font-semibold">
                                 <p className="flex items-center gap-2"><Calendar size={15} className="opacity-80" /> {formatDate(ticketDetail.show_id?.start_time)}</p>
                                 <p className="flex items-center gap-2"><Armchair size={15} className="opacity-80" /> Khu vực: {ticketDetail.zone_id?.name || 'N/A'}</p>
@@ -141,26 +178,36 @@ export default function TicketDetailPage() {
                         </div>
 
                         {/* KHU VỰC CỤM MÃ QR ĐỘNG XOAY VÒNG */}
-                        <div className="bg-white p-4 rounded-2xl flex flex-col items-center shrink-0 mx-auto md:mx-0">
-                            <div className="p-1 bg-white relative">
-                                <QRCodeSVG value={qrPayload} size={150} level="M" includeMargin={false} />
-                            </div>
+                        <div className="bg-white p-4 rounded-2xl flex flex-col items-center shrink-0 mx-auto md:mx-0 min-w-[190px]">
+                            {isTicketUsable ? (
+                                <>
+                                    <div className="p-1 bg-white relative">
+                                        <QRCodeSVG value={qrPayload || ticketDetail._id} size={150} level="M" includeMargin={false} />
+                                    </div>
 
-                            {/* Thanh đếm ngược thông báo đổi mã trực quan ngay dưới QR */}
-                            <div className="w-full mt-3">
-                                <div className="flex justify-between text-[10px] font-black text-slate-400 mb-1">
-                                    <span>MÃ ĐỔI MỚI:</span>
-                                    <span className={timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-primary'}>
-                                        {timeLeft} GIÂY
-                                    </span>
+                                    {/* Thanh đếm ngược thông báo đổi mã trực quan ngay dưới QR */}
+                                    <div className="w-full mt-3">
+                                        <div className="flex justify-between text-[10px] font-black text-slate-400 mb-1">
+                                            <span>MÃ ĐỔI MỚI:</span>
+                                            <span className={timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-primary'}>
+                                                {timeLeft} GIÂY
+                                            </span>
+                                        </div>
+                                        <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                                            <div
+                                                className={`h-full transition-all duration-1000 ease-linear rounded-full ${timeLeft <= 5 ? 'bg-red-500' : 'bg-primary'}`}
+                                                style={{ width: progressWidth }}
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="w-[150px] h-[150px] rounded-xl border border-slate-200 bg-slate-50 flex flex-col items-center justify-center text-center p-4">
+                                    <StatusIcon size={36} className={ticketStatus === 'USED' ? 'text-slate-500 mb-2' : 'text-red-500 mb-2'} />
+                                    <p className="text-sm font-black text-slate-800">{statusConfig.label}</p>
+                                    <p className="text-[11px] text-slate-500 mt-1 leading-snug">Không còn hiển thị QR</p>
                                 </div>
-                                <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full transition-all duration-1000 ease-linear rounded-full ${timeLeft <= 5 ? 'bg-red-500' : 'bg-primary'}`}
-                                        style={{ width: progressWidth }}
-                                    />
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </div>
 
@@ -169,6 +216,7 @@ export default function TicketDetailPage() {
                         <div><p className="text-white/50 text-[10px] font-medium mb-0.5">HÀNG GHẾ</p><p className="text-sm font-black text-white">{ticketDetail.seat_id?.row || '---'}</p></div>
                         <div><p className="text-white/50 text-[10px] font-medium mb-0.5">SỐ GHẾ</p><p className="text-sm font-black text-white">{ticketDetail.seat_id?.seat_number || '---'}</p></div>
                         <div><p className="text-white/50 text-[10px] font-medium mb-0.5">LOẠI VÉ</p><p className="text-sm font-black text-pink-300">{ticketDetail.ticket_type_id?.name || 'Standard'}</p></div>
+                        <div><p className="text-white/50 text-[10px] font-medium mb-0.5">TRẠNG THÁI</p><p className="text-sm font-black text-white">{statusConfig.label}</p></div>
                     </div>
 
                     {/* Hiệu ứng đục lỗ cắt góc vé răng cưa tại điểm nối */}
@@ -204,7 +252,15 @@ export default function TicketDetailPage() {
                     <div className="pt-6 border-t border-white/10 space-y-3">
                         <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-blue-100">
                             <div><p className="text-blue-300 text-[10px] font-medium uppercase">Khu vực</p><p className="font-bold text-white text-sm">{ticketDetail.zone_id?.name || 'N/A'}</p></div>
-                            <div><p className="text-blue-300 text-[10px] font-medium uppercase">Mã Token</p><p className="font-mono text-white font-bold text-sm tracking-wider">{totpCode}</p></div>
+                            <div>
+                                <p className="text-blue-300 text-[10px] font-medium uppercase">{isTicketUsable ? 'Mã Token' : 'Check-in lúc'}</p>
+                                <p className="font-mono text-white font-bold text-sm tracking-wider">
+                                    {isTicketUsable ? totpCode : (ticketDetail.check_in_time ? formatDate(ticketDetail.check_in_time) : '---')}
+                                </p>
+                            </div>
+                        </div>
+                        <div className={`p-3 rounded-xl border text-xs font-semibold ${isTicketUsable ? 'bg-emerald-500/10 border-emerald-300/20 text-emerald-100' : 'bg-black/20 border-white/10 text-blue-100'}`}>
+                            {statusConfig.description}
                         </div>
                         <div className="bg-black/20 p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs font-bold">
                             <span>VỊ TRÍ: HÀNG {ticketDetail.seat_id?.row}, GHẾ {ticketDetail.seat_id?.seat_number}</span>
@@ -217,9 +273,13 @@ export default function TicketDetailPage() {
             <div className="w-full max-w-4xl mt-6 bg-amber-50 border border-amber-200 p-4 rounded-xl flex gap-3 items-start text-xs text-amber-800 font-medium">
                 <ShieldAlert size={18} className="text-amber-600 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                    <p className="font-bold">KHUYẾN CÁO BẢO MẬT AN TOÀN VÉ ĐIỆN TỬ DYNAMIC QR:</p>
+                    <p className="font-bold">{isTicketUsable ? 'KHUYẾN CÁO BẢO MẬT AN TOÀN VÉ ĐIỆN TỬ DYNAMIC QR:' : 'THÔNG BÁO TRẠNG THÁI VÉ:'}</p>
                     <p className="text-amber-700/90 leading-relaxed">
-                        Mã QR Code trên là mã bảo mật thông minh **tự động xoay vòng làm mới sau mỗi 30 giây**. Hành vi chụp ảnh màn hình điện thoại hoặc in vé ra giấy sẽ khiến mã QR bị hết hạn sau 30 giây và **không thể quét để qua cổng kiểm soát**. Vui lòng mở trực tiếp giao diện trang này trên thiết bị di động tại quầy soát vé.
+                        {isTicketUsable
+                            ? 'Mã QR Code trên là mã bảo mật thông minh tự động xoay vòng làm mới sau mỗi 30 giây. Hành vi chụp ảnh màn hình điện thoại hoặc in vé ra giấy sẽ khiến mã QR bị hết hạn sau 30 giây và không thể quét để qua cổng kiểm soát. Vui lòng mở trực tiếp giao diện trang này trên thiết bị di động tại quầy soát vé.'
+                            : ticketStatus === 'USED'
+                                ? `Vé này đã được sử dụng${ticketDetail.check_in_time ? ` lúc ${formatDate(ticketDetail.check_in_time)}` : ''}. Hệ thống đã ẩn mã QR để tránh quét lại hoặc chia sẻ nhầm vé đã check-in.`
+                                : 'Vé này hiện không còn hợp lệ. Vui lòng liên hệ ban tổ chức hoặc bộ phận hỗ trợ nếu bạn cho rằng đây là nhầm lẫn.'}
                     </p>
                 </div>
             </div>

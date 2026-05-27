@@ -126,7 +126,7 @@ export const syncCheckIn = async (req: Request, res: Response): Promise<void> =>
         const updatedTicket = await Ticket.findByIdAndUpdate(
             ticketId,
             {
-                check_in_status: true,
+                status: 'USED',
                 check_in_time: scannedAt || new Date()
             },
             { new: true }
