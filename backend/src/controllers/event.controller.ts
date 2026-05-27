@@ -32,35 +32,24 @@ export const createEvent = async (req: Request, res: Response) => {
 };
 export const getEvents = async (req: Request, res: Response) => {
     try {
-        const { status, genre, page, limit } = req.query;
-        const now = new Date();
-        const filter: any = {};
-
+        const { status, genre, page } = req.query;
+        let filter: any = {};
         if (status === "upcoming") {
-            filter.start_date = { $gt: now };
-            filter.status = 'published';
+            filter.date = { $gt: new Date() };
         }
         else if (status === "ongoing") {
-            filter.start_date = { $lte: now };
-            filter.end_date = { $gte: now };
-            filter.status = 'published';
+            filter.date = { $lte: new Date(), $gte: new Date() };
         }
         else if (status === "past") {
-            filter.end_date = { $lt: now };
-            filter.status = 'published';
-        }
-        else if (status) {
-            filter.status = status;
+            filter.date = { $lt: new Date() };
         }
         if (genre) {
             filter.genre = genre;
         }
         const options = {
             page: parseInt(page as string) || 1,
-            limit: Math.min(parseInt(limit as string) || 10, 50),
-            sort: { start_date: 1 },
-            lean: true,
-            select: 'name description genre poster_url banner_url artists start_date end_date status created_at'
+            limit: 10,
+            sort: { start_date: 1 }
         };
         const events = await Event.paginate(filter, options);
         res.status(200).json(events);
@@ -298,84 +287,108 @@ export const getOrganizerEventById = async (req: Request, res: Response) => {
 };
 export const searchEventsPublic = async (req: Request, res: Response) => {
     try {
-        const keyword = (req.query.q || req.query.keyword || req.query.search || req.query.name) as string;
-        const city = (req.query.city || req.query.location) as string;
-        const genre = req.query.genre as string;
-        const sort = (req.query.sort as string) || 'newest';
-        const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+        const startedAt = Date.now();
+        const keyword = String(req.query.q || req.query.keyword || req.query.search || req.query.name || '').trim();
+        const city = String(req.query.city || req.query.location || '').trim();
+        const genre = String(req.query.genre || '').trim();
+        const sort = String(req.query.sort || 'newest');
+        const limit = Math.min(Math.max(parseInt(String(req.query.limit || '20'), 10) || 20, 1), 50);
+
         const findQuery: any = { status: 'published' };
 
-        if (keyword && keyword.trim() !== '' && keyword !== 'undefined' && keyword !== 'null') {
-            const cleanKeyword = keyword.trim();
+        if (keyword && keyword !== 'undefined' && keyword !== 'null') {
             findQuery.$or = [
-                { name: { $regex: cleanKeyword, $options: 'i' } },
-                { description: { $regex: cleanKeyword, $options: 'i' } },
-                { artists: { $regex: cleanKeyword, $options: 'i' } }
+                { name: { $regex: keyword, $options: 'i' } },
+                { artists: { $regex: keyword, $options: 'i' } },
+                { genre: { $regex: keyword, $options: 'i' } },
             ];
         }
 
-        if (genre && genre.trim() !== '' && genre !== 'undefined' && genre !== 'all') {
-            findQuery.genre = genre.trim();
+        if (genre && genre !== 'undefined' && genre !== 'all') {
+            findQuery.genre = genre;
         }
 
-        if (city && city.trim() !== '' && city !== 'undefined' && city !== 'all') {
-            const venueIds = await Venue.find({
-                city: { $regex: `^${city.trim()}$`, $options: 'i' }
-            }).distinct('_id');
+        if (city && city !== 'undefined' && city !== 'all') {
+            const matchingVenues = await Venue.find({
+                city: { $regex: `^${city}$`, $options: 'i' }
+            }).select('_id').lean();
 
-            const allowedEventIds = await Show.find({ venue_id: { $in: venueIds }, status: 'published' }).distinct('event_id');
-            findQuery._id = { $in: allowedEventIds };
+            const venueIds = matchingVenues.map((v: any) => v._id);
+            const matchingShows = await Show.find({ venue_id: { $in: venueIds } })
+                .select('event_id')
+                .lean();
+
+            findQuery._id = {
+                $in: [...new Set(matchingShows.map((s: any) => String(s.event_id || s.event)))]
+            };
         }
 
         let sortOption: any = { created_at: -1 };
         if (sort === 'upcoming') {
             sortOption = { start_date: 1 };
+        } else if (sort === 'oldest') {
+            sortOption = { created_at: 1 };
         }
 
+        // IMPORTANT:
+        // Do not fetch banner_url here. Some projects store base64 images in banner_url/poster_url,
+        // and pulling full image fields makes /events/search extremely slow on VPS/Atlas.
         const events = await Event.find(findQuery)
-            .select('name description genre artists poster_url banner_url start_date end_date created_at')
+            .select('_id name genre artists poster_url start_date end_date created_at status')
             .sort(sortOption)
             .limit(limit)
             .lean();
 
-        const eventIds = events.map(e => e._id);
-        const relatedShows = await Show.find({ event_id: { $in: eventIds }, status: 'published' })
+        const eventIds = events.map((event: any) => event._id);
+
+        const relatedShows = await Show.find({ event_id: { $in: eventIds } })
             .select('event_id venue_id start_time')
             .sort({ start_time: 1 })
             .populate({ path: 'venue_id', select: 'name city' })
             .lean();
 
-        const firstShowByEvent = new Map<string, any>();
-        for (const show of relatedShows) {
-            const eventKey = String((show as any).event_id);
-            if (!firstShowByEvent.has(eventKey)) {
-                firstShowByEvent.set(eventKey, show);
+        const showByEventId = new Map<string, any>();
+        for (const show of relatedShows as any[]) {
+            const eventId = String(show.event_id || show.event);
+            if (!showByEventId.has(eventId)) {
+                showByEventId.set(eventId, show);
             }
         }
 
+        const toSafeImageUrl = (value?: string) => {
+            if (!value) return null;
+            // Avoid sending huge base64 data URIs in list/search APIs.
+            // Detail page may still request the full event image separately if needed.
+            if (value.startsWith('data:image')) return null;
+            return value;
+        };
+
         const formattedEvents = events.map((event: any) => {
-            const matchShow = firstShowByEvent.get(String(event._id));
+            const matchShow = showByEventId.get(String(event._id));
             const venueInfo = matchShow?.venue_id as any;
+
             return {
                 _id: event._id,
                 name: event.name,
-                description: event.description,
                 genre: event.genre,
-                artists: event.artists,
-                poster_url: event.poster_url,
-                banner_url: event.banner_url,
+                artists: event.artists || [],
+                poster_url: toSafeImageUrl(event.poster_url),
                 start_date: event.start_date,
                 end_date: event.end_date,
                 venue_info: venueInfo ? {
                     name: venueInfo.name,
-                    city: venueInfo.city
-                } : null
+                    city: venueInfo.city,
+                } : null,
             };
         });
 
+        if (process.env.NODE_ENV !== 'production') {
+            console.log(`[searchEventsPublic] ${formattedEvents.length} events in ${Date.now() - startedAt}ms`);
+        }
+
         return res.status(200).json({
             success: true,
-            data: formattedEvents
+            data: formattedEvents,
         });
 
     } catch (error) {

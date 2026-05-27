@@ -21,16 +21,6 @@ const EventSchema = new Mongoose.Schema<IEvent>({
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
 });
-
-
-// Indexes for public listing/search and organizer dashboard.
-// These are intentionally aligned with controllers that filter by status/genre/organizer and sort by created_at/start_date.
-EventSchema.index({ status: 1, created_at: -1 });
-EventSchema.index({ status: 1, start_date: 1 });
-EventSchema.index({ genre: 1, status: 1 });
-EventSchema.index({ organizer_id: 1, created_at: -1 });
-EventSchema.index({ name: 'text', description: 'text', artists: 'text' });
-
 EventSchema.virtual('time_state').get(function () {
     const now = new Date();
     if (this.status === 'cancelled') return 'cancelled';
@@ -45,6 +35,11 @@ EventSchema.virtual('sale_state').get(function () {
     if (now >= this.start_date && now <= this.end_date) return 'on_sale';
     return 'closed';
 });
+EventSchema.index({ status: 1, created_at: -1 });
+EventSchema.index({ status: 1, start_date: 1 });
+EventSchema.index({ genre: 1, status: 1 });
+EventSchema.index({ organizer_id: 1, created_at: -1 });
+
 EventSchema.plugin(paginate);
 EventSchema.set('toJSON', { virtuals: true });
 EventSchema.set('toObject', { virtuals: true });
