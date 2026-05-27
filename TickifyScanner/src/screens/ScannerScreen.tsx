@@ -14,6 +14,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useScannerStore } from '../stores/useScannerStore';
 import { extractTicketId, offlineScanProcess } from '../utils/scannerUtils';
 import { onlineCheckIn } from '../api/scannerApi';
+import { ApiError } from '../api/client';
 import { ScanMode } from '../types/scanner';
 import { getShowBadgeLabel, getShowTimeState } from '../utils/showUtils';
 
@@ -25,8 +26,15 @@ export default function ScannerScreen({ navigation, route }: Props) {
     const publicKey = useScannerStore((state) => state.publicKeysByShowId[show._id] || show.public_key);
     const addScannedTicket = useScannerStore((state) => state.addScannedTicket);
     const hasTicketInShow = useScannerStore((state) => state.hasTicketInShow);
-    const scannedTickets = useScannerStore((state) => state.scannedTickets.filter(t => t.showId === show._id));
-    const pendingTickets = useScannerStore((state) => state.getPendingTicketsByShow(show._id));
+    const allScannedTickets = useScannerStore((state) => state.scannedTickets);
+    const scannedTickets = useMemo(
+        () => allScannedTickets.filter((ticket) => ticket.showId === show._id),
+        [allScannedTickets, show._id],
+    );
+    const pendingTickets = useMemo(
+        () => scannedTickets.filter((ticket) => !ticket.synced && ticket.status === 'LOCAL_VALID'),
+        [scannedTickets],
+    );
     const markTicketSynced = useScannerStore((state) => state.markTicketSynced);
 
     const [mode, setMode] = useState<ScanMode>('online');
@@ -127,10 +135,12 @@ export default function ScannerScreen({ navigation, route }: Props) {
             setScanTitle('Check-in thành công');
             setScanMessage('Server đã chuyển vé sang USED.');
         } catch (err: any) {
-            if (String(err.message || '').includes('đã được sử dụng')) {
-                setResultType('warning');
-                setScanTitle('Vé đã dùng');
-                setScanMessage(err.message);
+            const message = String(err.message || 'Không thể kết nối tới server');
+
+            if (err instanceof ApiError && err.status < 500) {
+                setResultType(message.includes('đã được sử dụng') ? 'warning' : 'error');
+                setScanTitle(message.includes('đã được sử dụng') ? 'Vé đã dùng' : 'Server từ chối vé');
+                setScanMessage(message);
                 return;
             }
 

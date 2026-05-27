@@ -8,11 +8,11 @@ export interface OfflineScanResult {
 }
 
 export function extractTicketId(qrData: string) {
-    return String(qrData || '').split('|')[0] || '';
+    return String(qrData || '').split('|')[0]?.trim() || '';
 }
 
 export const offlineScanProcess = async (qrData: string, publicKeyPEM: string): Promise<OfflineScanResult> => {
-    const parts = String(qrData || '').split('|');
+    const parts = String(qrData || '').split('|').map(part => part.trim());
     if (parts.length < 4) {
         return { success: false, message: 'Mã QR không đúng chuẩn Tickify.' };
     }
@@ -45,7 +45,9 @@ export const offlineScanProcess = async (qrData: string, publicKeyPEM: string): 
             secret: OTPAuth.Secret.fromBase32(ticketSecret),
         });
 
-        const delta = totp.validate({ token: currentTotpCode, window: 1 });
+        // Cho phép lệch thời gian khoảng ±60 giây giữa máy khách mở vé và máy scanner.
+        // Điều này tránh fail hàng loạt khi điện thoại/server lệch clock nhẹ hoặc quét đúng lúc QR đổi mã.
+        const delta = totp.validate({ token: currentTotpCode.trim(), window: 2 });
         if (delta === null) {
             return { success: false, message: 'Mã QR đã hết hạn. Vui lòng yêu cầu khách mở lại vé.' };
         }

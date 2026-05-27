@@ -4,6 +4,18 @@ export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1
 
 type ApiOptions = RequestInit & { auth?: boolean };
 
+export class ApiError extends Error {
+    status: number;
+    data: any;
+
+    constructor(message: string, status: number, data: any) {
+        super(message);
+        this.name = 'ApiError';
+        this.status = status;
+        this.data = data;
+    }
+}
+
 type JsonResponse<T> = {
     data: T;
     response: Response;
@@ -58,7 +70,7 @@ async function requestJson<T>(path: string, options: ApiOptions = {}): Promise<J
 
     if (!response.ok) {
         const message = data?.message || data?.error || 'Không thể kết nối tới server';
-        throw new Error(message);
+        throw new ApiError(message, response.status, data);
     }
 
     return { data: data as T, response };

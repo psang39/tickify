@@ -7,7 +7,7 @@ import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 
 const parseQrData = (qrData: string) => {
-    const parts = String(qrData || '').split('|');
+    const parts = String(qrData || '').split('|').map(part => part.trim());
     if (parts.length < 4) return null;
     return {
         ticketId: parts[0],
