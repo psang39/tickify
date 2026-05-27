@@ -20,7 +20,7 @@ const mimeToExt: Record<string, string> = {
 
 const parseDataUrl = (value?: string) => {
   if (!value?.startsWith('data:image')) return null;
-  const match = value.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/s);
+  const match = value.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,([\s\S]+)$/);
   if (!match) return null;
   return {
     mime: match[1],
