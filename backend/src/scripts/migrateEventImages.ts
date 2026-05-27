@@ -42,11 +42,11 @@ const saveImage = async (eventId: string, field: 'poster' | 'banner', value?: st
 };
 
 const main = async () => {
-  if (!process.env.MONGO_URI) {
-    throw new Error('Missing MONGO_URI in .env');
+  if (!process.env.URI) {
+    throw new Error('Missing URI in .env');
   }
 
-  await mongoose.connect(process.env.MONGO_URI);
+  await mongoose.connect(process.env.URI);
   const events = await Event.find({
     $or: [
       { poster_url: /^data:image/ },
