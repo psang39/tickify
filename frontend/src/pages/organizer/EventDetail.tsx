@@ -225,7 +225,14 @@ export default function EventDetail() {
     });
 
     const { mutateAsync: createShow } = useMutation({
-        mutationFn: async (newShowData: any) => { return (await api.post(`organizer/events/${eventId}/shows`, newShowData)).data; }
+        mutationFn: async (newShowData: any) => {
+            const response = await api.post(`/organizer/events/${eventId}/shows`, newShowData, {
+                // SVG thật có thể lớn; backend đã trả response sớm và xử lý seatmap nền,
+                // nhưng giữ timeout rộng để tránh axios tự hủy request khi mạng/server chậm.
+                timeout: 0
+            });
+            return response.data;
+        }
     });
 
     const [isSubmittingShow, setIsSubmittingShow] = useState(false);
@@ -294,15 +301,28 @@ export default function EventDetail() {
                 name: showData.name, description: showData.description, start_time: showData.start_time, end_time: showData.end_time, venue_id: showData.venue_id, sale_start: showData.sale_start, sale_end: showData.sale_end, stadium_map_svg: showData.stadium_map_svg,
                 ticket_types: ticketTypes.map(tt => ({ ...tt, price: Number(tt.price), total_quantity: tt.total_quantity !== '' ? Number(tt.total_quantity) : null }))
             };
-            await createShow(finalPayload);
-            showSuccess("Tạo Show và Cấu hình Vé thành công.");
+            const result = await createShow(finalPayload);
+            showSuccess(
+                result?.seatmap_status === 'processing'
+                    ? "Tạo Show thành công. Sơ đồ ghế đang được xử lý nền."
+                    : "Tạo Show và Cấu hình Vé thành công."
+            );
             setShowForm(false);
             queryClient.invalidateQueries({ queryKey: ['event-shows', eventId] });
             setShowData({ name: '', description: '', start_time: '', end_time: '', venue_id: '', sale_start: '', sale_end: '', stadium_map_svg: '' });
             setTicketTypes([]);
             setVenueSearch('');
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.message || "Có lỗi xảy ra trong quá trình lưu dữ liệu show!");
+            console.error("Create show error:", error);
+            queryClient.invalidateQueries({ queryKey: ['event-shows', eventId] });
+
+            if (error.code === 'ECONNABORTED') {
+                setErrorMessage("Request tạo show bị timeout. Vui lòng tải lại danh sách show để kiểm tra show đã được tạo chưa.");
+            } else if (error.code === 'ERR_CANCELED' || error.message === 'canceled') {
+                setErrorMessage("Request tạo show đã bị hủy trước khi server trả kết quả. Có thể show đã được tạo, vui lòng tải lại danh sách show.");
+            } else {
+                setErrorMessage(error.response?.data?.message || "Có lỗi xảy ra trong quá trình lưu dữ liệu show!");
+            }
         } finally {
             setIsSubmittingShow(false);
         }
@@ -740,11 +760,31 @@ export default function EventDetail() {
                                         >
                                             <div className="flex justify-between items-start mb-4">
                                                 <h3 className="font-bold text-base text-slate-800 group-hover:text-primary transition-colors line-clamp-2">{show.name}</h3>
-                                                <span className={`shrink-0 text-[10px] font-black uppercase px-2 py-1 rounded-md ${show.status === 'published' ? 'bg-green-100 text-green-700' :
-                                                    show.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'
-                                                    }`}>
-                                                    {show.status || 'Draft'}
-                                                </span>
+                                                <div className="flex shrink-0 flex-col items-end gap-1">
+                                                    <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${show.status === 'published' ? 'bg-green-100 text-green-700' :
+                                                        show.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'
+                                                        }`}>
+                                                        {show.status || 'Draft'}
+                                                    </span>
+
+                                                    {show.seatmap_status === 'processing' && (
+                                                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-md bg-amber-100 text-amber-700">
+                                                            Đang xử lý seatmap
+                                                        </span>
+                                                    )}
+
+                                                    {show.seatmap_status === 'ready' && (
+                                                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-md bg-emerald-100 text-emerald-700">
+                                                            Seatmap sẵn sàng
+                                                        </span>
+                                                    )}
+
+                                                    {show.seatmap_status === 'failed' && (
+                                                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-md bg-red-100 text-red-700">
+                                                            Lỗi seatmap
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             <div className="space-y-2 mb-6">
@@ -755,8 +795,17 @@ export default function EventDetail() {
                                             </div>
 
                                             <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                                                <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
-                                                    Đã thiết lập Zone
+                                                <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-md ${show.seatmap_status === 'processing'
+                                                    ? 'text-amber-700 bg-amber-100'
+                                                    : show.seatmap_status === 'failed'
+                                                        ? 'text-red-700 bg-red-100'
+                                                        : 'text-slate-500 bg-slate-100'
+                                                    }`}>
+                                                    {show.seatmap_status === 'processing'
+                                                        ? 'Đang xử lý Zone'
+                                                        : show.seatmap_status === 'failed'
+                                                            ? 'Lỗi thiết lập Zone'
+                                                            : 'Đã thiết lập Zone'}
                                                 </span>
                                                 <Button
                                                     variant="ghost"

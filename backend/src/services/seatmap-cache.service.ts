@@ -343,7 +343,7 @@ export const regenerateSeatmapFromSvg = async (params: {
                 event_id: show.event_id,
                 show_id: show._id
             })),
-            { session }
+            session ? { session } : {}
         );
     }
 
@@ -373,7 +373,7 @@ export const regenerateSeatmapFromSvg = async (params: {
         };
     });
 
-    const createdZones = await Zone.insertMany(zoneDrafts, { session });
+    const createdZones = await Zone.insertMany(zoneDrafts, session ? { session } : {});
     const seatsToInsert: any[] = [];
 
     createdZones.forEach((zone: any, index) => {
@@ -422,10 +422,10 @@ export const regenerateSeatmapFromSvg = async (params: {
     });
 
     if (seatsToInsert.length > 0) {
-        await Seat.insertMany(seatsToInsert, { session });
+        await Seat.insertMany(seatsToInsert, session ? { session } : {});
     }
 
-    await Promise.all(createdZones.map((zone: any) => zone.save({ session })));
+    await Promise.all(createdZones.map((zone: any) => zone.save(session ? { session } : {})));
 
     show.stadium_map_svg = stadiumMapSvg;
     show.map_assets = mapAssets;

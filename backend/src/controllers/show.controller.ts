@@ -70,6 +70,7 @@ export const createShow = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Show end time must be within event duration" });
         }
 
+        const hasSeatmapSvg = Boolean(stadium_map_svg);
         const { publicKey, privateKey } = generateRSAKeyPair();
         const encryptedPrivateKey = encryptPrivateKey(privateKey);
 
@@ -86,8 +87,10 @@ export const createShow = async (req: Request, res: Response) => {
             stadium_map_svg,
             map_assets: parseMapAssetsFromSvg(stadium_map_svg),
             public_key: publicKey,
-            encrypted_private_key: encryptedPrivateKey
-        }], { session });
+            encrypted_private_key: encryptedPrivateKey,
+            seatmap_status: hasSeatmapSvg ? 'processing' : 'none',
+            seatmap_error: null
+        } as any], { session });
 
         let parsedTicketTypes = ticket_types || [];
         if (typeof parsedTicketTypes === 'string') {
@@ -115,27 +118,21 @@ export const createShow = async (req: Request, res: Response) => {
             );
         }
 
-        let seatmapResult: any = { zones: [], total_seats_generated: 0 };
-        if (stadium_map_svg) {
-            seatmapResult = await regenerateSeatmapFromSvg({
-                showId: savedShow._id.toString(),
-                stadiumMapSvg: stadium_map_svg,
-                session
-            });
-        }
-
         await session.commitTransaction();
         session.endSession();
 
         res.status(201).json({
-            message: "Tạo Show, quét sơ đồ và khởi tạo Seatmap thành công!",
+            message: hasSeatmapSvg
+                ? "Tạo Show thành công. Seatmap đang được xử lý nền."
+                : "Tạo Show thành công.",
             show: savedShow,
-            auto_generated_zones: seatmapResult.zones,
-            total_seats_generated: seatmapResult.total_seats_generated
+            seatmap_status: hasSeatmapSvg ? "processing" : "none",
+            auto_generated_zones: [],
+            total_seats_generated: 0
         });
 
-        if (stadium_map_svg) {
-            setImmediate(async () => {
+        setImmediate(async () => {
+            if (hasSeatmapSvg) {
                 try {
                     console.time(`[createShow] regenerate seatmap ${savedShow._id}`);
 
@@ -144,7 +141,7 @@ export const createShow = async (req: Request, res: Response) => {
                         seatmap_error: null
                     });
 
-                    await regenerateSeatmapFromSvg({
+                    const seatmapResult = await regenerateSeatmapFromSvg({
                         showId: savedShow._id.toString(),
                         stadiumMapSvg: stadium_map_svg
                     });
@@ -156,6 +153,7 @@ export const createShow = async (req: Request, res: Response) => {
                         seatmap_error: null
                     });
 
+                    console.log(`[createShow] Seatmap generated for show ${savedShow._id}: ${seatmapResult.total_seats_generated} seats`);
                     console.timeEnd(`[createShow] regenerate seatmap ${savedShow._id}`);
                 } catch (error: any) {
                     console.error("Lỗi xử lý seatmap nền:", error);
@@ -165,10 +163,16 @@ export const createShow = async (req: Request, res: Response) => {
                         seatmap_error: error?.message || "Không thể xử lý seatmap"
                     });
                 }
-            });
-        }
 
+                return;
+            }
 
+            try {
+                await rebuildShowRedisCache(savedShow._id.toString());
+            } catch (cacheError) {
+                console.error("Lỗi rebuild Redis cache sau khi tạo show:", cacheError);
+            }
+        });
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
@@ -176,6 +180,7 @@ export const createShow = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Lỗi hệ thống khi khởi tạo Show", error });
     }
 };
+
 export const getShowsByEvent = async (req: Request, res: Response) => {
     try {
         const { event_id } = req.params;

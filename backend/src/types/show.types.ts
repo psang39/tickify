@@ -22,5 +22,7 @@ export interface IShow extends Document {
     updated_at: Date;
     encrypted_private_key: string;
     public_key: string;
+    seatmap_status: 'none' | 'processing' | 'ready' | 'failed';
+    seatmap_error: string | null;
 }
 
