@@ -14,8 +14,8 @@ export default function CreateEvent() {
     const { showSuccess, showError } = useFeedbackStore();
 
     const [formData, setFormData] = useState({
-        name: 'Taylor Swift - The Eras Tour',
-        artists: 'Taylor Swift, Paramore',
+        name: 'Tên sự kiện của bạn',
+        artists: 'Nghệ sĩ sẽ biểu diễn',
         description: 'Nhấp vào đây để chỉnh sửa mô tả chi tiết về sự kiện của bạn...',
         genre: 'Pop / Concert',
         start_date: '',
@@ -24,7 +24,6 @@ export default function CreateEvent() {
         banner_url: '',
         banner_offset_y: 50,
         status: 'draft',
-        organizer_id: user?.id || ''
     });
 
     const [bannerFile, setBannerFile] = useState<File | null>(null);
@@ -80,7 +79,8 @@ export default function CreateEvent() {
     };
 
     const handleSubmit = async () => {
-        if (!formData.organizer_id) { showError("Bạn chưa đăng nhập!"); return; }
+        const organizer_id = user?.id || user?._id as string;
+        if (!organizer_id) { showError("Bạn chưa đăng nhập!"); return; }
         if (!formData.start_date || !formData.end_date) { showError("Vui lòng thiết lập mốc ngày khai mạc và bế mạc sự kiện!"); return; }
 
         try {
@@ -93,6 +93,8 @@ export default function CreateEvent() {
             payload.append('end_date', formData.end_date);
             payload.append('banner_offset_y', String(formData.banner_offset_y));
             payload.append('status', formData.status);
+            payload.append('organizer_id', organizer_id);
+
             if (posterFile) payload.append('poster', posterFile);
             if (bannerFile) payload.append('banner', bannerFile);
 

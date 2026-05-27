@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { api } from '@/lib/axiosClient';
 
 interface User {
-    id: string;
+    _id?: string
+    id?: string;
     first_name: string;
     last_name: string;
     username: string;
