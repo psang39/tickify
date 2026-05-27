@@ -3,13 +3,13 @@ import {
     ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
-    SafeAreaView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { loginStaff } from '../api/scannerApi';
@@ -41,7 +41,7 @@ export default function LoginScreen({ navigation }: Props) {
                 return;
             }
 
-            setAuth(data.token, data.user);
+            setAuth(data.sessionCookie, data.user);
             navigation.replace('Shows');
         } catch (err: any) {
             setError(err.message || 'Đăng nhập thất bại.');

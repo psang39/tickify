@@ -2,12 +2,12 @@ import React, { useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
-    SafeAreaView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';

@@ -3,15 +3,15 @@ import {
     ActivityIndicator,
     FlatList,
     RefreshControl,
-    SafeAreaView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { getAssignedShows, getShowPublicKey } from '../api/scannerApi';
+import { getAssignedShows, getShowPublicKey, logoutStaff } from '../api/scannerApi';
 import { useScannerStore } from '../stores/useScannerStore';
 import { AssignedShow } from '../types/scanner';
 import { formatDateTime, getShowBadgeLabel, getShowTimeState } from '../utils/showUtils';
@@ -71,9 +71,15 @@ export default function ShowsScreen({ navigation }: Props) {
         }
     };
 
-    const handleLogout = () => {
-        logout();
-        navigation.replace('Login');
+    const handleLogout = async () => {
+        try {
+            await logoutStaff();
+        } catch {
+            // Nếu mạng lỗi thì vẫn xóa session local để staff có thể đăng nhập lại.
+        } finally {
+            logout();
+            navigation.replace('Login');
+        }
     };
 
     const renderShow = ({ item }: { item: AssignedShow }) => {

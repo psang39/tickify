@@ -1,11 +1,26 @@
-import { apiFetch } from './client';
+import { apiFetch, apiFetchWithResponse, getSessionCookieFromSetCookie } from './client';
 import { AssignedShow, ScannedTicket, StaffUser } from '../types/scanner';
 
 export async function loginStaff(email: string, password: string) {
-    return apiFetch<{ token: string; user: StaffUser }>('/auth/login', {
+    const { data, response } = await apiFetchWithResponse<{ token?: string; user: StaffUser }>('/auth/login', {
         auth: false,
         method: 'POST',
         body: JSON.stringify({ email, password }),
+    });
+
+    const setCookie = response.headers.get('set-cookie');
+    const sessionCookie = getSessionCookieFromSetCookie(setCookie) || (data.token ? `SessionID=${data.token}` : null);
+
+    if (!sessionCookie) {
+        throw new Error('Server không trả về SessionID cookie sau khi đăng nhập.');
+    }
+
+    return { user: data.user, sessionCookie };
+}
+
+export async function logoutStaff() {
+    return apiFetch<{ message?: string }>('/auth/logout', {
+        method: 'POST',
     });
 }
 

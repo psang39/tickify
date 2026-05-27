@@ -4,13 +4,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AssignedShow, ScannedTicket, ScanStatus, StaffUser } from '../types/scanner';
 
 interface ScannerState {
-    token: string | null;
+    sessionCookie: string | null;
     user: StaffUser | null;
     selectedShow: AssignedShow | null;
     publicKeysByShowId: Record<string, string>;
     scannedTickets: ScannedTicket[];
 
-    setAuth: (token: string, user: StaffUser) => void;
+    setAuth: (sessionCookie: string, user: StaffUser) => void;
     logout: () => void;
     setSelectedShow: (show: AssignedShow | null) => void;
     savePublicKey: (showId: string, publicKey: string) => void;
@@ -25,14 +25,14 @@ interface ScannerState {
 export const useScannerStore = create<ScannerState>()(
     persist(
         (set, get) => ({
-            token: null,
+            sessionCookie: null,
             user: null,
             selectedShow: null,
             publicKeysByShowId: {},
             scannedTickets: [],
 
-            setAuth: (token, user) => set({ token, user }),
-            logout: () => set({ token: null, user: null, selectedShow: null }),
+            setAuth: (sessionCookie, user) => set({ sessionCookie, user }),
+            logout: () => set({ sessionCookie: null, user: null, selectedShow: null }),
             setSelectedShow: (show) => set({ selectedShow: show }),
             savePublicKey: (showId, publicKey) => set((state) => ({
                 publicKeysByShowId: { ...state.publicKeysByShowId, [showId]: publicKey },

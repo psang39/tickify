@@ -4,7 +4,6 @@ import Ticket from '../models/ticket.model';
 import Event from '../models/event.model';
 import { Request, Response } from 'express';
 import Show from '../models/show.model';
-import bcrypt from 'bcrypt';
 import Order from '../models/order.model';
 import CheckInLog from '../models/check-in-log.model';
 import mongoose from 'mongoose';
@@ -23,13 +22,9 @@ export const createStaffAccount = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Email này đã được sử dụng trong hệ thống" });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-
         const newStaff = new Staff({
             email,
-            password: hashedPassword,
+            password,
             first_name,
             last_name,
             role: 'Staff',
