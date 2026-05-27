@@ -127,14 +127,48 @@ export const createShow = async (req: Request, res: Response) => {
         await session.commitTransaction();
         session.endSession();
 
-        await rebuildShowRedisCache(savedShow._id.toString());
-
         res.status(201).json({
             message: "Tạo Show, quét sơ đồ và khởi tạo Seatmap thành công!",
             show: savedShow,
             auto_generated_zones: seatmapResult.zones,
             total_seats_generated: seatmapResult.total_seats_generated
         });
+
+        if (stadium_map_svg) {
+            setImmediate(async () => {
+                try {
+                    console.time(`[createShow] regenerate seatmap ${savedShow._id}`);
+
+                    await Show.findByIdAndUpdate(savedShow._id, {
+                        seatmap_status: "processing",
+                        seatmap_error: null
+                    });
+
+                    await regenerateSeatmapFromSvg({
+                        showId: savedShow._id.toString(),
+                        stadiumMapSvg: stadium_map_svg
+                    });
+
+                    await rebuildShowRedisCache(savedShow._id.toString());
+
+                    await Show.findByIdAndUpdate(savedShow._id, {
+                        seatmap_status: "ready",
+                        seatmap_error: null
+                    });
+
+                    console.timeEnd(`[createShow] regenerate seatmap ${savedShow._id}`);
+                } catch (error: any) {
+                    console.error("Lỗi xử lý seatmap nền:", error);
+
+                    await Show.findByIdAndUpdate(savedShow._id, {
+                        seatmap_status: "failed",
+                        seatmap_error: error?.message || "Không thể xử lý seatmap"
+                    });
+                }
+            });
+        }
+
+
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
