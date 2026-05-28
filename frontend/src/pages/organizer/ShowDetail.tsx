@@ -69,11 +69,11 @@ export default function ShowDetail() {
 
     // State hứng dữ liệu thời gian thực (SSE)
     const [liveMonitor, setLiveMonitor] = useState({
-        activeUsers: 0,
-        holdingSeats: 0,
+        holdingCount: 0,
+        soldCount: 0,
         totalRevenue: 0,
-        ticketsSoldLastMinute: 0,
-        status: 'Đang kết nối...'
+        timestamp: '',
+        status: 'Chưa kết nối'
     });
 
 
@@ -81,22 +81,31 @@ export default function ShowDetail() {
         if (!showId || activeTab !== 'LIVE') return;
 
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
-        const eventSource = new EventSource(`${API_URL}/organizer/sse/dashboard/${showId}`,
-            { withCredentials: true }
-        );
+        const eventSource = new EventSource(`${API_URL}/organizer/sse/dashboard/${showId}`, {
+            withCredentials: true
+        });
+
+        setLiveMonitor(prev => ({ ...prev, status: 'Đang kết nối...' }));
+
+        eventSource.onopen = () => {
+            setLiveMonitor(prev => ({ ...prev, status: 'Live' }));
+        };
 
         eventSource.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                setLiveMonitor({
-                    activeUsers: data.active_viewers || 0,
-                    holdingSeats: data.holding_seats || 0,
-                    totalRevenue: data.total_revenue || 0,
-                    ticketsSoldLastMinute: data.tickets_sold || 0,
+
+                setLiveMonitor(prev => ({
+                    ...prev,
+                    holdingCount: Number(data.holdingCount ?? data.holding_seats ?? 0),
+                    soldCount: Number(data.soldCount ?? data.tickets_sold ?? 0),
+                    totalRevenue: Number(data.totalRevenue ?? data.total_revenue ?? 0),
+                    timestamp: data.timestamp || new Date().toISOString(),
                     status: 'Live'
-                });
+                }));
             } catch (error) {
                 console.error("Lỗi phân tích dữ liệu SSE:", error);
+                setLiveMonitor(prev => ({ ...prev, status: 'Lỗi dữ liệu' }));
             }
         };
 
@@ -870,26 +879,44 @@ export default function ShowDetail() {
                     </div>
 
                     {/* Khối Thống kê số liệu Động */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                        {/* Panel 1: Đếm lượng View truy cập đồng thời */}
+                        {/* Panel 1: Số ghế đang được giữ */}
                         <div className="bg-slate-800 text-white rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
-                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Khán giả đang giữ phòng vé</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Ghế đang được giữ</span>
                             <div className="text-5xl font-mono font-bold tracking-tight mt-4">
-                                {liveMonitor.holdingSeats.toLocaleString()}
+                                {liveMonitor.holdingCount.toLocaleString()}
                             </div>
-                            <span className="text-[10px] text-slate-500 font-medium mt-2">* Cập nhật liên tục mỗi 3 giây</span>
+                            <span className="text-[10px] text-slate-500 font-medium mt-2">* Dữ liệu từ Redis holding_seats</span>
                         </div>
 
-                        {/* Panel 2: Vận tốc bán vé gối đầu */}
+                        {/* Panel 2: Vé đã bán */}
+                        <div className="bg-white border border-gray-100 rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                <Ticket size={14} /> Vé đã bán
+                            </span>
+                            <div className="text-5xl font-mono font-bold tracking-tight text-slate-900 mt-4">
+                                {liveMonitor.soldCount.toLocaleString()}
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-medium mt-2">* Dữ liệu từ Redis sold_count</span>
+                        </div>
+
+                        {/* Panel 3: Doanh thu */}
                         <div className="bg-white border-2 border-primary/20 rounded-2xl p-6 flex flex-col justify-between min-h-[140px] bg-gradient-to-br from-primary/5 to-white">
                             <span className="text-xs font-bold uppercase tracking-wider text-primary">Doanh thu hiện tại</span>
-                            <div className="text-5xl font-mono font-bold tracking-tight text-primary mt-4">
-                                +{liveMonitor.totalRevenue.toLocaleString()}
+                            <div className="text-4xl xl:text-5xl font-mono font-bold tracking-tight text-primary mt-4">
+                                {liveMonitor.totalRevenue.toLocaleString()}đ
                             </div>
                             <span className="text-[10px] text-primary/60 font-medium mt-2">* Đo lường dựa trên giao dịch thành công</span>
                         </div>
 
+                    </div>
+
+                    <div className="flex items-center justify-end gap-1.5 text-[11px] text-slate-400 font-medium">
+                        <Clock size={13} />
+                        <span>
+                            Cập nhật cuối: {liveMonitor.timestamp ? new Date(liveMonitor.timestamp).toLocaleTimeString('vi-VN') : 'Chưa có dữ liệu'}
+                        </span>
                     </div>
 
                     {/* Khối hướng dẫn vận hành cho Organizer */}
