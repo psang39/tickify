@@ -192,7 +192,7 @@ export default function ShowDetail() {
     // MUTATION: ĐỀ XUẤT VENUE MỚI TẠI CHỖ TỪ ORGANIZER
     const { mutateAsync: suggestVenueMutation, isPending: isSuggestingVenue } = useMutation({
         mutationFn: async (newVenueData: any) => {
-            const response = await api.post('/organizer/venues', newVenueData);
+            const response = await api.post('/venues', newVenueData);
             return response.data?.data || response.data;
         },
         onSuccess: (newVenue) => {
