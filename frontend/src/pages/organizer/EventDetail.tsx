@@ -208,7 +208,7 @@ export default function EventDetail() {
 
     const { mutateAsync: suggestVenueMutation, isPending: isSuggestingVenue } = useMutation({
         mutationFn: async (newVenuePayload: any) => {
-            const response = await api.post('/organizer/venues', newVenuePayload);
+            const response = await api.post('/venues', newVenuePayload);
             return response.data?.data || response.data;
         },
         onSuccess: (newVenue) => {
