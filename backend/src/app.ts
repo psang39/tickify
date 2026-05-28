@@ -10,26 +10,56 @@ import router from './routes/index';
 const app = Express();
 
 app.use(cookieParser());
+const normalizeOrigin = (origin: string) => origin.trim().replace(/\/$/, '');
+
 const allowedOrigins = Array.from(new Set([
+    // Production domain
+    'https://tickify.tech',
+    'https://www.tickify.tech',
+
+    // Keep HTTP while the domain is not fully switched to SSL yet.
+    // After HTTPS works, you can remove these two lines.
+    'http://tickify.tech',
+    'http://www.tickify.tech',
+
+    // Local development / Vite preview
     'http://localhost:5173',
     'http://localhost:4173',
     'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:4173',
+    'http://127.0.0.1:3000',
+
     ...(process.env.FRONTEND_URL || '')
         .split(',')
-        .map(origin => origin.trim())
+        .map(normalizeOrigin)
+        .filter(Boolean),
+    ...(process.env.CORS_ALLOWED_ORIGINS || '')
+        .split(',')
+        .map(normalizeOrigin)
         .filter(Boolean),
 ]));
 
-app.use(cors({
+const corsOptions: cors.CorsOptions = {
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        // Allow requests without Origin, e.g. mobile app, Postman, curl, server-to-server webhook.
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        const requestOrigin = normalizeOrigin(origin);
+        if (allowedOrigins.includes(requestOrigin)) {
             return callback(null, true);
         }
 
         return callback(new Error(`CORS blocked origin: ${origin}`));
     },
     credentials: true,
-}));
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-checkout-token', 'x-sync-key'],
+};
+
+app.use(cors(corsOptions));
 
 setServers(['1.1.1.1', '8.8.8.8']);
 

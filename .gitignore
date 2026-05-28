@@ -11,3 +11,5 @@ dist/
 backend/.env.example
 frontend/.env.example
 .gitignore
+backend/.env.production.example
+frontend/.env.production.example

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { api } from "@/lib/axiosClient";
+import { api, API_BASE_URL } from "@/lib/axiosClient";
 import { BookingStepper } from "../../components/booking/BookingStepper";
 import { StageCanvas } from "@/features/seatmap/components/StageCanvas";
 import { Button } from "../../components/ui/button";
@@ -121,10 +121,7 @@ export default function TicketBookingPage() {
       // Chỉ thực thi giải phóng ghế khi đóng tab vĩnh viễn hoặc crash ứng dụng
       if (orderId && (step === 3 || step === 4)) {
         const checkoutToken = localStorage.getItem(`checkoutToken_${showId}`);
-        const baseUrl =
-          import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
-
-        fetch(`${baseUrl}/orders/release`, {
+        fetch(`${API_BASE_URL}/orders/release`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -316,10 +313,7 @@ export default function TicketBookingPage() {
     const checkoutKey = `checkoutToken_${showId}`;
     const token = localStorage.getItem(checkoutKey);
     if (!token) return;
-    const API_URL =
-      import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
-
-    const sse = new EventSource(`${API_URL}/shows/${showId}/stream`, {
+    const sse = new EventSource(`${API_BASE_URL}/shows/${showId}/stream`, {
       withCredentials: true,
     });
 
