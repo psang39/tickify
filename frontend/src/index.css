@@ -1055,3 +1055,86 @@ html.dark .organizer-hero-genre:focus {
 }
 /* === Organizer EventDetail hero editable fields fix END === */
 
+/* === Tickify organizer EventDetail hero field fix START === */
+/*
+  index.css has broad input/select/textarea styles with !important.
+  These rules must stay at the very end so the hero title textarea remains transparent.
+*/
+textarea.organizer-hero-title-field,
+textarea.organizer-hero-title-field:hover,
+textarea.organizer-hero-title-field:focus,
+textarea[class*="font-black"][class*="text-white"],
+textarea[class*="font-black"][class*="text-white"]:hover,
+textarea[class*="font-black"][class*="text-white"]:focus,
+html.dark textarea.organizer-hero-title-field,
+html.dark textarea.organizer-hero-title-field:hover,
+html.dark textarea.organizer-hero-title-field:focus,
+html.dark textarea[class*="font-black"][class*="text-white"],
+html.dark textarea[class*="font-black"][class*="text-white"]:hover,
+html.dark textarea[class*="font-black"][class*="text-white"]:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+
+textarea.organizer-hero-title-field,
+textarea[class*="font-black"][class*="text-white"] {
+  border-bottom-color: transparent !important;
+}
+
+textarea.organizer-hero-title-field:hover,
+textarea[class*="font-black"][class*="text-white"]:hover {
+  border-bottom-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+textarea.organizer-hero-title-field:focus,
+textarea[class*="font-black"][class*="text-white"]:focus {
+  border-bottom-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+input.organizer-hero-artist-field,
+input.organizer-hero-artist-field:hover,
+input.organizer-hero-artist-field:focus,
+html.dark input.organizer-hero-artist-field,
+html.dark input.organizer-hero-artist-field:hover,
+html.dark input.organizer-hero-artist-field:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border-top-color: transparent !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+
+input.organizer-hero-genre-field,
+input.organizer-hero-genre-field:hover,
+input.organizer-hero-genre-field:focus,
+html.dark input.organizer-hero-genre-field,
+html.dark input.organizer-hero-genre-field:hover,
+html.dark input.organizer-hero-genre-field:focus {
+  background: rgba(255, 255, 255, 0.055) !important;
+  background-color: rgba(255, 255, 255, 0.055) !important;
+  background-image: none !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+input.organizer-hero-genre-field:hover,
+input.organizer-hero-genre-field:focus,
+html.dark input.organizer-hero-genre-field:hover,
+html.dark input.organizer-hero-genre-field:focus {
+  background: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
+}
+/* === Tickify organizer EventDetail hero field fix END === */

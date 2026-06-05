@@ -400,7 +400,7 @@ export default function EventDetail() {
                                 <Info size={14} className="ml-2 opacity-80" />
                                 <input
                                     disabled={!isInfoTab || currentStatus !== 'draft'}
-                                    className="organizer-hero-field organizer-hero-genre bg-transparent border-none outline-none text-white placeholder-white/70 w-36 px-2 py-1 text-sm font-semibold disabled:cursor-not-allowed"
+                                    className="organizer-hero-genre-field w-auto max-w-xs border border-white/10 rounded-full px-4 py-1.5 text-xs md:text-sm font-bold uppercase tracking-[0.22em] text-white/90 backdrop-blur-sm outline-none transition-colors placeholder-white/35"
                                     value={eventFormData.genre} placeholder="Thể loại sự kiện..." onChange={(e) => setEventFormData({ ...eventFormData, genre: e.target.value })}
                                 />
                             </div>
@@ -418,7 +418,7 @@ export default function EventDetail() {
                             <textarea
                                 rows={2}
                                 disabled={!isInfoTab || currentStatus !== 'draft'}
-                                className={`organizer-hero-field organizer-hero-title w-full bg-transparent border-b border-transparent outline-none text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight drop-shadow-md transition-colors py-1 placeholder-white/40 resize-none overflow-hidden disabled:cursor-not-allowed`}
+                                className="organizer-hero-title-field !bg-transparent bg-transparent w-full border-b border-transparent hover:border-white/10 focus:border-white/20 outline-none text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight drop-shadow-md transition-colors py-1 placeholder-white/40 resize-none overflow-hidden"
                                 value={eventFormData.name} placeholder="Nhập tên sự kiện..." onChange={(e) => setEventFormData({ ...eventFormData, name: e.target.value })}
                             />
                         </div>
@@ -428,7 +428,7 @@ export default function EventDetail() {
                             <input
                                 type="text"
                                 disabled={!isInfoTab || currentStatus !== 'draft'}
-                                className={`organizer-hero-field organizer-hero-subtitle w-full bg-transparent border-b border-transparent outline-none text-lg md:text-xl text-white/90 font-medium drop-shadow-md transition-all p-1 -ml-1 rounded placeholder-white/40 disabled:cursor-not-allowed ${isInfoTab && currentStatus === 'draft' ? 'hover:border-white/20 focus:border-white/50' : ''}`}
+                                className="organizer-hero-artist-field !bg-transparent bg-transparent w-full border-b border-transparent hover:border-white/10 focus:border-white/20 outline-none text-base md:text-lg text-white/85 font-medium drop-shadow-sm transition-colors py-1 placeholder-white/35"
                                 value={eventFormData.artists} placeholder="Người biểu diễn/diễn giả (Optional)..." onChange={(e) => setEventFormData({ ...eventFormData, artists: e.target.value })}
                             />
                         </div>
