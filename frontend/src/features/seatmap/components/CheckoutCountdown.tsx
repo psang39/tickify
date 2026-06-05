@@ -93,8 +93,8 @@ export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({
         <div
             className={`font-bold px-8 py-2 rounded-lg border transition-colors
             ${isPaymentPhase
-                    ? "bg-gray-50 text-black-300 border-gray-200 dark:border-white/10 font-medium"
-                    : "bg-gray-50 text-black-300 border-gray-200 dark:border-white/10 font-medium"
+                    ? "bg-slate-950/70 text-black-300 border-white/10 dark:border-white/10 font-medium"
+                    : "bg-slate-950/70 text-black-300 border-white/10 dark:border-white/10 font-medium"
                 }`}
         >
             {isPaymentPhase ? "Thời gian thanh toán: " : "Thời gian giữ chỗ: "}

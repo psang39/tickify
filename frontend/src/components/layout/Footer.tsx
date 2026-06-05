@@ -56,7 +56,7 @@ export default function Footer() {
                     />
                     <FooterColumn
                         title="Sự kiện"
-                        items={['Sự kiện nổi bật', 'Sự kiện đã hủy', 'Sự kiện đổi lịch', 'Hướng dẫn mua vé']}
+                        items={['Show nổi bật', 'Sự kiện đã hủy', 'Sự kiện đổi lịch', 'Hướng dẫn mua vé']}
                     />
                 </div>
 

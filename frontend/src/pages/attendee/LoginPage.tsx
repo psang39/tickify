@@ -67,30 +67,30 @@ export default function LoginPage() {
             <section className="flex items-center justify-center px-6 py-12 lg:px-16">
                 <div className="w-full max-w-lg">
                     <Link to="/" className="mb-8 block text-2xl font-black tracking-wide text-[#FF0082] lg:hidden">Tickify</Link>
-                    <h2 className="text-3xl font-black tracking-tight text-slate-800 dark:text-slate-100">Đăng nhập</h2>
+                    <h2 className="text-3xl font-black tracking-tight text-slate-100 dark:text-slate-100">Đăng nhập</h2>
                     <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
                         <div>
-                            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Email</label>
+                            <label className="mb-2 block text-sm font-semibold text-slate-200 dark:text-slate-200">Email</label>
                             <input
                                 type="email"
                                 required
                                 disabled={loginMutation.isPending}
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="h-12 w-full rounded-xl border border-slate-300 px-4 text-sm text-slate-800 dark:text-slate-100 outline-none transition focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100 disabled:opacity-60"
+                                className="h-12 w-full rounded-xl border border-slate-300 px-4 text-sm text-slate-100 dark:text-slate-100 outline-none transition focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100 disabled:opacity-60"
                                 placeholder="Nhập email của bạn"
                             />
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Mật khẩu</label>
+                            <label className="mb-2 block text-sm font-semibold text-slate-200 dark:text-slate-200">Mật khẩu</label>
                             <input
                                 type="password"
                                 required
                                 disabled={loginMutation.isPending}
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                className="h-12 w-full rounded-xl border border-slate-300 px-4 text-sm text-slate-800 dark:text-slate-100 outline-none transition focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100 disabled:opacity-60"
+                                className="h-12 w-full rounded-xl border border-slate-300 px-4 text-sm text-slate-100 dark:text-slate-100 outline-none transition focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100 disabled:opacity-60"
                                 placeholder="Nhập mật khẩu"
                             />
                             <button type="button" className="mt-3 text-sm font-medium text-slate-400 hover:text-[#FF0082]">Quên mật khẩu?</button>

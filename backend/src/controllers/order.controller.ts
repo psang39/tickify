@@ -574,13 +574,13 @@ export const getOrders = async (req: Request, res: Response) => {
         if (attendee.id !== user_id) {
             return res.status(403).json({ message: 'Unauthorized to view orders' });
         }
-        const orders = await Order.find({ user_id: user_id }).populate('event_id', 'name').populate({
-            path: 'show_id', // Bước 1: Populate show trước
-            select: 'name venue_id start_time', // Chọn các trường cần ở show
+        const orders = await Order.find({ user_id: user_id }).populate('event_id', 'name').sort({ createdAt: -1 }).populate({
+            path: 'show_id', 
+            select: 'name venue_id start_time', 
             populate: {
-                path: 'venue_id', // Bước 2: Populate tiếp venue từ show
-                model: 'Venue',    // Tên của collection Venue trong DB của bạn
-                select: 'name'     // Lấy tên của địa điểm
+                path: 'venue_id',
+                model: 'Venue',    
+                select: 'name'    
             }
         });
         const ticketNumbers = orders.flatMap(order => order.items.map(item => item.seat_id));

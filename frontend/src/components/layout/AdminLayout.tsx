@@ -18,9 +18,9 @@ export default function AdminLayout() {
     const currentPath = location.pathname;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900/80 font-sans text-slate-900 dark:text-slate-50">
+        <div className="min-h-screen bg-slate-950/70 dark:bg-slate-900/80 font-sans text-slate-50 dark:text-slate-50">
             <div className="flex min-h-screen">
-                <aside className="hidden w-64 shrink-0 border-r border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 lg:block">
+                <aside className="hidden w-64 shrink-0 border-r border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 lg:block">
                     <div className="sticky top-0 flex h-screen flex-col justify-between">
                         <div className="px-5 py-5">
                             <button
@@ -32,7 +32,7 @@ export default function AdminLayout() {
                                     T
                                 </div>
                                 <div className="leading-tight">
-                                    <p className="text-base font-black tracking-tight text-slate-900 dark:text-slate-50">Tickify</p>
+                                    <p className="text-base font-black tracking-tight text-slate-50 dark:text-slate-50">Tickify</p>
                                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Trang quản trị</p>
                                 </div>
                             </button>
@@ -76,18 +76,18 @@ export default function AdminLayout() {
                 </aside>
 
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 px-4 py-3 backdrop-blur lg:px-8">
+                    <header className="sticky top-0 z-20 border-b border-white/10 dark:border-white/10 bg-white/90 dark:bg-slate-950/90 px-4 py-3 backdrop-blur lg:px-8">
                         <div className="flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
-                                <button className="rounded-lg border border-slate-200 dark:border-white/10 p-2 text-slate-600 dark:text-slate-300 lg:hidden" type="button">
+                                <button className="rounded-lg border border-white/10 dark:border-white/10 p-2 text-slate-600 dark:text-slate-300 lg:hidden" type="button">
                                     <Menu size={18} />
                                 </button>
                                 <div>
                                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản trị hệ thống</p>
-                                    <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50 md:text-xl">Bảng điều khiển Admin</h1>
+                                    <h1 className="text-lg font-bold text-slate-50 dark:text-slate-50 md:text-xl">Bảng điều khiển Admin</h1>
                                 </div>
                             </div>
-                            <div className="hidden items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/80 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 sm:flex">
+                            <div className="hidden items-center gap-2 rounded-full border border-white/10 dark:border-white/10 bg-slate-950/70 dark:bg-slate-900/80 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 sm:flex">
                                 <ShieldCheck size={15} className="text-primary" />
                                 Quyền quản trị
                             </div>
@@ -120,7 +120,7 @@ function SidebarLink({
             onClick={onClick}
             className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-all ${active
                 ? 'bg-primary/10 text-primary shadow-sm'
-                : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900'
+                : 'text-slate-500 hover:bg-slate-950/70 dark:hover:bg-slate-800 hover:text-slate-50'
                 }`}
         >
             <span className={active ? 'text-primary' : 'text-slate-400'}>{icon}</span>

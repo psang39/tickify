@@ -147,7 +147,7 @@ export default function AdminDashboard() {
             <LoadingOverlay isVisible={isGlobalLoading} />
 
             <header>
-                <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Tổng quan hệ thống</h1>
+                <h1 className="text-3xl font-black text-slate-100 dark:text-slate-100 tracking-tight">Tổng quan hệ thống</h1>
                 <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">Cập nhật hệ thống: {new Date().toLocaleTimeString('vi-VN')}</p>
             </header>
 
@@ -161,9 +161,9 @@ export default function AdminDashboard() {
 
 
             {(isVenueFormOpen || editingVenueId) && (
-                <section className={`bg-white dark:bg-slate-900/90 border rounded-[24px] p-6 transition-all duration-300 ${editingVenueId ? 'border-primary ring-2 ring-primary/5' : 'border-slate-200'} animate-in slide-in-from-top duration-200`}>
+                <section className={`bg-white dark:bg-slate-900/90 border rounded-[24px] p-6 transition-all duration-300 ${editingVenueId ? 'border-primary ring-2 ring-primary/5' : 'border-white/10'} animate-in slide-in-from-top duration-200`}>
                     <div className="border-b border-slate-100 dark:border-white/10 pb-4 mb-5">
-                        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                        <h2 className="text-lg font-bold text-slate-100 dark:text-slate-100 flex items-center gap-2">
                             {editingVenueId ? <Edit3 size={20} className="text-primary" /> : <PlusCircle size={20} className="text-primary" />}
                             {editingVenueId ? `Đang chỉnh sửa địa điểm: ${venueForm.name}` : "Khởi tạo Địa điểm (Venue) Hệ thống"}
                         </h2>
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
                                     placeholder="VD: Nhà thi đấu Phú Thọ"
                                     value={venueForm.name}
                                     onChange={(e) => setVenueForm({ ...venueForm, name: e.target.value })}
-                                    className="border border-slate-200 dark:border-white/10 rounded-xl p-3 bg-slate-50 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all text-slate-700 dark:text-slate-200"
+                                    className="border border-white/10 dark:border-white/10 rounded-xl p-3 bg-slate-950/70 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all text-slate-200 dark:text-slate-200"
                                 />
                             </div>
 
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
                                     placeholder="VD: 1 Lữ Gia, Phường 15, Quận 11, TP. HCM"
                                     value={venueForm.address}
                                     onChange={(e) => setVenueForm({ ...venueForm, address: e.target.value })}
-                                    className="border border-slate-200 dark:border-white/10 rounded-xl p-3 bg-slate-50 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all text-slate-700 dark:text-slate-200"
+                                    className="border border-white/10 dark:border-white/10 rounded-xl p-3 bg-slate-950/70 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all text-slate-200 dark:text-slate-200"
                                 />
                             </div>
 
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
                                     placeholder="VD: Hồ Chí Minh hoặc Hà Nội"
                                     value={venueForm.city}
                                     onChange={(e) => setVenueForm({ ...venueForm, city: e.target.value })}
-                                    className="border border-slate-200 dark:border-white/10 rounded-xl p-3 bg-slate-50 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all text-slate-700 dark:text-slate-200"
+                                    className="border border-white/10 dark:border-white/10 rounded-xl p-3 bg-slate-950/70 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all text-slate-200 dark:text-slate-200"
                                 />
                             </div>
                         </div>
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
                                     placeholder="VD: 10.771"
                                     value={venueForm.latitude}
                                     onChange={(e) => setVenueForm({ ...venueForm, latitude: e.target.value })}
-                                    className="border border-slate-200 dark:border-white/10 rounded-xl p-3 bg-slate-50 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all font-mono text-slate-700 dark:text-slate-200"
+                                    className="border border-white/10 dark:border-white/10 rounded-xl p-3 bg-slate-950/70 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all font-mono text-slate-200 dark:text-slate-200"
                                 />
                             </div>
 
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
                                     placeholder="VD: 106.657"
                                     value={venueForm.longitude}
                                     onChange={(e) => setVenueForm({ ...venueForm, longitude: e.target.value })}
-                                    className="border border-slate-200 dark:border-white/10 rounded-xl p-3 bg-slate-50 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all font-mono text-slate-700 dark:text-slate-200"
+                                    className="border border-white/10 dark:border-white/10 rounded-xl p-3 bg-slate-950/70 dark:bg-slate-900/80 text-sm font-medium focus:outline-none focus:border-primary focus:bg-white transition-all font-mono text-slate-200 dark:text-slate-200"
                                 />
                             </div>
 
@@ -237,7 +237,7 @@ export default function AdminDashboard() {
                                 <button
                                     type="button"
                                     onClick={handleCancelEdit}
-                                    className="flex-1 bg-slate-200 dark:bg-slate-700/70 hover:bg-slate-300 text-slate-700 dark:text-slate-200 font-bold text-sm h-[46px] rounded-xl transition-all border-none cursor-pointer"
+                                    className="flex-1 bg-slate-200 dark:bg-slate-700/70 hover:bg-slate-300 text-slate-200 dark:text-slate-200 font-bold text-sm h-[46px] rounded-xl transition-all border-none cursor-pointer"
                                 >
                                     Hủy bỏ
                                 </button>
@@ -254,15 +254,15 @@ export default function AdminDashboard() {
             )}
 
             {/* BẢNG XỂU DUYỆT TÀI KHOẢN ORGANIZER */}
-            <section className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-[24px] overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-50/50">
-                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Yêu cầu mở tài khoản Ban Tổ Chức</h2>
+            <section className="bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-[24px] overflow-hidden concert-poster-card">
+                <div className="px-6 py-5 border-b border-white/10 dark:border-white/10 flex justify-between items-center bg-slate-950/70/50">
+                    <h2 className="text-lg font-bold text-slate-100 dark:text-slate-100">Yêu cầu mở tài khoản Ban Tổ Chức</h2>
                     <span className="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-md">{orgPagination?.totalDocs || 0} đang chờ</span>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 dark:border-white/10 text-xs uppercase tracking-wider text-slate-400 font-bold bg-slate-50/30">
+                            <tr className="border-b border-white/10 dark:border-white/10 text-xs uppercase tracking-wider text-slate-400 font-bold bg-slate-950/70/30">
                                 <th className="px-6 py-4">Tên Tổ Chức / Họ Tên</th>
                                 <th className="px-6 py-4">Email Liên Hệ</th>
                                 <th className="px-6 py-4">Ngày Đăng Ký</th>
@@ -274,8 +274,8 @@ export default function AdminDashboard() {
                                 <tr><td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic font-medium">Không có yêu cầu tài khoản nào đang chờ xử lý.</td></tr>
                             ) : (
                                 pendingOrganizers.map((org: any) => (
-                                    <tr key={org._id} className="border-b border-slate-100 dark:border-white/10 hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-100">{org.company_name} / {org.last_name} {org.first_name}</td>
+                                    <tr key={org._id} className="border-b border-slate-100 dark:border-white/10 hover:bg-slate-950/70/50 transition-colors">
+                                        <td className="px-6 py-4 font-bold text-slate-100 dark:text-slate-100">{org.company_name} / {org.last_name} {org.first_name}</td>
                                         <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300">{org.email}</td>
                                         <td className="px-6 py-4 text-sm font-medium text-slate-500 dark:text-slate-400">{new Date(org.createdAt || org.created_at || Date.now()).toLocaleDateString('vi-VN')}</td>
                                         <td className="px-6 py-4 flex justify-end gap-2">
@@ -289,21 +289,21 @@ export default function AdminDashboard() {
                     </table>
                 </div>
                 {orgPagination && orgPagination.totalPages > 1 && (
-                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-between bg-slate-50/20">
+                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-between bg-slate-950/70/20">
                         <span className="text-xs text-slate-400 font-medium">Trang {orgPagination.page} / {orgPagination.totalPages}</span>
                         <div className="flex items-center gap-1">
-                            <button onClick={() => setOrgPage(p => Math.max(p - 1, 1))} disabled={!orgPagination.hasPrevPage} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"><ChevronLeft size={16} /></button>
-                            <button onClick={() => setOrgPage(p => Math.min(p + 1, orgPagination.totalPages))} disabled={!orgPagination.hasNextPage} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
+                            <button onClick={() => setOrgPage(p => Math.max(p - 1, 1))} disabled={!orgPagination.hasPrevPage} className="p-1.5 rounded-lg border border-white/10 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-950/70 dark:hover:bg-slate-800 transition-colors cursor-pointer"><ChevronLeft size={16} /></button>
+                            <button onClick={() => setOrgPage(p => Math.min(p + 1, orgPagination.totalPages))} disabled={!orgPagination.hasNextPage} className="p-1.5 rounded-lg border border-white/10 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-950/70 dark:hover:bg-slate-800 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
                         </div>
                     </div>
                 )}
             </section>
 
             {/* BẢNG TỔNG QUAN DANH SÁCH ĐỊA ĐIỂM */}
-            <section className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-[24px] overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-50/50">
+            <section className="bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-[24px] overflow-hidden concert-poster-card">
+                <div className="px-6 py-5 border-b border-white/10 dark:border-white/10 flex justify-between items-center bg-slate-950/70/50">
                     <div>
-                        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">Quản lý danh sách Địa điểm (Venues)</h2>
+                        <h2 className="text-lg font-bold text-slate-100 dark:text-slate-100">Quản lý danh sách Địa điểm (Venues)</h2>
                         <p className="text-xs text-slate-400 mt-0.5 font-medium">Danh mục toàn bộ các sân bãi, nhà thi đấu, trung tâm hội nghị khả dụng</p>
                     </div>
 
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-slate-200 dark:border-white/10 text-xs uppercase tracking-wider text-slate-400 font-bold bg-slate-50/30">
+                            <tr className="border-b border-white/10 dark:border-white/10 text-xs uppercase tracking-wider text-slate-400 font-bold bg-slate-950/70/30">
                                 <th className="px-6 py-4">Tên Địa Điểm</th>
                                 <th className="px-6 py-4">Địa Chỉ Chi Tiết</th>
                                 <th className="px-6 py-4">Trạng thái</th>
@@ -339,8 +339,8 @@ export default function AdminDashboard() {
                                 <tr><td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic font-medium">Hệ thống chưa ghi nhận bất kỳ địa điểm nào.</td></tr>
                             ) : (
                                 allVenues.map((venue: any) => (
-                                    <tr key={venue._id} className="border-b border-slate-100 dark:border-white/10 hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                                    <tr key={venue._id} className="border-b border-slate-100 dark:border-white/10 hover:bg-slate-950/70/50 transition-colors">
+                                        <td className="px-6 py-4 font-bold text-slate-100 dark:text-slate-100 flex items-center gap-2">
                                             <MapPin size={15} className="text-primary/70 shrink-0" /> {venue.name}
                                         </td>
                                         <td className="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-300 max-w-xs truncate">{venue.address}</td>
@@ -390,11 +390,11 @@ export default function AdminDashboard() {
                 </div>
 
                 {venuePagination && venuePagination.totalPages > 1 && (
-                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-between bg-slate-50/20">
+                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-between bg-slate-950/70/20">
                         <span className="text-xs text-slate-400 font-medium">Trang {venuePagination.page} / {venuePagination.totalPages}</span>
                         <div className="flex items-center gap-1">
-                            <button onClick={() => setVenuePage(p => Math.max(p - 1, 1))} disabled={!venuePagination.hasPrevPage} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"><ChevronLeft size={16} /></button>
-                            <button onClick={() => setVenuePage(p => Math.min(p + 1, venuePagination.totalPages))} disabled={!venuePagination.hasNextPage} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
+                            <button onClick={() => setVenuePage(p => Math.max(p - 1, 1))} disabled={!venuePagination.hasPrevPage} className="p-1.5 rounded-lg border border-white/10 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-950/70 dark:hover:bg-slate-800 transition-colors cursor-pointer"><ChevronLeft size={16} /></button>
+                            <button onClick={() => setVenuePage(p => Math.min(p + 1, venuePagination.totalPages))} disabled={!venuePagination.hasNextPage} className="p-1.5 rounded-lg border border-white/10 dark:border-white/10 text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-950/70 dark:hover:bg-slate-800 transition-colors cursor-pointer"><ChevronRight size={16} /></button>
                         </div>
                     </div>
                 )}
@@ -405,13 +405,13 @@ export default function AdminDashboard() {
 
 function StatCard({ title, value, icon, bg }: { title: string, value: string | number, icon: React.ReactNode, bg: string }) {
     return (
-        <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 p-6 rounded-2xl flex items-center gap-5 shadow-none">
+        <div className="bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 p-6 rounded-2xl flex items-center gap-5 shadow-none">
             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${bg}`}>
                 {icon}
             </div>
             <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">{title}</p>
-                <p className="text-2xl font-black text-slate-800 dark:text-slate-100">{value}</p>
+                <p className="text-2xl font-black text-slate-100 dark:text-slate-100">{value}</p>
             </div>
         </div>
     );

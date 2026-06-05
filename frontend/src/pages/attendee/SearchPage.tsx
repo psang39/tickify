@@ -55,9 +55,9 @@ export default function SearchPage() {
             <div className="bg-white dark:bg-slate-900/90 border-b border-gray-100 dark:border-white/10 py-10 px-8">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Kết quả tìm kiếm</h1>
+                        <h1 className="text-2xl font-black text-slate-100 dark:text-slate-100 tracking-tight">Tìm vé concert</h1>
                         <p className="text-xs font-medium text-slate-400 mt-1">
-                            Tìm thấy {eventsList.length} sự kiện phù hợp cho từ khóa <span className="text-[#4C4DCC] font-bold">"{queryKeyword || 'Tất cả'}"</span>
+                            Tìm thấy {eventsList.length} show phù hợp với từ khóa <span className="text-[#4C4DCC] font-bold">"{queryKeyword || 'Tất cả'}"</span>
                         </p>
                     </div>
 
@@ -69,7 +69,7 @@ export default function SearchPage() {
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-                            className="w-full bg-slate-50 dark:bg-slate-900/80 border border-gray-200 dark:border-white/10 rounded-full py-2.5 pl-4 pr-12 text-xs font-medium outline-none focus:border-primary focus:bg-white transition-all text-slate-700 dark:text-slate-200"
+                            className="w-full bg-slate-950/70 dark:bg-slate-900/80 border border-white/10 dark:border-white/10 rounded-full py-2.5 pl-4 pr-12 text-xs font-medium outline-none focus:border-primary focus:bg-white transition-all text-slate-200 dark:text-slate-200"
                         />
                         <button onClick={applyFilters} className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-[#4C4DCC] text-white p-1.5 rounded-full border-none cursor-pointer hover:opacity-90">
                             <Search size={14} />
@@ -82,19 +82,19 @@ export default function SearchPage() {
             <div className="max-w-7xl mx-auto px-8 mt-10 grid grid-cols-1 lg:grid-cols-4 gap-8">
 
                 {/* 1. CỘT TRÁI: BỘ LỌC PHẲNG (FLAT SIDEBAR) */}
-                <aside className="lg:col-span-1 bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-2xl p-5 h-fit space-y-6">
+                <aside className="lg:col-span-1 bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-2xl p-5 h-fit space-y-6">
                     <div className="flex items-center gap-2 border-b border-slate-50 dark:border-white/10 pb-3">
                         <SlidersHorizontal size={16} className="text-slate-500 dark:text-slate-400" />
-                        <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Bộ lọc tìm kiếm</h2>
+                        <h2 className="text-sm font-bold text-slate-100 dark:text-slate-100 uppercase tracking-wider">Lọc show diễn</h2>
                     </div>
 
                     {/* Bộ lọc: Khu vực Thành phố */}
                     <div className="space-y-2">
-                        <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><MapPin size={12} /> Địa điểm tổ chức</label>
+                        <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><MapPin size={12} /> Thành phố / venue</label>
                         <select
                             value={selectedCity}
                             onChange={(e) => { setSelectedCity(e.target.value); setTimeout(applyFilters, 0); }}
-                            className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 outline-none focus:border-primary"
+                            className="w-full border border-white/10 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-950/70 dark:bg-slate-900/80 text-slate-200 dark:text-slate-200 outline-none focus:border-primary"
                         >
                             <option value="">Tất cả thành phố</option>
                             <option value="Hồ Chí Minh">TP. Hồ Chí Minh</option>
@@ -103,15 +103,15 @@ export default function SearchPage() {
                         </select>
                     </div>
 
-                    {/* Bộ lọc: Thể loại nhạc */}
+                    {/* Bộ lọc: Dòng nhạc nhạc */}
                     <div className="space-y-2">
-                        <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><Music size={12} /> Thể loại âm nhạc</label>
+                        <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><Music size={12} /> Dòng nhạc</label>
                         <select
                             value={selectedGenre}
                             onChange={(e) => { setSelectedGenre(e.target.value); setTimeout(applyFilters, 0); }}
-                            className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 outline-none focus:border-primary"
+                            className="w-full border border-white/10 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-950/70 dark:bg-slate-900/80 text-slate-200 dark:text-slate-200 outline-none focus:border-primary"
                         >
-                            <option value="">Tất cả danh mục</option>
+                            <option value="">Tất cả dòng nhạc</option>
                             <option value="Pop / Concert">Pop / Concert</option>
                             <option value="Rock">Rock</option>
                             <option value="Jazz">Jazz</option>
@@ -121,14 +121,14 @@ export default function SearchPage() {
 
                     {/* Bộ lọc: Thứ tự sắp xếp */}
                     <div className="space-y-2">
-                        <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><ArrowUpDown size={12} /> Sắp xếp kết quả</label>
+                        <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><ArrowUpDown size={12} /> Sắp xếp show</label>
                         <select
                             value={sortBy}
                             onChange={(e) => { setSortBy(e.target.value); setTimeout(applyFilters, 0); }}
-                            className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 outline-none focus:border-primary"
+                            className="w-full border border-white/10 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-950/70 dark:bg-slate-900/80 text-slate-200 dark:text-slate-200 outline-none focus:border-primary"
                         >
                             <option value="newest">Mới nhất</option>
-                            <option value="upcoming">Sắp diễn ra gần nhất</option>
+                            <option value="upcoming">Gần diễn ra nhất</option>
                         </select>
                     </div>
 
@@ -136,7 +136,7 @@ export default function SearchPage() {
                         onClick={applyFilters}
                         className="w-full bg-[#4C4DCC] text-white font-bold text-xs py-2.5 rounded-xl border-none cursor-pointer transition-opacity hover:opacity-90 block text-center"
                     >
-                        Áp dụng bộ lọc
+                        Tìm vé
                     </button>
                 </aside>
 
@@ -149,8 +149,8 @@ export default function SearchPage() {
                             ))}
                         </div>
                     ) : eventsList.length === 0 ? (
-                        <div className="w-full bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-2xl p-12 text-center text-slate-400 font-medium italic text-sm">
-                            Không tìm thấy sự kiện nào khớp với bộ lọc hiện tại. Vui lòng đổi từ khóa khác!
+                        <div className="w-full bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-2xl p-12 text-center text-slate-400 font-medium italic text-sm">
+                            Chưa có show nào khớp với bộ lọc hiện tại. Thử đổi từ khóa, thành phố hoặc dòng nhạc khác.
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 animate-in fade-in duration-200">
@@ -158,7 +158,7 @@ export default function SearchPage() {
                                 <div
                                     key={event._id}
                                     onClick={() => navigate(`/events/${event._id}`)}
-                                    className="bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-[24px] overflow-hidden hover:border-[#4C4DCC]/40 cursor-pointer transition-all flex flex-col group"
+                                    className="bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-[24px] overflow-hidden hover:border-[#FF0082]/40 cursor-pointer transition-all flex flex-col group concert-poster-card"
                                 >
                                     {/* KHU VỰC KHUNG ẢNH BANNER POSTER 3:4 NGHIÊM NGẶT */}
                                     <div className="w-full aspect-[3/4] bg-slate-100 dark:bg-slate-800/80 overflow-hidden relative">
@@ -172,7 +172,7 @@ export default function SearchPage() {
                                             <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon size={32} /></div>
                                         )}
                                         {/* Tag thể loại góc trên ảnh */}
-                                        <span className="absolute top-3 left-3 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm text-slate-800 dark:text-slate-100 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-100 dark:border-white/10">
+                                        <span className="absolute top-3 left-3 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm text-slate-100 dark:text-slate-100 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-100 dark:border-white/10">
                                             {event.genre}
                                         </span>
                                     </div>
@@ -180,7 +180,7 @@ export default function SearchPage() {
                                     {/* NỘI DUNG CHỮ DƯỚI CHÂN CARD */}
                                     <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                                         <div className="space-y-1">
-                                            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug group-hover:text-[#4C4DCC] transition-colors line-clamp-2">
+                                            <h3 className="font-bold text-slate-100 dark:text-slate-100 text-sm leading-snug group-hover:text-[#FF0082] transition-colors line-clamp-2">
                                                 {event.name}
                                             </h3>
                                             {event.artists && (

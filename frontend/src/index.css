@@ -570,3 +570,309 @@ html.dark img {
   }
 }
 /* === Tickify dark full frontend audit patch v4 END === */
+
+/* === Tickify concert reskin v5 START === */
+:root {
+  --concert-primary: #FF0082;
+  --concert-secondary: #262880;
+  --concert-ink: #070A18;
+  --concert-panel: rgba(10, 15, 37, 0.86);
+  --concert-panel-strong: rgba(8, 11, 28, 0.94);
+  --concert-border: rgba(255, 255, 255, 0.11);
+  --concert-muted: #94a3b8;
+  --concert-stage-bg:
+    radial-gradient(circle at 12% 0%, rgba(255, 0, 130, 0.26), transparent 34%),
+    radial-gradient(circle at 88% 8%, rgba(38, 40, 128, 0.56), transparent 36%),
+    radial-gradient(circle at 50% 100%, rgba(255, 0, 130, 0.16), transparent 32%),
+    linear-gradient(135deg, #070A18 0%, #0B1026 45%, #17113A 100%);
+}
+
+html, body, #root {
+  min-height: 100%;
+}
+
+body {
+  background: var(--concert-stage-bg) !important;
+  color: #f8fafc;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.055) 0 1px, transparent 1px 84px),
+    linear-gradient(65deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 96px),
+    radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.10), transparent 28%);
+  mask-image: linear-gradient(to bottom, black, rgba(0, 0, 0, 0.3), transparent 95%);
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background: rgba(255, 0, 130, 0.35);
+  color: white;
+}
+
+.concert-page-shell,
+[class~="bg-[#F7F7FA]"],
+[class~="bg-[#F8F7FF]"],
+[class~="bg-[#F9FAFB]"],
+[class~="bg-[#FAFAFA]"],
+[class~="bg-[#FFF5FB]"],
+[class~="bg-[#fff5fb]"],
+[class~="bg-[#FDF2F8]"],
+[class~="bg-[#fdf2f8]"],
+[class~="bg-slate-50"],
+[class~="bg-gray-50"],
+[class~="bg-zinc-50"],
+[class~="bg-neutral-50"],
+[class~="bg-stone-50"] {
+  background: var(--concert-stage-bg) !important;
+  color: #f8fafc !important;
+}
+
+main [class~="bg-white"],
+section [class~="bg-white"],
+aside [class~="bg-white"],
+article [class~="bg-white"],
+main [class~="bg-slate-50"],
+section [class~="bg-slate-50"],
+aside [class~="bg-slate-50"],
+main [class~="bg-gray-50"],
+section [class~="bg-gray-50"],
+aside [class~="bg-gray-50"] {
+  background: var(--concert-panel) !important;
+  color: #f8fafc !important;
+  border-color: var(--concert-border) !important;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+}
+
+header,
+footer,
+[class*="sticky"][class*="top-0"],
+[class*="fixed"][class*="top-0"] {
+  background: rgba(7, 10, 24, 0.82) !important;
+  border-color: var(--concert-border) !important;
+  color: #f8fafc !important;
+  backdrop-filter: blur(18px);
+}
+
+h1, h2, h3,
+[class~="text-slate-900"],
+[class~="text-gray-900"],
+[class~="text-slate-800"],
+[class~="text-gray-800"] {
+  color: #f8fafc !important;
+}
+
+[class~="text-slate-700"],
+[class~="text-gray-700"],
+[class~="text-slate-600"],
+[class~="text-gray-600"],
+[class~="text-neutral-600"] {
+  color: #cbd5e1 !important;
+}
+
+[class~="text-slate-500"],
+[class~="text-gray-500"],
+[class~="text-neutral-500"] {
+  color: #94a3b8 !important;
+}
+
+[class~="border-gray-200"],
+[class~="border-slate-200"],
+[class~="border-gray-100"],
+[class~="border-slate-100"] {
+  border-color: var(--concert-border) !important;
+}
+
+input,
+select,
+textarea {
+  background: rgba(8, 11, 28, 0.78) !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.13) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(203, 213, 225, 0.66) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(255, 0, 130, 0.75) !important;
+  box-shadow: 0 0 0 3px rgba(255, 0, 130, 0.18) !important;
+}
+
+table {
+  color: #e2e8f0;
+}
+
+thead,
+thead tr,
+[class~="bg-slate-100"],
+[class~="bg-gray-100"] {
+  background: rgba(15, 23, 42, 0.86) !important;
+  color: #f8fafc !important;
+}
+
+tbody tr,
+[class~="divide-y"] > * {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+tbody tr:hover,
+[class~="hover:bg-slate-50"]:hover,
+[class~="hover:bg-slate-100"]:hover,
+[class~="hover:bg-gray-50"]:hover,
+[class~="hover:bg-gray-100"]:hover,
+[class~="hover:bg-white"]:hover {
+  background: rgba(255, 0, 130, 0.09) !important;
+}
+
+.ticket-card,
+.concert-ticket-card,
+.concert-poster-card,
+main [class*="rounded-[24px]"][class*="overflow-hidden"],
+main [class*="rounded-2xl"][class*="overflow-hidden"][class*="bg-white"],
+main [class*="rounded-3xl"][class*="bg-white"],
+main [class*="rounded-2xl"][class*="bg-white"] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(16, 21, 54, 0.96), rgba(7, 10, 24, 0.96)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(255, 0, 130, 0.04);
+}
+
+.ticket-card::before,
+.concert-ticket-card::before,
+.concert-poster-card::before,
+main [class*="rounded-[24px]"][class*="overflow-hidden"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, var(--concert-primary), var(--concert-secondary), var(--concert-primary)) 1;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 0, 130, 0.16), transparent 34%),
+    linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.24));
+}
+
+.ticket-card:hover,
+.concert-ticket-card:hover,
+.concert-poster-card:hover,
+main [class*="rounded-[24px]"][class*="overflow-hidden"]:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 0, 130, 0.42) !important;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.46), 0 0 34px rgba(255, 0, 130, 0.16);
+}
+
+main img {
+  filter: saturate(1.08) contrast(1.06);
+}
+
+[class~="rounded-full"],
+[class~="rounded-xl"],
+[class~="rounded-2xl"],
+[class~="rounded-3xl"] {
+  border-color: rgba(255, 255, 255, 0.11);
+}
+
+[class~="bg-[#FF0082]"],
+[class~="bg-primary"],
+button[class*="bg-primary"],
+a[class*="bg-primary"] {
+  background: linear-gradient(135deg, var(--concert-primary), #B00067) !important;
+  color: white !important;
+  box-shadow: 0 14px 34px rgba(255, 0, 130, 0.28);
+}
+
+[class~="bg-[#262880]"],
+[class~="bg-secondary"] {
+  background: linear-gradient(135deg, var(--concert-secondary), #10134F) !important;
+  color: white !important;
+}
+
+[class~="bg-pink-50"],
+[class~="bg-rose-50"],
+[class~="bg-fuchsia-50"] {
+  background: rgba(255, 0, 130, 0.12) !important;
+  color: #fbcfe8 !important;
+  border-color: rgba(255, 0, 130, 0.25) !important;
+}
+
+[class~="bg-blue-50"],
+[class~="bg-indigo-50"],
+[class~="bg-violet-50"] {
+  background: rgba(38, 40, 128, 0.28) !important;
+  color: #c7d2fe !important;
+  border-color: rgba(129, 140, 248, 0.25) !important;
+}
+
+[class~="bg-green-50"],
+[class~="bg-emerald-50"] {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(16, 185, 129, 0.22) !important;
+}
+
+[class~="bg-yellow-50"],
+[class~="bg-amber-50"] {
+  background: rgba(245, 158, 11, 0.13) !important;
+  color: #fde68a !important;
+  border-color: rgba(245, 158, 11, 0.22) !important;
+}
+
+[class~="bg-red-50"],
+[class~="bg-rose-100"] {
+  background: rgba(244, 63, 94, 0.13) !important;
+  color: #fecdd3 !important;
+  border-color: rgba(244, 63, 94, 0.24) !important;
+}
+
+[class~="shadow-sm"],
+[class~="shadow"],
+[class~="shadow-md"] {
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24) !important;
+}
+
+[class~="ring-gray-200"],
+[class~="ring-slate-200"] {
+  --tw-ring-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Seat-map / booking surfaces: keep the stage feel instead of pale product-card panels. */
+[class*="seat" i],
+[class*="stage" i],
+[class*="map" i] {
+  --concert-seat-glow: 0 0 18px rgba(255, 0, 130, 0.18);
+}
+
+svg {
+  filter: drop-shadow(0 18px 45px rgba(0, 0, 0, 0.28));
+}
+
+/* Admin and organizer should look like a backstage control room, not a generic white dashboard. */
+[class*="Dashboard"],
+[class*="Management"],
+[class*="Organizer"],
+[class*="Admin"] {
+  color-scheme: dark;
+}
+/* === Tickify concert reskin v5 END === */

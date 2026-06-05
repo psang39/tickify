@@ -41,7 +41,7 @@ export default function EventDetailPage() {
     if (!event) {
         return (
             <div className="mx-auto max-w-7xl px-6 py-20 text-center">
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Không tìm thấy sự kiện</h1>
+                <h1 className="text-2xl font-bold text-slate-100 dark:text-slate-100">Không tìm thấy sự kiện</h1>
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Sự kiện có thể đã bị ẩn hoặc không còn tồn tại.</p>
                 <Link to="/" className="mt-6 inline-flex rounded-xl bg-[#FF0082] px-6 py-3 text-sm font-bold text-white">Về trang chủ</Link>
             </div>
@@ -49,7 +49,7 @@ export default function EventDetailPage() {
     }
 
     return (
-        <div className="bg-white dark:bg-slate-900/90 font-sans text-slate-900 dark:text-slate-50">
+        <div className="bg-white dark:bg-slate-900/90 font-sans text-slate-50 dark:text-slate-50">
             <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
                 <button onClick={() => navigate(-1)} className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-[#FF0082]">
                     <ChevronLeft size={18} /> Quay lại
@@ -70,41 +70,41 @@ export default function EventDetailPage() {
 
             <section className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 pb-8 lg:grid-cols-3 lg:px-8">
                 <main className="lg:col-span-2">
-                    <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 p-6">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Thông tin sự kiện</h2>
+                    <div className="rounded-3xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 p-6">
+                        <h2 className="text-xl font-bold text-slate-50 dark:text-slate-50">Thông tin sự kiện</h2>
                         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/80 p-4">
+                            <div className="rounded-2xl bg-slate-950/70 dark:bg-slate-900/80 p-4">
                                 <p className="text-xs font-bold uppercase text-slate-400">Thời gian</p>
-                                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200"><CalendarDays size={16} />{formatDate(event.start_date)} - {formatDate(event.end_date)}</p>
+                                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-200 dark:text-slate-200"><CalendarDays size={16} />{formatDate(event.start_date)} - {formatDate(event.end_date)}</p>
                             </div>
-                            <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/80 p-4">
+                            <div className="rounded-2xl bg-slate-950/70 dark:bg-slate-900/80 p-4">
                                 <p className="text-xs font-bold uppercase text-slate-400">Trạng thái</p>
                                 <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#00A878]"><Ticket size={16} />{getStatusLabel(event.status)}</p>
                             </div>
-                            <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/80 p-4 sm:col-span-2">
+                            <div className="rounded-2xl bg-slate-950/70 dark:bg-slate-900/80 p-4 sm:col-span-2">
                                 <p className="text-xs font-bold uppercase text-slate-400">Nghệ sĩ</p>
-                                <p className="mt-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                <p className="mt-2 text-sm font-semibold text-slate-200 dark:text-slate-200">
                                     {Array.isArray(event.artists) && event.artists.length > 0 ? event.artists.join(', ') : 'Đang cập nhật'}
                                 </p>
                             </div>
                         </div>
                         <div className="mt-6 border-t border-slate-100 dark:border-white/10 pt-6">
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-50">Mô tả</h3>
+                            <h3 className="text-sm font-bold text-slate-50 dark:text-slate-50">Mô tả</h3>
                             <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-slate-300">{event.description || 'Thông tin chi tiết sự kiện sẽ được cập nhật trong thời gian tới.'}</p>
                         </div>
                     </div>
 
-                    <div className="mt-8 rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 p-6">
+                    <div className="mt-8 rounded-3xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 p-6">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Danh sách show</h2>
+                                <h2 className="text-xl font-bold text-slate-50 dark:text-slate-50">Danh sách show</h2>
                                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Chọn một show để xem sơ đồ ghế và đặt vé.</p>
                             </div>
                             {totalPages > 1 && (
                                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
                                     Trang {page}/{totalPages}
-                                    <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded-full border border-slate-200 dark:border-white/10 p-2 disabled:opacity-40"><ChevronLeft size={16} /></button>
-                                    <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="rounded-full border border-slate-200 dark:border-white/10 p-2 disabled:opacity-40"><ChevronRight size={16} /></button>
+                                    <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded-full border border-white/10 dark:border-white/10 p-2 disabled:opacity-40"><ChevronLeft size={16} /></button>
+                                    <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="rounded-full border border-white/10 dark:border-white/10 p-2 disabled:opacity-40"><ChevronRight size={16} /></button>
                                 </div>
                             )}
                         </div>
@@ -113,19 +113,19 @@ export default function EventDetailPage() {
                             {isShowsLoading ? (
                                 [1, 2, 3, 4].map((item) => <div key={item} className="h-36 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800/80" />)
                             ) : shows.length === 0 ? (
-                                <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/80 p-8 text-center text-sm font-medium text-slate-400 md:col-span-2">Hiện chưa có show nào đang mở bán công khai.</div>
+                                <div className="rounded-2xl bg-slate-950/70 dark:bg-slate-900/80 p-8 text-center text-sm font-medium text-slate-400 md:col-span-2">Hiện chưa có show nào đang mở bán công khai.</div>
                             ) : shows.map((show: any) => {
                                 const venue = show.venue_id || show.venue_info;
                                 const isBookable = show.status === 'published';
                                 return (
-                                    <article key={show._id} className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90">
+                                    <article key={show._id} className="overflow-hidden rounded-2xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90">
                                         <div className="flex">
                                             <div className={`flex w-24 shrink-0 flex-col items-center justify-center ${isBookable ? 'bg-[#262880] text-white' : 'bg-slate-200 text-slate-500'}`}>
                                                 <span className="text-2xl font-black">{new Date(show.start_time).toLocaleDateString('vi-VN', { day: '2-digit' })}</span>
                                                 <span className="text-xs font-bold">Tháng {new Date(show.start_time).getMonth() + 1}</span>
                                             </div>
                                             <div className="flex flex-1 flex-col gap-2 p-4">
-                                                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-50">{show.name}</h3>
+                                                <h3 className="text-sm font-bold text-slate-50 dark:text-slate-50">{show.name}</h3>
                                                 <p className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400"><Clock size={14} />{formatTime(show.start_time)}</p>
                                                 <p className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400"><MapPin size={14} />{venue?.name || 'Địa điểm đang cập nhật'}{venue?.city ? `, ${venue.city}` : ''}</p>
                                                 <button
@@ -145,14 +145,14 @@ export default function EventDetailPage() {
                 </main>
 
                 <aside className="space-y-5">
-                    <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 p-5">
-                        <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Poster sự kiện</h3>
+                    <div className="rounded-3xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 p-5">
+                        <h3 className="text-base font-bold text-slate-50 dark:text-slate-50">Poster sự kiện</h3>
                         <div className="mt-4 aspect-[3/4] overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800/80">
                             {event.poster_url ? <img src={event.poster_url} alt={event.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-slate-300"><ImageIcon size={36} /></div>}
                         </div>
                     </div>
-                    <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 p-5">
-                        <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Lưu ý đặt vé</h3>
+                    <div className="rounded-3xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 p-5">
+                        <h3 className="text-base font-bold text-slate-50 dark:text-slate-50">Lưu ý đặt vé</h3>
                         <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">Bạn nên kiểm tra kỹ thời gian, địa điểm và trạng thái mở bán của từng show trước khi đặt vé. Vé sau khi thanh toán sẽ được lưu trong lịch sử đặt vé.</p>
                     </div>
                 </aside>
@@ -160,7 +160,7 @@ export default function EventDetailPage() {
 
             <section className="mx-auto max-w-7xl px-6 pb-14 lg:px-8">
                 <div className="mb-5 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Gợi ý cho bạn</h2>
+                    <h2 className="text-xl font-bold text-slate-50 dark:text-slate-50">Gợi ý cho bạn</h2>
                     <Link to="/search" className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-[#FF0082]">Xem thêm</Link>
                 </div>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

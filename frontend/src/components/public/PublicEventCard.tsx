@@ -12,7 +12,7 @@ export default function PublicEventCard({ event }: { event: any }) {
     return (
         <article
             onClick={() => navigate(`/events/${event._id}`)}
-            className="group overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-slate-900/90 transition-all hover:-translate-y-1 hover:border-[#4C4DCC]/40 hover:shadow-lg cursor-pointer"
+            className="group overflow-hidden rounded-2xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 transition-all hover:-translate-y-1 hover:border-[#FF0082]/40 hover:shadow-lg cursor-pointer"
         >
             <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-800/80">
                 {event.poster_url || event.banner_url ? (
@@ -27,13 +27,13 @@ export default function PublicEventCard({ event }: { event: any }) {
                     </div>
                 )}
                 {event.genre && (
-                    <span className="absolute left-3 top-3 rounded-full bg-white/90 dark:bg-slate-950/90 px-3 py-1 text-[11px] font-bold text-slate-700 dark:text-slate-200 backdrop-blur">
+                    <span className="absolute left-3 top-3 rounded-full bg-white/90 dark:bg-slate-950/90 px-3 py-1 text-[11px] font-bold text-slate-200 dark:text-slate-200 backdrop-blur">
                         {event.genre}
                     </span>
                 )}
             </div>
             <div className="space-y-2 p-4">
-                <h3 className="line-clamp-2 text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-[#4C4DCC]">
+                <h3 className="line-clamp-2 text-sm font-bold text-slate-100 dark:text-slate-100 group-hover:text-[#FF0082]">
                     {event.name}
                 </h3>
                 <p className="line-clamp-1 text-xs font-medium text-slate-400">

@@ -716,7 +716,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             </Stage>
 
             {mapBounds && (
-                <div className="absolute bottom-4 left-4 z-10 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm rounded-lg shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden pointer-events-none" style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}>
+                <div className="absolute bottom-4 left-4 z-10 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 dark:border-white/10 overflow-hidden pointer-events-none" style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}>
                     <Stage width={MINIMAP_SIZE} height={MINIMAP_SIZE}>
                         <Layer>
                             {mapAssets.map((asset, idx) => (
@@ -742,7 +742,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 </div>
             )}
 
-            <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1 bg-white/90 dark:bg-slate-950/90 backdrop-blur shadow-xl rounded-lg border border-slate-200 dark:border-white/10 overflow-hidden pointer-events-auto">
+            <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1 bg-white/90 dark:bg-slate-950/90 backdrop-blur shadow-xl rounded-lg border border-white/10 dark:border-white/10 overflow-hidden pointer-events-auto">
                 <button onClick={() => handleZoomButton(1)} className="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-primary transition-colors text-xl font-medium active:bg-slate-200 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-pink-300 dark:active:bg-white/15" >+</button>
                 <div className="w-full h-[1px] bg-slate-200 dark:bg-slate-700/70"></div>
                 <button onClick={() => handleZoomButton(-1)} className="w-10 h-10 flex items-center justify-center text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-primary transition-colors text-2xl font-medium active:bg-slate-200 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-pink-300 dark:active:bg-white/15" >-</button>

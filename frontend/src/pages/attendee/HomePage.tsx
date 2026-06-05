@@ -68,12 +68,12 @@ export default function HomePage() {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-900/90 font-sans text-slate-900 dark:text-slate-50">
-            <section className="relative overflow-hidden bg-[#F7F7FA] dark:bg-[#050510]">
+        <div className="bg-white dark:bg-slate-900/90 font-sans text-slate-50 dark:text-slate-50">
+            <section className="relative overflow-hidden bg-[#070A18] text-slate-50 concert-page-shell dark:bg-[#050510]">
                 <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-6 py-10 lg:grid-cols-2 lg:px-8 lg:py-8">
                     <div className="space-y-6 lg:pr-8">
                         <span className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-4 py-2 text-xs font-bold text-[#FF0082]">
-                            <Sparkles size={15} /> Sự kiện mới nhất trên Tickify
+                            <Sparkles size={15} /> Đêm diễn mới nhất trên Tickify
                         </span>
 
                         <div>
@@ -89,11 +89,11 @@ export default function HomePage() {
                                 </div>
                             ) : (
                                 <>
-                                    <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-slate-900 dark:text-slate-50 md:text-5xl">
-                                        {heroEvent?.name || 'Khám phá sự kiện bạn yêu thích'}
+                                    <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-slate-50 dark:text-slate-50 md:text-5xl">
+                                        {heroEvent?.name || 'Khám phá show diễn bạn yêu thích'}
                                     </h1>
                                     <p className="mt-4 max-w-lg text-sm leading-7 text-slate-500 dark:text-slate-400">
-                                        {heroEvent?.description || 'Tìm kiếm sự kiện, xem lịch diễn, chọn show phù hợp và đặt vé nhanh chóng trên Tickify.'}
+                                        {heroEvent?.description || 'Săn show đang mở bán, xem lịch diễn, chọn hạng vé và đặt vé nhanh chóng trên Tickify.'}
                                     </p>
                                 </>
                             )}
@@ -132,9 +132,9 @@ export default function HomePage() {
                             <button
                                 onClick={() => navigate('/search')}
                                 disabled={isPageLoading}
-                                className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 px-7 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 transition hover:border-[#4C4DCC] hover:text-[#4C4DCC] disabled:cursor-not-allowed disabled:text-slate-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:text-pink-200"
+                                className="rounded-xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 px-7 py-3 text-sm font-bold text-slate-200 dark:text-slate-200 transition hover:border-[#FF0082] hover:text-[#FF0082] disabled:cursor-not-allowed disabled:text-slate-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:text-pink-200"
                             >
-                                Khám phá thêm
+                                Xem thêm show
                             </button>
                         </div>
                     </div>
@@ -147,7 +147,7 @@ export default function HomePage() {
                         )}
 
                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-6 text-white">
-                            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-pink-200">Sự kiện nổi bật</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-pink-200">Show nổi bật</p>
 
                             {isPageLoading ? (
                                 <div className="mt-3 space-y-3">
@@ -172,14 +172,14 @@ export default function HomePage() {
 
                 <div className="bg-[#3B3B49] py-8">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                        <p className="mb-4 text-sm font-semibold text-white/90">Tìm sự kiện phù hợp với bạn</p>
+                        <p className="mb-4 text-sm font-semibold text-white/90">Tìm show phù hợp với lịch của bạn</p>
                         <div className="flex max-w-xl items-center gap-2 rounded-xl bg-white/20 p-2 backdrop-blur">
                             <Search className="ml-2 text-white/70" size={18} />
                             <input
                                 value={keyword}
                                 onChange={(e) => setKeyword(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && goSearch()}
-                                placeholder="Nhập tên sự kiện, thể loại hoặc địa điểm..."
+                                placeholder="Tìm tên concert, nghệ sĩ, dòng nhạc hoặc địa điểm..."
                                 className="flex-1 bg-transparent px-2 py-2 text-sm text-white outline-none placeholder:text-white/60"
                             />
                             <button onClick={goSearch} className="rounded-lg bg-[#FF0082] px-4 py-2 text-xs font-bold text-white">Tìm kiếm</button>
@@ -190,7 +190,7 @@ export default function HomePage() {
 
             <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
                 <div className="mb-5 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Sự kiện sắp diễn ra</h2>
+                    <h2 className="text-xl font-bold text-slate-50 dark:text-slate-50">Show sắp diễn ra</h2>
                     <Link to="/search?sort=upcoming" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FF0082]">Xem tất cả</Link>
                 </div>
 
@@ -203,8 +203,8 @@ export default function HomePage() {
                         {visibleUpcomingEvents.slice(0, 4).map((event: any) => <PublicEventCard key={event._id} event={event} />)}
                     </div>
                 ) : (
-                    <div className="rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/80 px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                        Hiện chưa có sự kiện nào được hiển thị.
+                    <div className="rounded-2xl border border-dashed border-white/10 dark:border-white/10 bg-slate-950/70 dark:bg-slate-900/80 px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+                        Hiện chưa có show nào được hiển thị.
                     </div>
                 )}
             </section>
@@ -212,7 +212,7 @@ export default function HomePage() {
             {(isPageLoading || genres.length > 0) && (
                 <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
                     <div className="mb-5 flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Khám phá theo thể loại</h2>
+                        <h2 className="text-xl font-bold text-slate-50 dark:text-slate-50">Khám phá theo dòng nhạc</h2>
                         <Link to="/search" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FF0082]">Xem thêm</Link>
                     </div>
 
@@ -226,10 +226,10 @@ export default function HomePage() {
                                 <button
                                     key={genre}
                                     onClick={() => navigate(`/search?genre=${encodeURIComponent(genre)}`)}
-                                    className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-900/90 px-5 py-6 text-left transition hover:border-[#FF0082] hover:shadow-md dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:shadow-pink-500/10"
+                                    className="rounded-2xl border border-white/10 bg-white dark:bg-slate-900/90 px-5 py-6 text-left transition hover:border-[#FF0082] hover:shadow-md dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:shadow-pink-500/10"
                                 >
-                                    <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Thể loại</span>
-                                    <span className="mt-2 block text-lg font-black text-slate-900 dark:text-slate-50">{genre}</span>
+                                    <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Dòng nhạc</span>
+                                    <span className="mt-2 block text-lg font-black text-slate-50 dark:text-slate-50">{genre}</span>
                                 </button>
                             ))}
                         </div>
@@ -242,16 +242,16 @@ export default function HomePage() {
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mb-6 flex items-end justify-between">
                             <div>
-                                <h2 className="text-xl font-bold">Sự kiện mới trên Tickify</h2>
-                                <p className="mt-1 text-sm text-white/60">Danh sách được lấy trực tiếp từ dữ liệu sự kiện hiện có.</p>
+                                <h2 className="text-xl font-bold">Vừa mở bán trên Tickify</h2>
+                                <p className="mt-1 text-sm text-white/60">Các show mới được mở bán và cập nhật trực tiếp từ hệ thống.</p>
                             </div>
-                            <Link to="/search" className="text-xs font-bold text-white/70 hover:text-white">Khám phá tất cả</Link>
+                            <Link to="/search" className="text-xs font-bold text-white/70 hover:text-white">Xem tất cả show</Link>
                         </div>
 
                         {isPageLoading ? (
                             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                                 {Array.from({ length: 3 }).map((_, index) => (
-                                    <article key={index} className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-50">
+                                    <article key={index} className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-50 dark:text-slate-50">
                                         <div className="h-40 animate-pulse bg-slate-300" />
                                         <div className="space-y-3 p-4">
                                             <SkeletonLine className="h-3 w-20" />
@@ -265,12 +265,12 @@ export default function HomePage() {
                         ) : (
                             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                                 {newestEvents.slice(0, 3).map((event: any) => (
-                                    <article key={event._id} onClick={() => navigate(`/events/${event._id}`)} className="ticket-card cursor-pointer overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-50 dark:border dark:border-white/10 dark:bg-slate-900/85 dark:text-slate-100">
+                                    <article key={event._id} onClick={() => navigate(`/events/${event._id}`)} className="ticket-card cursor-pointer overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-50 dark:text-slate-50 dark:border dark:border-white/10 dark:bg-slate-900/85 dark:text-slate-100 concert-ticket-card">
                                         <img src={event.banner_url || event.poster_url || heroImage} alt={event.name} className="h-40 w-full object-cover" />
                                         <div className="p-4">
                                             <p className="text-[11px] font-semibold text-slate-400">{event.genre || 'Sự kiện'}</p>
                                             <h3 className="mt-1 line-clamp-2 text-sm font-bold">{event.name}</h3>
-                                            <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500 dark:text-slate-400">{event.description || 'Thông tin sự kiện sẽ được cập nhật trong thời gian tới.'}</p>
+                                            <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500 dark:text-slate-400">{event.description || 'Thông tin show sẽ được cập nhật trong thời gian tới.'}</p>
                                         </div>
                                     </article>
                                 ))}

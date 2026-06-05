@@ -168,7 +168,7 @@ export default function CreateEvent() {
                             <Info size={14} className="ml-2 opacity-80" />
                             <input
                                 className="bg-transparent border-none outline-none text-white placeholder-white/70 w-32 px-2 py-1 text-sm font-semibold"
-                                value={formData.genre} placeholder="Thể loại..." onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+                                value={formData.genre} placeholder="Dòng nhạc..." onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
                             />
                         </div>
                         <div className="w-full relative group/title">
@@ -196,7 +196,7 @@ export default function CreateEvent() {
                         <div className="absolute top-6 right-6 text-gray-300 opacity-0 group-hover/desc:opacity-100"><Edit3 size={18} /></div>
                         <h2 className="text-xl font-bold text-secondary mb-3">Giới thiệu sự kiện</h2>
                         <textarea
-                            className="w-full bg-transparent outline-none border-2 border-transparent hover:border-gray-100 focus:border-primary/30 focus:bg-gray-50 rounded-xl p-3 -ml-3 text-gray-600 dark:text-slate-300 leading-relaxed text-base resize-none min-h-[150px] transition-all"
+                            className="w-full bg-transparent outline-none border-2 border-transparent hover:border-gray-100 focus:border-primary/30 focus:bg-slate-950/70 rounded-xl p-3 -ml-3 text-gray-600 dark:text-slate-300 leading-relaxed text-base resize-none min-h-[150px] transition-all"
                             value={formData.description} placeholder="Viết vài lời giới thiệu hấp dẫn về sự kiện của bạn..."
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         />
@@ -206,14 +206,14 @@ export default function CreateEvent() {
                         <h2 className="text-xl font-bold text-secondary mb-3 flex items-center gap-2">
                             <Calendar className="text-primary" size={20} /> Thiết lập thời gian chung
                         </h2>
-                        <div className="bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center bg-gradient-to-r from-slate-50 to-white">
+                        <div className="bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center bg-gradient-to-r from-slate-50 to-white">
                             <div className="flex-1 w-full space-y-1.5">
-                                <label className="text-xs font-bold text-gray-700 dark:text-slate-200 uppercase tracking-wide">Ngày khai mạc</label>
+                                <label className="text-xs font-bold text-slate-200 dark:text-slate-200 uppercase tracking-wide">Ngày khai mạc</label>
                                 <input type="date" className="w-full bg-white dark:bg-slate-900/90 border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm text-secondary" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} />
                             </div>
                             <div className="hidden md:block text-gray-300"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg></div>
                             <div className="flex-1 w-full space-y-1.5">
-                                <label className="text-xs font-bold text-gray-700 dark:text-slate-200 uppercase tracking-wide">Ngày bế mạc</label>
+                                <label className="text-xs font-bold text-slate-200 dark:text-slate-200 uppercase tracking-wide">Ngày bế mạc</label>
                                 <input type="date" className="w-full bg-white dark:bg-slate-900/90 border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm text-secondary" value={formData.end_date} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} />
                             </div>
                         </div>
@@ -225,7 +225,7 @@ export default function CreateEvent() {
                         <h3 className="font-bold text-lg mb-1 text-secondary flex items-center gap-2">Ảnh Poster (Dọc)</h3>
                         <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">Tỉ lệ chuẩn 3:4. Dùng để hiển thị ở trang danh sách sự kiện.</p>
 
-                        <div className="w-full flex-1 min-h-[300px] bg-slate-50 dark:bg-slate-900/80 rounded-xl overflow-hidden relative border-2 border-dashed border-gray-200 dark:border-white/10 transition-colors group">
+                        <div className="w-full flex-1 min-h-[300px] bg-slate-950/70 dark:bg-slate-900/80 rounded-xl overflow-hidden relative border-2 border-dashed border-white/10 dark:border-white/10 transition-colors group">
                             {formData.poster_url ? (
                                 <img src={formData.poster_url} className="w-full h-full object-cover" alt="Poster" />
                             ) : (
@@ -246,7 +246,7 @@ export default function CreateEvent() {
                 </div>
             </div>
 
-            <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900/90 border-t border-gray-200 dark:border-white/10 z-50">
+            <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900/90 border-t border-white/10 dark:border-white/10 z-50">
                 <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
                     <div>
                         <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chế độ khởi tạo</p>
