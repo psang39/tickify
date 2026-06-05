@@ -50,7 +50,7 @@ export default function HomePage() {
     const { data: upcomingEvents = [], isLoading: isUpcomingLoading } = usePublicEvents({ limit: 8, sort: 'upcoming' });
 
     const isPageLoading = isNewestLoading || isUpcomingLoading;
-    const visibleUpcomingEvents = upcomingEvents.length ? upcomingEvents : newestEvents;
+    const visibleUpcomingEvents = upcomingEvents;
     const heroEvent = useMemo(() => visibleUpcomingEvents?.[0] || newestEvents?.[0], [newestEvents, visibleUpcomingEvents]);
     const featureImage = heroEvent?.banner_url || heroEvent?.poster_url || heroImage;
 
@@ -108,7 +108,7 @@ export default function HomePage() {
                         ) : heroEvent ? (
                             <div className="flex flex-wrap gap-3 text-sm text-slate-600 dark:text-slate-300">
                                 <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900/90 px-4 py-2 font-semibold shadow-sm">
-                                    <Calendar size={16} className="text-[#FF0082]" /> {formatDate(heroEvent.start_date)}
+                                    <Calendar size={16} className="text-[#FF0082]" /> {formatDate(heroEvent.next_show_start_time || heroEvent.start_date)}
                                 </span>
                                 <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900/90 px-4 py-2 font-semibold shadow-sm">
                                     <MapPin size={16} className="text-[#4C4DCC]" /> {getEventVenueText(heroEvent)}
@@ -161,7 +161,7 @@ export default function HomePage() {
                                 <>
                                     <h2 className="mt-2 text-2xl font-black">{heroEvent?.name || 'Tickify Event'}</h2>
                                     <div className="mt-3 flex flex-wrap gap-4 text-xs font-semibold text-white/90">
-                                        <span className="flex items-center gap-1"><Calendar size={14} />{formatDate(heroEvent?.start_date)}</span>
+                                        <span className="flex items-center gap-1"><Calendar size={14} />{formatDate(heroEvent?.next_show_start_time || heroEvent?.start_date)}</span>
                                         {heroEvent?.genre && <span className="flex items-center gap-1"><Music2 size={14} />{heroEvent.genre}</span>}
                                     </div>
                                 </>

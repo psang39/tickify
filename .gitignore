@@ -26,3 +26,12 @@ backend/src/services/dashboardThrottler.ts.bak-sse-holding-v1
 frontend/src/pages/organizer/ShowDetail.tsx.bak-sse-holding-v1
 apply_tickify_organizer_sse_holding_fix_v1.cjs
 backend/src/services/sse.service.ts.bak-sse-holding-v1
+backend/src/controllers/event.controller.ts.bak-event-status-v2
+.gitignore
+backend/src/utils/showAvailability.ts.bak-event-status-v2
+frontend/src/components/public/PublicEventCard.tsx.bak-event-status-v2
+frontend/src/lib/showAvailability.ts.bak-event-status-v2
+frontend/src/pages/attendee/SearchPage.tsx.bak-event-status-v2
+frontend/src/pages/attendee/HomePage.tsx.bak-event-status-v2
+frontend/src/pages/attendee/EventDetailPage.tsx.bak-event-status-v2
+apply_tickify_event_status_homepage_v2.cjs

@@ -17,10 +17,18 @@ const formatTime = (value?: string) => {
     return new Date(value).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
-const getStatusLabel = (status?: string) => {
-    if (status === 'published') return 'Đang mở bán';
-    if (status === 'cancelled') return 'Đã hủy';
-    return 'Sắp công bố';
+const getEventStatusLabel = (status?: string, shows: any[] = [], isShowsLoading = false) => {
+  if (status === 'cancelled') return 'Đã hủy';
+  if (status !== 'published') return 'Sắp công bố';
+  if (isShowsLoading) return 'Đang kiểm tra lịch show';
+  if (!shows.length) return 'Chưa có show mở bán';
+  const availabilityList = shows.map((show) => getShowAvailability(show));
+  if (availabilityList.some((item) => item.isBookable)) return 'Đang mở bán vé';
+  if (availabilityList.some((item) => item.timeState === 'ongoing')) return 'Đang diễn ra';
+  if (availabilityList.every((item) => item.timeState === 'past')) return 'Đã kết thúc';
+  if (availabilityList.some((item) => item.saleState === 'coming_soon')) return 'Sắp mở bán';
+  if (availabilityList.every((item) => item.saleState === 'closed')) return 'Đã đóng bán';
+  return 'Chưa mở bán';
 };
 
 export default function EventDetailPage() {
@@ -80,7 +88,7 @@ export default function EventDetailPage() {
                             </div>
                             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 p-4">
                                 <p className="text-xs font-bold uppercase text-slate-400">Trạng thái</p>
-                                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#00A878]"><Ticket size={16} />{getStatusLabel(event.status)}</p>
+                                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#00A878]"><Ticket size={16} />{getEventStatusLabel(event.status, shows, isShowsLoading)}</p>
                             </div>
                             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 p-4 sm:col-span-2">
                                 <p className="text-xs font-bold uppercase text-slate-400">Nghệ sĩ</p>
@@ -99,7 +107,7 @@ export default function EventDetailPage() {
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Danh sách show</h2>
-                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Chọn một show để xem sơ đồ ghế và đặt vé.</p>
+                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Chọn một show còn hiệu lực để xem sơ đồ ghế và đặt vé.</p>
                             </div>
                             {totalPages > 1 && (
                                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">

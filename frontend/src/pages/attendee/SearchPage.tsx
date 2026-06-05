@@ -194,7 +194,7 @@ export default function SearchPage() {
                                         <div className="pt-2.5 border-t border-slate-50 dark:border-white/10 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                                             <div className="flex items-center gap-1">
                                                 <Calendar size={13} className="text-slate-400" />
-                                                <span>{new Date(event.start_date).toLocaleDateString('vi-VN')}</span>
+                                                <span>{new Date(event.next_show_start_time || event.start_date).toLocaleDateString('vi-VN')}</span>
                                             </div>
                                             {/* Sẽ hiển thị Thành phố nếu đã kết nối Populate sang bảng Venue */}
                                             <div className="flex items-center gap-0.5 text-[#4C4DCC] font-bold">

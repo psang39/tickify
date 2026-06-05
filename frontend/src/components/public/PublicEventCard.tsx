@@ -40,7 +40,7 @@ export default function PublicEventCard({ event }: { event: any }) {
                     {Array.isArray(event.artists) ? event.artists.join(', ') : event.artists || 'Nhiều nghệ sĩ'}
                 </p>
                 <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/10 pt-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                    <span className="flex items-center gap-1"><Calendar size={13} />{formatDate(event.start_date)}</span>
+                    <span className="flex items-center gap-1"><Calendar size={13} />{formatDate(event.next_show_start_time || event.start_date)}</span>
                     <span className="flex items-center gap-1 text-[#4C4DCC]"><MapPin size={13} />{event.venue_info?.city || 'Việt Nam'}</span>
                 </div>
             </div>

@@ -24,18 +24,21 @@ const computeTimeState = (show: any, now: Date) => {
 };
 
 const computeSaleState = (show: any, now: Date) => {
-  if (show?.status === 'cancelled') return 'closed' as const;
+  const timeState = show?.time_state || computeTimeState(show, now);
+  if (show?.status === 'cancelled' || timeState === 'past' || timeState === 'ongoing') return 'closed' as const;
   const saleStart = toDate(show?.sale_start);
   const saleEnd = toDate(show?.sale_end);
   if (saleStart && now < saleStart) return 'coming_soon' as const;
-  if (saleEnd && now <= saleEnd) return 'on_sale' as const;
+  if (saleStart && saleEnd && now >= saleStart && now <= saleEnd) return 'on_sale' as const;
+  if (!saleStart && saleEnd && now <= saleEnd) return 'on_sale' as const;
   return 'closed' as const;
 };
 
 export const getShowAvailability = (show: any): FrontendShowAvailability => {
   const now = new Date();
   const timeState = show?.time_state || computeTimeState(show, now);
-  const saleState = show?.sale_state || computeSaleState(show, now);
+  let saleState = show?.sale_state || computeSaleState(show, now);
+  if (timeState === 'past' || timeState === 'ongoing' || timeState === 'cancelled') saleState = 'closed';
   const backendBookable = typeof show?.is_bookable === 'boolean' ? show.is_bookable : undefined;
   const isBookable = backendBookable ?? (show?.status === 'published' && timeState === 'upcoming' && saleState === 'on_sale');
   const bookingStatus = show?.booking_status || (() => {

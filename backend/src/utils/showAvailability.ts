@@ -34,10 +34,17 @@ export const computeShowAvailability = (show: any, now: Date = new Date()) => {
   else time_state = 'past';
 
   let sale_state: ShowSaleState;
-  if (status === 'cancelled') sale_state = 'closed';
-  else if (saleStart && now < saleStart) sale_state = 'coming_soon';
-  else if (saleEnd && now <= saleEnd) sale_state = 'on_sale';
-  else sale_state = 'closed';
+  if (status === 'cancelled' || time_state === 'past' || time_state === 'ongoing') {
+    sale_state = 'closed';
+  } else if (saleStart && now < saleStart) {
+    sale_state = 'coming_soon';
+  } else if (saleStart && saleEnd && now >= saleStart && now <= saleEnd) {
+    sale_state = 'on_sale';
+  } else if (!saleStart && saleEnd && now <= saleEnd) {
+    sale_state = 'on_sale';
+  } else {
+    sale_state = 'closed';
+  }
 
   let booking_status: ShowBookingStatus = 'on_sale';
   let booking_message = 'Show đang mở bán. Bạn có thể chọn ghế và đặt vé.';
