@@ -84,7 +84,6 @@ export default function AdminDashboard() {
         }
     });
 
-
     const deleteVenueMutation = useMutation({
         mutationFn: async (venueId: string) => api.delete(`/admin/venues/${venueId}`),
         onSuccess: () => {
@@ -95,12 +94,10 @@ export default function AdminDashboard() {
         onError: (err: any) => showError(err.response?.data?.message || "Không thể xóa địa điểm này!")
     });
 
-
     const verifyVenueMutation = useMutation({
         mutationFn: async (venueId: string) => api.put(`/admin/venues/${venueId}/verify`),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['adminAllVenues'] })
     });
-
 
     const verifyOrgMutation = useMutation({
         mutationFn: async (userId: string) => api.put(`/admin/organizers/${userId}/verify`),
@@ -110,7 +107,6 @@ export default function AdminDashboard() {
         mutationFn: async (userId: string) => api.delete(`/admin/organizers/${userId}/reject`),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pendingOrganizers'] })
     });
-
 
     const handleStartEdit = (venue: any) => {
         setEditingVenueId(venue._id);
@@ -151,14 +147,12 @@ export default function AdminDashboard() {
                 <p className="text-slate-500 mt-1 font-medium">Cập nhật hệ thống: {new Date().toLocaleTimeString('vi-VN')}</p>
             </header>
 
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Tổng Tài khoản" value={statsData?.totalUsers?.toLocaleString() || 0} icon={<Users size={24} className="text-blue-500" />} bg="bg-blue-50" />
                 <StatCard title="Sự kiện Active" value={statsData?.totalActiveEvents?.toLocaleString() || 0} icon={<Ticket size={24} className="text-emerald-500" />} bg="bg-emerald-50" />
                 <StatCard title="Sự kiện chờ duyệt" value={statsData?.totalPendingEvents?.toLocaleString() || 0} icon={<CalendarClock size={24} className="text-amber-500" />} bg="bg-amber-50" />
                 <StatCard title="Tổng Doanh thu" value={new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(statsData?.totalSystemRevenue || 0)} icon={<DollarSign size={24} className="text-primary" />} bg="bg-pink-50" />
             </div>
-
 
             {(isVenueFormOpen || editingVenueId) && (
                 <section className={`bg-white border rounded-[24px] p-6 transition-all duration-300 ${editingVenueId ? 'border-primary ring-2 ring-primary/5' : 'border-slate-200'} animate-in slide-in-from-top duration-200`}>
@@ -253,7 +247,7 @@ export default function AdminDashboard() {
                 </section>
             )}
 
-            {/* BẢNG XỂU DUYỆT TÀI KHOẢN ORGANIZER */}
+            
             <section className="bg-white border border-slate-200 rounded-[24px] overflow-hidden">
                 <div className="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
                     <h2 className="text-lg font-bold text-slate-800">Yêu cầu mở tài khoản Ban Tổ Chức</h2>
@@ -299,7 +293,7 @@ export default function AdminDashboard() {
                 )}
             </section>
 
-            {/* BẢNG TỔNG QUAN DANH SÁCH ĐỊA ĐIỂM */}
+            
             <section className="bg-white border border-slate-200 rounded-[24px] overflow-hidden">
                 <div className="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
                     <div>
@@ -307,7 +301,7 @@ export default function AdminDashboard() {
                         <p className="text-xs text-slate-400 mt-0.5 font-medium">Danh mục toàn bộ các sân bãi, nhà thi đấu, trung tâm hội nghị khả dụng</p>
                     </div>
 
-                    {/* 🌟 CỤM ĐIỀU KHIỂN: GỒM BADGE SỐ LƯỢNG VÀ NÚT TẠO MỚI PHẲNG MỊN */}
+                    
                     <div className="flex items-center gap-4">
                         <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-md">{venuePagination?.totalDocs || 0} tổng số</span>
                         <button

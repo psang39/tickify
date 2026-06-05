@@ -48,7 +48,6 @@ export default function ManageUsersPage() {
         return null;
     };
 
-
     return (
         <div className="w-full max-w-6xl animate-in fade-in duration-300">
             <LoadingOverlay isVisible={isLoading} />
@@ -108,7 +107,7 @@ export default function ManageUsersPage() {
                     </table>
                 </div>
 
-                {/* TRÌNH PHÂN TRANG (PAGINATION) */}
+                
                 <div className="px-6 py-4 border-t border-slate-200 bg-slate-50/30 flex items-center justify-between">
                     <span className="text-sm text-slate-500 font-medium">
                         Trang <span className="font-bold text-slate-800">{page + 1}</span>

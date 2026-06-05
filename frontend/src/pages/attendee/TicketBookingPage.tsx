@@ -35,7 +35,7 @@ export default function TicketBookingPage() {
   const [liveSeatsData, setLiveSeatsData] = useState<any[]>([]);
   const [zoneSummaries, setZoneSummaries] = useState<Record<string, any>>({});
 
-  // STATE CHO SIDEBAR FILTER
+  
   const [filterMinPrice, setFilterMinPrice] = useState<number | "">("");
   const [filterMaxPrice, setFilterMaxPrice] = useState<number | "">("");
   const [selectedTicketTypes, setSelectedTicketTypes] = useState<string[]>([]);
@@ -94,7 +94,7 @@ export default function TicketBookingPage() {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       const { step, orderId } = trackingRef.current;
 
-      // NẾU ĐANG ĐI THANH TOÁN -> TUYỆT ĐỐI KHÔNG HIỆN POPUP CẢNH BÁO CỦA TRÌNH DUYỆT
+      
       if (isPayingRef.current) return;
 
       if (orderId && (step === 3 || step === 4)) {
@@ -110,7 +110,7 @@ export default function TicketBookingPage() {
 
       const { step, orderId } = trackingRef.current;
 
-      // NẾU ĐANG DI CHUYỂN SANG VNPAY -> BỎ QUA KHÔNG ĐƯỢC CHẠY LỆNH HỦY GHẾ
+      
       if (isPayingRef.current) {
         console.log(
           "Hệ thống chuyển hướng thanh toán an toàn. Giữ nguyên trạng thái ghế.",
@@ -118,7 +118,7 @@ export default function TicketBookingPage() {
         return;
       }
 
-      // Chỉ thực thi giải phóng ghế khi đóng tab vĩnh viễn hoặc crash ứng dụng
+      
       if (orderId && (step === 3 || step === 4)) {
         const checkoutToken = localStorage.getItem(`checkoutToken_${showId}`);
         fetch(`${API_BASE_URL}/orders/release`, {
@@ -134,9 +134,9 @@ export default function TicketBookingPage() {
       }
     };
   }, [showId]);
-  // ==========================================
-  // FETCH DỮ LIỆU BẰNG TANSTACK QUERY
-  // ==========================================
+  
+  
+  
   const { data: userData } = useQuery({
     queryKey: ["current-user"],
     queryFn: async () => {
@@ -305,9 +305,9 @@ export default function TicketBookingPage() {
     ticketTypeDictionary,
   ]);
 
-  // ==========================================
-  // KẾT NỐI REAL-TIME SSE
-  // ==========================================
+  
+  
+  
   useEffect(() => {
     if (!showId) return;
     const checkoutKey = `checkoutToken_${showId}`;
@@ -536,7 +536,6 @@ export default function TicketBookingPage() {
       .filter(Number.isFinite);
     return Math.max(1000000, ...(prices.length ? prices : [0]));
   }, [ticketTypeDictionary]);
-
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -987,7 +986,7 @@ export default function TicketBookingPage() {
                 </div>
               </div>
 
-              {/* Phần 2: Phương thức thanh toán */}
+              
               <div>
                 <h3 className="text-l font-medium text-blue-700 mb-6">
                   2. Chọn phương thức thanh toán
@@ -1095,7 +1094,7 @@ export default function TicketBookingPage() {
       )}
 
       <main className="max-w-[1440px] mx-auto px-8 py-6">
-        {/* Header Tiêu đề sự kiện */}
+        
 
         <EventInfoHeader
           showInfo={showInfo}
@@ -1114,10 +1113,10 @@ export default function TicketBookingPage() {
           {renderStepContent()}
         </div>
 
-        {/* THANH ĐIỀU HƯỚNG CHUNG BÊN DƯỚI (Chỉ hiện ở bước 3) */}
+        
         {currentStep !== 2 && currentStep !== 5 && currentStep !== 4 && (
           <div className="mt-8 flex justify-between items-center border-t border-gray-200 pt-6 pb-10">
-            {/* Nút lùi này là dự phòng ở dưới cùng màn hình */}
+            
             <Button
               variant="ghost"
               onClick={handleBack}

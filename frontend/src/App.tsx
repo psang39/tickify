@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/layout/AdminLayout';
@@ -58,6 +59,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <FeedbackModalHost />
+        <ThemeToggle variant="floating" />
         <Routes>
           <Route element={<ProtectedRoute allowedRoles={ADMIN_ROLES} />}>
             <Route element={<AdminLayout />}>

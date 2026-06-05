@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { api } from '@/lib/axiosClient'; // Đường dẫn tới file Axios config của bạn
+import { api } from '@/lib/axiosClient'; 
 import { ErrorModal } from '@/components/shared/ErrorModal';
 import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 
@@ -8,14 +8,13 @@ export default function MockGatewayPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    // Đọc tham số từ URL
+    
 
     const orderId = searchParams.get('orderId');
     const amount = searchParams.get('amount');
 
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
 
     const handlePayment = async (status: 'SUCCESS' | 'FAILED') => {
         setIsLoading(true);
@@ -61,7 +60,7 @@ export default function MockGatewayPage() {
                     <p className="text-blue-100 mt-1 text-sm">Môi trường giả lập thanh toán</p>
                 </div>
 
-                {/* Thông tin đơn hàng */}
+                
                 <div className="p-8">
                     <div className="text-center mb-8">
                         <p className="text-slate-500 text-sm mb-2">Số tiền thanh toán</p>

@@ -110,7 +110,7 @@ export default function CreateEvent() {
         <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
             <LoadingOverlay isVisible={isPending} message="Đang tạo sự kiện..." />
 
-            {/* NÚT BACK GÓC TRÁI QUAY LẠI DANH SÁCH THEO THIẾT KẾ TRANG DETAIL */}
+            
             <button
                 onClick={() => navigate('/organizer/events')}
                 className="absolute top-6 left-6 z-20 bg-black/40 hover:bg-black/70 text-white p-2.5 rounded-full backdrop-blur-md transition-all border border-transparent"

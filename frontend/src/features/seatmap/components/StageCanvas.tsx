@@ -228,7 +228,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     const { mapBounds, zoneLabels, assetLabels } = useMemo(() => {
         const boundsList: any[] = [];
 
-        // 1. Bounds từ seats
+        
         if (drawableSeatsData.length > 0) {
             const xs = drawableSeatsData
                 .map(s => Number(s.x))
@@ -248,13 +248,13 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             }
         }
 
-        // 2. Bounds từ zones
+        
         zonesData.forEach(zone => {
             const bounds = getPathBounds(zone.path_data || zone.layout_map);
             if (bounds) boundsList.push(bounds);
         });
 
-        // 3. Bounds từ assets
+        
         mapAssets.forEach(asset => {
             const bounds = getPathBounds(asset.path_data);
             if (bounds) boundsList.push(bounds);
@@ -281,7 +281,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 };
             }
 
-            // Fallback nếu zone không có path hợp lệ
+            
             const seatsInZone = drawableSeatsData.filter(s => s.zone_id === zone._id);
 
             if (seatsInZone.length === 0) return null;
@@ -413,9 +413,8 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
         }));
     };
 
-
     const handleZoneMouseLeave = () => {
-        // Tắt tooltip khi chuột rời khỏi zone
+        
         setZoneTooltip(prev => ({ ...prev, visible: false }));
     };
     const handleMouseEnter = useCallback((e: any, seat: any, isAvailable: boolean) => {
@@ -428,7 +427,6 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
             const stage = e.target.getStage();
             if (stage) stage.container().style.cursor = 'default';
         }
-
 
         if (timerRef.current) clearTimeout(timerRef.current);
         const stage = e.target.getStage();
@@ -547,7 +545,6 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
     useEffect(() => {
         clearAllTooltips();
     }, [isZoomedIn, clearAllTooltips]);
-
 
     const handleZoomButton = (direction: 1 | -1) => {
         clearAllTooltips();
@@ -780,7 +777,7 @@ export const StageCanvas: React.FC<StageCanvasProps> = ({
                 <div
                     className="absolute z-50 pointer-events-none bg-slate-900/95 backdrop-blur-md border border-slate-700 text-white p-4 rounded-xl shadow-2xl transition-opacity duration-150 ease-out"
                     style={{
-                        // Cộng thêm 15px để Tooltip không bị che bởi chính con trỏ chuột
+                        
                         top: zoneTooltip.y + 15,
                         left: zoneTooltip.x + 15,
                         transform: 'translate(0, 0)'

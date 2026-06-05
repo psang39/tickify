@@ -51,7 +51,6 @@ export default function OrganizerDashboard() {
     const ticketTypeBreakdown = data?.ticketTypeBreakdown || [];
     const recentCheckIns = data?.recentCheckIns || [];
 
-
     const checkInChartData = useMemo(() => Object.entries((data?.checkIns || {}) as Record<string, number>)
         .filter(([, count]) => Number(count) > 0)
         .map(([name, value]) => ({ name: resultLabel[name] || name, value })), [data]);

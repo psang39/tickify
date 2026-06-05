@@ -41,7 +41,7 @@ export default function SearchPage() {
                 }
             });
 
-            return res.data || []; // Trả về mảng sự kiện hoặc mảng rỗng nếu không có data
+            return res.data || []; 
         }
     });
 
@@ -51,7 +51,7 @@ export default function SearchPage() {
 
     return (
         <div className="w-full min-h-screen bg-[#F8F9FA] font-sans pb-20">
-            {/* KHU VỰC TIÊU ĐỀ TRANG TÌM KIẾM */}
+            
             <div className="bg-white border-b border-gray-100 py-10 px-8">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -61,7 +61,7 @@ export default function SearchPage() {
                         </p>
                     </div>
 
-                    {/* Thanh tìm kiếm dập nổi tại trang */}
+                    
                     <div className="w-full md:max-w-md relative">
                         <input
                             type="text"
@@ -78,17 +78,17 @@ export default function SearchPage() {
                 </div>
             </div>
 
-            {/* BỐ CỤC LƯỚI CHÍNH */}
+            
             <div className="max-w-7xl mx-auto px-8 mt-10 grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-                {/* 1. CỘT TRÁI: BỘ LỌC PHẲNG (FLAT SIDEBAR) */}
+                
                 <aside className="lg:col-span-1 bg-white border border-gray-200 rounded-2xl p-5 h-fit space-y-6">
                     <div className="flex items-center gap-2 border-b border-slate-50 pb-3">
                         <SlidersHorizontal size={16} className="text-slate-500" />
                         <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Bộ lọc tìm kiếm</h2>
                     </div>
 
-                    {/* Bộ lọc: Khu vực Thành phố */}
+                    
                     <div className="space-y-2">
                         <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><MapPin size={12} /> Địa điểm tổ chức</label>
                         <select
@@ -103,7 +103,7 @@ export default function SearchPage() {
                         </select>
                     </div>
 
-                    {/* Bộ lọc: Thể loại nhạc */}
+                    
                     <div className="space-y-2">
                         <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><Music size={12} /> Thể loại âm nhạc</label>
                         <select
@@ -111,7 +111,7 @@ export default function SearchPage() {
                             onChange={(e) => { setSelectedGenre(e.target.value); setTimeout(applyFilters, 0); }}
                             className="w-full border border-gray-200 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 text-slate-700 outline-none focus:border-primary"
                         >
-                            <option value="">Tất cả thể loại</option>
+                            <option value="">Tất cả danh mục</option>
                             <option value="Pop / Concert">Pop / Concert</option>
                             <option value="Rock">Rock</option>
                             <option value="Jazz">Jazz</option>
@@ -119,7 +119,7 @@ export default function SearchPage() {
                         </select>
                     </div>
 
-                    {/* Bộ lọc: Thứ tự sắp xếp */}
+                    
                     <div className="space-y-2">
                         <label className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1"><ArrowUpDown size={12} /> Sắp xếp kết quả</label>
                         <select
@@ -127,7 +127,7 @@ export default function SearchPage() {
                             onChange={(e) => { setSortBy(e.target.value); setTimeout(applyFilters, 0); }}
                             className="w-full border border-gray-200 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 text-slate-700 outline-none focus:border-primary"
                         >
-                            <option value="newest">Mới nhất gối đầu</option>
+                            <option value="newest">Mới nhất</option>
                             <option value="upcoming">Sắp diễn ra gần nhất</option>
                         </select>
                     </div>
@@ -140,7 +140,7 @@ export default function SearchPage() {
                     </button>
                 </aside>
 
-                {/* 2. CỘT PHẢI: LƯỚI THẺ SỰ KIỆN POSTER 3:4 ĐÚNG STYLE TRANG CHỦ */}
+                
                 <main className="lg:col-span-3">
                     {isLoading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 animate-pulse">
@@ -160,7 +160,7 @@ export default function SearchPage() {
                                     onClick={() => navigate(`/events/${event._id}`)}
                                     className="bg-white border border-gray-200 rounded-[24px] overflow-hidden hover:border-[#4C4DCC]/40 cursor-pointer transition-all flex flex-col group"
                                 >
-                                    {/* KHU VỰC KHUNG ẢNH BANNER POSTER 3:4 NGHIÊM NGẶT */}
+                                    
                                     <div className="w-full aspect-[3/4] bg-slate-100 overflow-hidden relative">
                                         {event.poster_url ? (
                                             <img
@@ -171,13 +171,13 @@ export default function SearchPage() {
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon size={32} /></div>
                                         )}
-                                        {/* Tag thể loại góc trên ảnh */}
+                                        
                                         <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-100">
                                             {event.genre}
                                         </span>
                                     </div>
 
-                                    {/* NỘI DUNG CHỮ DƯỚI CHÂN CARD */}
+                                    
                                     <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                                         <div className="space-y-1">
                                             <h3 className="font-bold text-slate-800 text-sm leading-snug group-hover:text-[#4C4DCC] transition-colors line-clamp-2">
@@ -190,13 +190,13 @@ export default function SearchPage() {
                                             )}
                                         </div>
 
-                                        {/* Mốc thời gian và Vùng thành phố tổ chức */}
+                                        
                                         <div className="pt-2.5 border-t border-slate-50 flex items-center justify-between text-[11px] text-slate-500 font-medium">
                                             <div className="flex items-center gap-1">
                                                 <Calendar size={13} className="text-slate-400" />
                                                 <span>{new Date(event.start_date).toLocaleDateString('vi-VN')}</span>
                                             </div>
-                                            {/* Sẽ hiển thị Thành phố nếu đã kết nối Populate sang bảng Venue */}
+                                            
                                             <div className="flex items-center gap-0.5 text-[#4C4DCC] font-bold">
                                                 <MapPin size={12} />
                                                 <span>{event.venue_info?.city || 'Việt Nam'}</span>

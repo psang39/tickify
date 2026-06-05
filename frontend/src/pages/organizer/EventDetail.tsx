@@ -227,8 +227,8 @@ export default function EventDetail() {
     const { mutateAsync: createShow } = useMutation({
         mutationFn: async (newShowData: any) => {
             const response = await api.post(`/organizer/events/${eventId}/shows`, newShowData, {
-                // SVG thật có thể lớn; backend đã trả response sớm và xử lý seatmap nền,
-                // nhưng giữ timeout rộng để tránh axios tự hủy request khi mạng/server chậm.
+                
+                
                 timeout: 0
             });
             return response.data;
@@ -327,7 +327,6 @@ export default function EventDetail() {
             setIsSubmittingShow(false);
         }
     };
-
 
     const filteredVenues = venues;
     const isInfoTab = activeTab === 'INFO';
@@ -436,7 +435,7 @@ export default function EventDetail() {
                 </div>
             </div>
 
-            {/* TAB NAVIGATION */}
+            
             <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 mt-8">
                 <div className="flex gap-4 border-b border-gray-200">
                     <button onClick={() => setActiveTab('INFO')} className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'INFO' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}><Settings size={18} /> Chỉnh sửa Thông tin</button>
@@ -478,7 +477,7 @@ export default function EventDetail() {
                     </div>
                 )}
 
-                {/* TAB 2: QUẢN LÝ SHOWS */}
+                
                 {activeTab === 'SHOWS' && (
                     <div className="space-y-6 animate-in fade-in">
                         <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200">
@@ -495,7 +494,7 @@ export default function EventDetail() {
                             <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-start gap-2.5 text-sm font-medium"><Info size={18} className="shrink-0 mt-0.5" /><span>Vui lòng chọn hành động "Kích hoạt Sự kiện" ở thanh bên dưới trước khi khởi tạo hoặc mở rộng các đêm diễn (Show) bên trong.</span></div>
                         )}
 
-                        {/* FORM TẠO SHOW */}
+                        
                         {showForm && currentStatus !== 'draft' && (
                             <form onSubmit={handleCreateAllShow} className="bg-white p-8 rounded-2xl border border-slate-200 space-y-6 animate-in slide-in-from-top-4">
                                 <h2 className="text-xl font-bold text-secondary border-b pb-3">Thông tin Show mới</h2>
@@ -507,12 +506,12 @@ export default function EventDetail() {
                                             value={showData.name} onChange={e => setShowData({ ...showData, name: e.target.value })} />
                                     </div>
 
-                                    {/* 🌟 NÂNG CẤP PHÂN HỆ CHỌN/TẠO VENUE INLINE CHO FORM TẠO SHOW */}
+                                    
                                     <div className="relative">
                                         <label className="block text-sm font-medium mb-1">Nơi tổ chức</label>
 
                                         {!isCreatingNewVenue ? (
-                                            /* BƯỚC 1: THANH TÌM KIẾM ĐỊA ĐIỂM CÓ SẴN (SEARCH-DRIVEN) */
+                                            
                                             <div className="relative">
                                                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                                 <input type="text" className="w-full border border-gray-300 rounded-lg py-2.5 pl-10 pr-4 outline-none focus:border-primary text-sm"
@@ -527,11 +526,11 @@ export default function EventDetail() {
                                                             <div key={venue._id} className="px-4 py-2.5 hover:bg-slate-50 cursor-pointer border-b border-gray-50"
                                                                 onMouseDown={() => { setShowData({ ...showData, venue_id: venue._id }); setVenueSearch(venue.name); setIsVenueDropdownOpen(false); }}>
                                                                 <div className="font-semibold text-gray-800 text-xs">{venue.name}</div>
-                                                                {/* ✨ ĐÃ SỬA: Chuỗi địa chỉ gộp nối Address + City liền mạch */}
+                                                                
                                                                 <div className="text-[10px] text-gray-400 mt-0.5 truncate">{venue.address}{venue.city ? `, ${venue.city}` : ''}</div>
                                                             </div>
                                                         ))}
-                                                        {/* ✨ ĐÃ SỬA: Nút khởi động panel tạo nhanh tại chân kết quả tìm kiếm */}
+                                                        
                                                         <div
                                                             className="px-4 py-2.5 hover:bg-slate-100 cursor-pointer border-t border-slate-100 text-[11px] font-bold text-primary text-center bg-slate-50/60 sticky bottom-0 z-10 transition-colors"
                                                             onMouseDown={() => setIsCreatingNewVenue(true)}
@@ -542,7 +541,7 @@ export default function EventDetail() {
                                                 )}
                                             </div>
                                         ) : (
-                                            /* BƯỚC 2: FORM PHẲNG ĐIỀN ĐỦ THÔNG TIN ĐỊA ĐIỂM KÈM TRƯỜNG CITY */
+                                            
                                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 animate-in fade-in duration-200">
                                                 <div className="flex justify-between items-center border-b border-slate-200 pb-1.5">
                                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Đề xuất địa điểm mới</span>
@@ -564,7 +563,7 @@ export default function EventDetail() {
                                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Địa chỉ chi tiết *</label>
                                                             <input type="text" placeholder="VD: 78 Khúc Thừa Dụ" value={newVenueForm.address} onChange={e => setNewVenueForm({ ...newVenueForm, address: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700" />
                                                         </div>
-                                                        {/* ✨ ĐÃ SỬA: Có ô nhập trường thành phố cho đối tác */}
+                                                        
                                                         <div className="col-span-1">
                                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Thành phố *</label>
                                                             <input type="text" placeholder="Hà Nội" value={newVenueForm.city} onChange={e => setNewVenueForm({ ...newVenueForm, city: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700" />
@@ -742,7 +741,7 @@ export default function EventDetail() {
                             </form>
                         )}
 
-                        {/* DANH SÁCH SHOWS HIỆN CÓ */}
+                        
                         {isLoadingShows ? (
                             <p className="text-gray-500 animate-pulse text-center py-10">Đang tải danh sách show...</p>
                         ) : (
@@ -828,7 +827,7 @@ export default function EventDetail() {
                 )}
             </div>
 
-            {/* BAR ĐIỀU KHIỂN CHẠY DƯỚI ĐÁY TRANG */}
+            
             {activeTab === 'INFO' && (
                 <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50">
                     <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">

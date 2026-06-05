@@ -37,10 +37,10 @@ export default function ShowDetail() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const [activeTab, setActiveTab] = useState<'CONFIG' | 'LIVE'>('CONFIG'); // State điều hướng Tab
+    const [activeTab, setActiveTab] = useState<'CONFIG' | 'LIVE'>('CONFIG'); 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { showSuccess, showError } = useFeedbackStore();
-    const [selectedStaffId, setSelectedStaffId] = useState<string>(''); // State quản lý ô select staff
+    const [selectedStaffId, setSelectedStaffId] = useState<string>(''); 
     const [ticketTypeForm, setTicketTypeForm] = useState<TicketTypeForm>(emptyTicketTypeForm);
     const [editingTicketTypeId, setEditingTicketTypeId] = useState<string | null>(null);
 
@@ -67,7 +67,7 @@ export default function ShowDetail() {
         longitude: ''
     });
 
-    // State hứng dữ liệu thời gian thực (SSE)
+    
     const [liveMonitor, setLiveMonitor] = useState({
         activeUsers: 0,
         holdingSeats: 0,
@@ -75,7 +75,6 @@ export default function ShowDetail() {
         ticketsSoldLastMinute: 0,
         status: 'Đang kết nối...'
     });
-
 
     useEffect(() => {
         if (!showId || activeTab !== 'LIVE') return;
@@ -125,8 +124,6 @@ export default function ShowDetail() {
         enabled: !!showId
     });
 
-
-
     const { data: ticketTypesData = [], isLoading: isLoadingTicketTypes } = useQuery({
         queryKey: ['organizer-show-ticket-types', showId],
         queryFn: async () => {
@@ -161,7 +158,7 @@ export default function ShowDetail() {
         }
     });
 
-    // Xử lý chia nhóm nhân sự phụ trách ca làm việc
+    
     const staffList = Array.isArray(staffListData) ? staffListData : [];
     const assignedStaff = staffList.filter((s: any) => s.assigned_show_ids?.includes(showId));
     const availableStaff = staffList.filter((s: any) => !s.assigned_show_ids?.includes(showId));
@@ -189,7 +186,7 @@ export default function ShowDetail() {
         }
     }, [showData]);
 
-    // MUTATION: ĐỀ XUẤT VENUE MỚI TẠI CHỖ TỪ ORGANIZER
+    
     const { mutateAsync: suggestVenueMutation, isPending: isSuggestingVenue } = useMutation({
         mutationFn: async (newVenueData: any) => {
             const response = await api.post('/venues', newVenueData);
@@ -246,8 +243,6 @@ export default function ShowDetail() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['organizer-staffs-list'] }),
         onError: (err: any) => setErrorMessage(err.response?.data?.message || "Không thể rút nhân viên.")
     });
-
-
 
     const invalidateTicketTypes = () => {
         queryClient.invalidateQueries({ queryKey: ['organizer-show-ticket-types', showId] });
@@ -350,7 +345,7 @@ export default function ShowDetail() {
             <LoadingOverlay isVisible={isAnyActionPending} message="Đang xử lý thao tác..." />
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
-            {/* BAR TIÊU ĐỀ TRÊN CÙNG */}
+            
             <div className="bg-white border-b border-gray-200 px-6 lg:px-12 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-40">
                 <div className="flex items-center gap-4">
                     <button
@@ -365,7 +360,7 @@ export default function ShowDetail() {
                     </div>
                 </div>
 
-                {/* HỆ THỐNG PHÂN TAB PHẲNG (NO SHADOW) */}
+                
                 <div className="flex bg-slate-100 p-1 rounded-xl self-start md:self-center border border-slate-200">
                     <button
                         onClick={() => setActiveTab('CONFIG')}
@@ -381,7 +376,7 @@ export default function ShowDetail() {
                     </button>
                 </div>
 
-                {/* TRẠNG THÁI CHỈ ĐỌC */}
+                
                 <div className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg bg-slate-50 text-xs font-bold self-start md:self-center">
                     <span className="text-gray-400 uppercase">Trạng thái:</span>
                     {currentStatus === 'draft' && <span className="text-slate-600 flex items-center gap-1"><EyeOff size={13} /> Bản nháp</span>}
@@ -390,13 +385,13 @@ export default function ShowDetail() {
                 </div>
             </div>
 
-            {/* ================================================================= */}
-            {/* TAB 1: CẤU HÌNH & NHÂN SỰ                                         */}
-            {/* ================================================================= */}
+            
+            
+            
             {activeTab === 'CONFIG' && (
                 <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 mt-8 grid grid-cols-1 xl:grid-cols-3 gap-8 animate-in fade-in duration-150">
 
-                    {/* CỘT TRÁI: KHU VỰC ĐIỀU CHỈNH THÔNG TIN FORM */}
+                    
                     <div className="xl:col-span-2 space-y-8">
                         {currentStatus === 'published' && (
                             <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl flex items-start gap-2.5 text-xs font-medium">
@@ -627,17 +622,17 @@ export default function ShowDetail() {
                         </div>
                     </div>
 
-                    {/* CỘT PHẢI: VENUE, MAP SVG & QUẢN LÝ NHÂN SỰ TRỰC CA */}
+                    
                     <div className="space-y-6">
 
-                        {/* 🌟 PHÂN HỆ ĐỊA ĐIỂM (VENUE) ĐÃ ĐƯỢC ĐỔI SANG INLINE CREATION FLUID UX */}
+                        
                         <div className="bg-white rounded-2xl p-6 border border-gray-100">
                             <h3 className="font-bold text-sm mb-3 text-slate-800 flex items-center gap-2">
                                 <MapPin size={16} className="text-primary" /> Nơi tổ chức
                             </h3>
 
                             {!isCreatingNewVenue ? (
-                                /* CHẾ ĐỘ 1: CHỌN ĐỊA ĐIỂM SẴN CÓ */
+                                
                                 <div className="space-y-4">
                                     <div className="relative">
                                         <input
@@ -659,7 +654,7 @@ export default function ShowDetail() {
                                                     </div>
                                                 ))}
 
-                                                {/* NÚT KÍCH HOẠT ĐỀ XUẤT VENUE MỚI TẠI CHÂN DROPDOWN */}
+                                                
                                                 <div
                                                     className="px-3 py-2.5 hover:bg-slate-100 cursor-pointer border-t border-slate-100 text-[11px] font-bold text-primary text-center bg-slate-50/50 sticky bottom-0 z-10 transition-colors"
                                                     onMouseDown={() => setIsCreatingNewVenue(true)}
@@ -862,7 +857,7 @@ export default function ShowDetail() {
             {activeTab === 'LIVE' && (
                 <div className="w-full max-w-4xl mx-auto px-6 lg:px-12 mt-8 space-y-6 animate-in fade-in duration-150">
 
-                    {/* Hộp Trạng thái đường truyền Stream */}
+                    
                     <div className="flex justify-between items-center bg-white border border-gray-200 px-5 py-4 rounded-xl">
                         <div className="space-y-0.5">
                             <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2">
@@ -876,10 +871,10 @@ export default function ShowDetail() {
                         </div>
                     </div>
 
-                    {/* Khối Thống kê số liệu Động */}
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                        {/* Panel 1: Đếm lượng View truy cập đồng thời */}
+                        
                         <div className="bg-slate-800 text-white rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
                             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Khán giả đang giữ phòng vé</span>
                             <div className="text-5xl font-mono font-bold tracking-tight mt-4">
@@ -888,7 +883,7 @@ export default function ShowDetail() {
                             <span className="text-[10px] text-slate-500 font-medium mt-2">* Cập nhật liên tục mỗi 3 giây</span>
                         </div>
 
-                        {/* Panel 2: Vận tốc bán vé gối đầu */}
+                        
                         <div className="bg-white border-2 border-primary/20 rounded-2xl p-6 flex flex-col justify-between min-h-[140px] bg-gradient-to-br from-primary/5 to-white">
                             <span className="text-xs font-bold uppercase tracking-wider text-primary">Doanh thu hiện tại</span>
                             <div className="text-5xl font-mono font-bold tracking-tight text-primary mt-4">
@@ -899,7 +894,7 @@ export default function ShowDetail() {
 
                     </div>
 
-                    {/* Khối hướng dẫn vận hành cho Organizer */}
+                    
                     <div className="bg-amber-50/50 border border-amber-200 rounded-xl p-4 flex items-start gap-2.5 text-xs text-amber-800 font-medium">
                         <Info size={16} className="shrink-0 mt-0.5 text-amber-600" />
                         <div className="space-y-1">
@@ -962,7 +957,7 @@ export default function ShowDetail() {
                         )}
                     </div>
 
-                    {/* BÊN PHẢI: QUẢN LÝ BIỂU MẪU CẤU HÌNH */}
+                    
                     <div className="flex gap-3 w-full sm:w-auto justify-end">
                         <Button
                             variant="outline"

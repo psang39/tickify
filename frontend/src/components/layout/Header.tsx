@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Ticket, ChevronDown, User, LayoutDashboard, LogOut } from 'lucide-react';
-import { useAuthStore } from '@/store/useAuthStore'; // Import Store của bạn
+import { useAuthStore } from '@/store/useAuthStore'; 
 
 export default function Header() {
     const navigate = useNavigate();
@@ -41,17 +41,16 @@ export default function Header() {
                     </Link>
                 )}
 
-                {/* CHỌN NGÔN NGỮ GIỮ NGUYÊN */}
+                
                 <button className="flex items-center gap-1 border border-gray-300 rounded-full px-3 py-1.5 text-gray-700 text-xs font-bold hover:border-gray-400 transition-colors bg-white">
                     VN <ChevronDown size={14} />
                 </button>
-
 
                 {!isAuthenticated ? (
 
                     <Link to="/login">
                         <button className="bg-[#4C4DCC] hover:bg-[#3b3ca3] text-white flex items-center gap-2 rounded-full px-6 py-2 text-sm font-bold transition-colors shadow-sm border-none cursor-pointer">
-                            Đăng nhập / Đăng ký
+                            Đăng nhập
                         </button>
                     </Link>
                 ) : (
@@ -65,7 +64,7 @@ export default function Header() {
                                 </button>
                             </Link>
                         ) : (
-                            /* 2B. ADMIN / ORGANIZER: Hiện Trang quản trị điều hướng thẳng về hệ thống */
+                            
                             <Link to={user?.role === 'Admin' ? '/admin/dashboard' : '/organizer/dashboard'}>
                                 <button className="bg-[#4C4DCC] hover:bg-[#3b3ca3] text-white flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors shadow-sm border-none cursor-pointer">
                                     <LayoutDashboard size={16} />
@@ -74,7 +73,7 @@ export default function Header() {
                             </Link>
                         )}
 
-                        {/* Nút đăng xuất nhanh bên cạnh */}
+                        
                         <button
                             onClick={() => { if (window.confirm("Xác nhận đăng xuất khỏi hệ thống?")) logout(); }}
                             className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors border-none bg-transparent cursor-pointer"

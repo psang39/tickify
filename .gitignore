@@ -13,3 +13,4 @@ frontend/.env.example
 .gitignore
 backend/.env.production.example
 frontend/.env.production.example
+apply_tickify_darkmode_patch.cjs

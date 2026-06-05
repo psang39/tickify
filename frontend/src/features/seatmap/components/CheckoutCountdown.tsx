@@ -46,7 +46,7 @@ export const CheckoutCountdown: React.FC<CheckoutCountdownProps> = ({
 
             if (Number.isNaN(expireTimeMs)) return;
 
-            // Dùng giờ server đã được offset
+            
             const getCurrentServerTimeMs = () => Date.now() + serverOffsetMs;
 
             const calculateTimeLeft = () => {

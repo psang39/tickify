@@ -2,10 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useQuery, useMutation } from '@tanstack/react-query';
-// Đảm bảo đường dẫn này khớp với project của bạn
+
 import { api } from '../../lib/axiosClient';
-
-
 
 type RoomPhase = 'LOADING' | 'COUNTDOWN' | 'IN_QUEUE' | 'REDIRECTING' | 'ERROR';
 
@@ -21,28 +19,28 @@ export const WaitingRoomPage = () => {
     const [initialPosition, setInitialPosition] = useState<number>(0);
     const [estimatedWait, setEstimatedWait] = useState<string>('Đang tính toán...');
 
-    const countdownIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);    // =========================================================================
-    // 1. MUTATION: XIN VÀO PHÒNG CHỜ
-    // =========================================================================
+    const countdownIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);    
+    
+    
     const joinMutation = useMutation({
         mutationFn: async () => {
-            // axiosClient đã tự gán baseURL từ biến VITE_API_URL và đính kèm Token (nếu có cấu hình)
+            
             const response = await api.post(`/waiting-room/${showId}/join`);
             return response.data;
         },
         onSuccess: (data) => {
-            // Trạng thái 200: Vào hàng đợi thành công
+            
             setCurrentPosition(data.position);
             setInitialPosition(data.position);
             setPhase('IN_QUEUE');
         },
         onError: (error: any) => {
-            // Axios tự động quăng lỗi nếu status code là 4xx, 5xx
+            
             const status = error.response?.status;
             const data = error.response?.data;
 
             if (status === 403 && data?.time_remaining_ms) {
-                // Chưa tới giờ -> Chuyển sang màn hình đếm ngược
+                
                 setTimeLeftMs(data.time_remaining_ms);
                 setPhase('COUNTDOWN');
             } else {
@@ -52,28 +50,28 @@ export const WaitingRoomPage = () => {
         }
     });
 
-    // =========================================================================
-    // 2. QUERY: POLLING KIỂM TRA LƯỢT (Chỉ chạy khi đang IN_QUEUE)
-    // =========================================================================
+    
+    
+    
     const { data: statusData } = useQuery({
         queryKey: ['waitingRoomStatus', showId],
         queryFn: async () => {
             const response = await api.get(`/waiting-room/${showId}/status`);
             return response.data;
         },
-        // Chỉ kích hoạt query này khi user đã vào hàng đợi
+        
         enabled: phase === 'IN_QUEUE',
-        // Tự động gọi lại sau mỗi 5 giây, dừng lại ngay khi tới lượt
+        
         refetchInterval: (query) => {
             return query.state.data?.status === 'WAITING' ? 5000 : false;
         }
     });
 
-    // =========================================================================
-    // 3. EFFECTS & LOGIC
-    // =========================================================================
+    
+    
+    
 
-    // Khởi chạy việc xin vào phòng chờ ngay khi component mount
+    
     useEffect(() => {
         joinMutation.mutate();
         return () => {
@@ -81,7 +79,7 @@ export const WaitingRoomPage = () => {
         };
     }, [showId]);
 
-    // Lắng nghe dữ liệu Polling trả về
+    
     useEffect(() => {
         if (!statusData) return;
 
@@ -97,14 +95,14 @@ export const WaitingRoomPage = () => {
         }
     }, [statusData, navigate, showId]);
 
-    // Xử lý đếm ngược (Vẫn dùng setInterval local vì đây là UI tick, không gọi API)
+    
     useEffect(() => {
         if (phase === 'COUNTDOWN' && timeLeftMs > 0) {
             countdownIntervalRef.current = setInterval(() => {
                 setTimeLeftMs((prev) => {
                     if (prev <= 1000) {
                         clearInterval(countdownIntervalRef.current!);
-                        joinMutation.mutate(); // Hết giờ tự động xin vào hàng đợi
+                        joinMutation.mutate(); 
                         return 0;
                     }
                     return prev - 1000;
@@ -116,7 +114,7 @@ export const WaitingRoomPage = () => {
         };
     }, [phase, timeLeftMs]);
 
-    // Format thời gian đếm ngược
+    
     const formatTime = (ms: number) => {
         const totalSeconds = Math.floor(ms / 1000);
         const hours = Math.floor(totalSeconds / 3600);

@@ -8,8 +8,8 @@ const resolveApiBaseUrl = () => {
         return normalizeApiUrl(envApiUrl);
     }
 
-    // Production fallback: frontend and backend are served on the same domain
-    // through Nginx, so API calls should go to https://tickify.tech/api/v1.
+    
+    
     if (typeof window !== 'undefined') {
         const { protocol, hostname, origin } = window.location;
         const isLocalhost = ['localhost', '127.0.0.1'].includes(hostname);
