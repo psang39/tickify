@@ -19,7 +19,7 @@ export default function PaymentResultPage() {
             return response.data?.data || response.data;
         },
         enabled: !!orderId,
-        
+        // Cho IPN ngầm có thời gian xử lý xong rồi FE tự refetch.
         refetchInterval: (query) => {
             const status = query.state.data?.status;
             return status === 'pending' ? 1500 : false;

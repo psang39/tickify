@@ -1,6 +1,7 @@
 import { Ticket, Calendar, MapPin, Check } from 'lucide-react';
 import { CheckoutCountdown } from './CheckoutCountdown';
 
+// Khai báo Props cho Component
 interface EventInfoHeaderProps {
     showInfo: any;
     isLoadingShow: boolean;
@@ -70,7 +71,13 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
                         </div>
                     )}
 
-                    
+                    {/* <Button
+                        variant="outline"
+                        onClick={onBack}
+                        className="px-6 py-5 rounded-xl border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
+                    >
+                        Đổi ngày
+                    </Button> */}
                 </div>
             </div>
         </div>

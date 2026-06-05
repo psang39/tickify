@@ -51,7 +51,7 @@ export default function Header() {
 
                     <Link to="/login">
                         <button className="bg-[#4C4DCC] hover:bg-[#3b3ca3] text-white flex items-center gap-2 rounded-full px-6 py-2 text-sm font-bold transition-colors shadow-sm border-none cursor-pointer">
-                            Đăng nhập
+                            Đăng nhập / Đăng ký
                         </button>
                     </Link>
                 ) : (

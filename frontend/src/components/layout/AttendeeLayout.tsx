@@ -11,7 +11,7 @@ export default function AttendeeLayout() {
     const location = useLocation();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    
+    // Fetch thông tin người dùng tập trung tại Layout để tránh duplicate query
     const { data: userData, isLoading, isError } = useQuery({
         queryKey: ['userProfile'],
         queryFn: async () => {
@@ -26,7 +26,7 @@ export default function AttendeeLayout() {
         }
     }, [isError]);
 
-    
+    // Tự động kiểm tra route hiện tại để kích hoạt trạng thái active cho sidebar
     const currentPath = location.pathname;
 
     return (
@@ -35,10 +35,10 @@ export default function AttendeeLayout() {
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             <div className="max-w-7xl mx-auto px-6 flex gap-8">
-                
+                {/* SIDEBAR TRÁI DÙNG CHUNG */}
                 <aside className="w-64 bg-white border border-slate-200 rounded-2xl flex flex-col justify-between shrink-0 h-[calc(100vh-140px)] sticky top-24 p-6">
                     <div>
-                        
+                        {/* Khu vực Avatar & Tên tài khoản */}
                         <div className="flex flex-col items-center text-center mb-10 pb-6 border-b border-slate-100">
                             <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-100 mb-3 bg-slate-50">
                                 <img
@@ -52,7 +52,7 @@ export default function AttendeeLayout() {
                             </h2>
                         </div>
 
-                        
+                        {/* Thanh điều hướng Menu */}
                         <nav className="space-y-1">
                             <SidebarLink
                                 icon={<User size={18} />}
@@ -72,14 +72,14 @@ export default function AttendeeLayout() {
                         </nav>
                     </div>
 
-                    
+                    {/* Nút đăng xuất tài khoản */}
                     <button className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-500 transition-colors font-semibold text-sm">
                         <LogOut size={18} />
                         <span>Đăng xuất</span>
                     </button>
                 </aside>
 
-                
+                {/* KHU VỰC CHỨA NỘI DUNG TRANG CON BÊN PHẢI */}
                 <main className="flex-1 bg-white border border-slate-200 rounded-2xl p-10">
                     <Outlet context={{ userData }} />
                 </main>

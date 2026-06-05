@@ -111,7 +111,7 @@ export default function SearchPage() {
                             onChange={(e) => { setSelectedGenre(e.target.value); setTimeout(applyFilters, 0); }}
                             className="w-full border border-gray-200 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 text-slate-700 outline-none focus:border-primary"
                         >
-                            <option value="">Tất cả danh mục</option>
+                            <option value="">Tất cả thể loại</option>
                             <option value="Pop / Concert">Pop / Concert</option>
                             <option value="Rock">Rock</option>
                             <option value="Jazz">Jazz</option>
@@ -127,7 +127,7 @@ export default function SearchPage() {
                             onChange={(e) => { setSortBy(e.target.value); setTimeout(applyFilters, 0); }}
                             className="w-full border border-gray-200 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 text-slate-700 outline-none focus:border-primary"
                         >
-                            <option value="newest">Mới nhất</option>
+                            <option value="newest">Mới nhất gối đầu</option>
                             <option value="upcoming">Sắp diễn ra gần nhất</option>
                         </select>
                     </div>
