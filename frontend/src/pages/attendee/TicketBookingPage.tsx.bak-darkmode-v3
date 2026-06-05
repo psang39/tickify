@@ -610,21 +610,21 @@ export default function TicketBookingPage() {
                       <button
                         type="button"
                         onClick={() => setActiveFilterTab("combo")}
-                        className={`rounded-xl px-2 py-2 transition-colors ${activeFilterTab === "combo" ? "bg-white text-primary shadow-sm dark:bg-slate-950 dark:text-pink-300" : "hover:text-slate-800 dark:hover:text-slate-100"}`}
+                        className={`rounded-xl px-2 py-2 transition-colors ${activeFilterTab === "combo" ? "bg-white text-primary shadow-sm" : "hover:text-slate-800"}`}
                       >
                         Số vé
                       </button>
                       <button
                         type="button"
                         onClick={() => setActiveFilterTab("price")}
-                        className={`rounded-xl px-2 py-2 transition-colors ${activeFilterTab === "price" ? "bg-white text-primary shadow-sm dark:bg-slate-950 dark:text-pink-300" : "hover:text-slate-800 dark:hover:text-slate-100"}`}
+                        className={`rounded-xl px-2 py-2 transition-colors ${activeFilterTab === "price" ? "bg-white text-primary shadow-sm" : "hover:text-slate-800"}`}
                       >
                         Giá
                       </button>
                       <button
                         type="button"
                         onClick={() => setActiveFilterTab("ticketType")}
-                        className={`rounded-xl px-2 py-2 transition-colors ${activeFilterTab === "ticketType" ? "bg-white text-primary shadow-sm dark:bg-slate-950 dark:text-pink-300" : "hover:text-slate-800 dark:hover:text-slate-100"}`}
+                        className={`rounded-xl px-2 py-2 transition-colors ${activeFilterTab === "ticketType" ? "bg-white text-primary shadow-sm" : "hover:text-slate-800"}`}
                       >
                         Hạng vé
                       </button>
@@ -708,7 +708,7 @@ export default function TicketBookingPage() {
                                   : Number(e.target.value),
                               )
                             }
-                            className="h-11 w-full rounded-xl border border-slate-200 px-3 text-center text-base outline-none focus:border-primary dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-pink-400"
+                            className="h-11 w-full rounded-xl border border-slate-200 px-3 text-center text-base outline-none focus:border-primary"
                             placeholder="Từ"
                           />
                           <input
@@ -722,7 +722,7 @@ export default function TicketBookingPage() {
                                   : Number(e.target.value),
                               )
                             }
-                            className="h-11 w-full rounded-xl border border-slate-200 px-3 text-center text-base outline-none focus:border-primary dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-pink-400"
+                            className="h-11 w-full rounded-xl border border-slate-200 px-3 text-center text-base outline-none focus:border-primary"
                             placeholder="Đến"
                           />
                         </div>
@@ -749,7 +749,7 @@ export default function TicketBookingPage() {
                                 key={typeId}
                                 type="button"
                                 onClick={() => toggleTicketTypeFilter(typeId)}
-                                className={`w-full rounded-2xl border px-4 py-3 text-left transition-colors ${isSelected ? "border-primary bg-primary/10 text-slate-900 dark:border-pink-400/70 dark:bg-pink-500/15 dark:text-pink-100" : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:border-pink-400/50"}`}
+                                className={`w-full rounded-2xl border px-4 py-3 text-left transition-colors ${isSelected ? "border-primary bg-primary/10 text-slate-900" : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"}`}
                               >
                                 <span className="flex items-center justify-between gap-3">
                                   <span className="text-base font-semibold">
@@ -846,7 +846,7 @@ export default function TicketBookingPage() {
                                 type="button"
                                 aria-label="Bỏ vé đã chọn"
                                 onClick={() => removeSeat && removeSeat(seat._id || seat.id)}
-                                className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/15 dark:hover:text-red-300"
+                                className="shrink-0 rounded-full p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
                               >
                                 <Trash2 size={16} />
                               </button>
@@ -1001,7 +1001,7 @@ export default function TicketBookingPage() {
                   <div className="p-6 flex flex-wrap gap-4">
                     <div
                       onClick={() => setPaymentMethod("VNPAY")}
-                      className={`w-32 h-24 rounded-xl border-2 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${paymentMethod === "VNPAY" ? "border-blue-500 bg-blue-50/50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)] dark:border-blue-300/70 dark:bg-blue-500/15" : "border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:border-blue-300/50"}`}
+                      className={`w-32 h-24 rounded-xl border-2 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${paymentMethod === "VNPAY" ? "border-blue-500 bg-blue-50/50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)]" : "border-slate-200 hover:border-slate-300"}`}
                     >
                       <div className="font-black text-blue-700 text-l tracking-tighter">
                         VNPAY
@@ -1012,7 +1012,7 @@ export default function TicketBookingPage() {
                     </div>
                     <div
                       onClick={() => setPaymentMethod("MOCK")}
-                      className={`w-32 h-24 rounded-xl border-2 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${paymentMethod === "MOCK" ? "border-blue-500 bg-blue-50/50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)] dark:border-blue-300/70 dark:bg-blue-500/15" : "border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:border-blue-300/50"}`}
+                      className={`w-32 h-24 rounded-xl border-2 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${paymentMethod === "MOCK" ? "border-blue-500 bg-blue-50/50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)]" : "border-slate-200 hover:border-slate-300"}`}
                     >
                       <div className="font-bold text-slate-700 text-lg">
                         MOCK

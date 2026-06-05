@@ -37,10 +37,10 @@ export default function ShowDetail() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const [activeTab, setActiveTab] = useState<'CONFIG' | 'LIVE'>('CONFIG'); // State điều hướng Tab
+    const [activeTab, setActiveTab] = useState<'CONFIG' | 'LIVE'>('CONFIG');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { showSuccess, showError } = useFeedbackStore();
-    const [selectedStaffId, setSelectedStaffId] = useState<string>(''); // State quản lý ô select staff
+    const [selectedStaffId, setSelectedStaffId] = useState<string>('');
     const [ticketTypeForm, setTicketTypeForm] = useState<TicketTypeForm>(emptyTicketTypeForm);
     const [editingTicketTypeId, setEditingTicketTypeId] = useState<string | null>(null);
 
@@ -67,7 +67,6 @@ export default function ShowDetail() {
         longitude: ''
     });
 
-    // State hứng dữ liệu thời gian thực (SSE)
     const [liveMonitor, setLiveMonitor] = useState({
         activeUsers: 0,
         holdingSeats: 0,
@@ -390,13 +389,10 @@ export default function ShowDetail() {
                 </div>
             </div>
 
-            {/* ================================================================= */}
-            {/* TAB 1: CẤU HÌNH & NHÂN SỰ                                         */}
-            {/* ================================================================= */}
+
             {activeTab === 'CONFIG' && (
                 <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 mt-8 grid grid-cols-1 xl:grid-cols-3 gap-8 animate-in fade-in duration-150">
 
-                    {/* CỘT TRÁI: KHU VỰC ĐIỀU CHỈNH THÔNG TIN FORM */}
                     <div className="xl:col-span-2 space-y-8">
                         {currentStatus === 'published' && (
                             <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl flex items-start gap-2.5 text-xs font-medium">

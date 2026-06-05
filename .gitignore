@@ -14,3 +14,5 @@ frontend/.env.example
 backend/.env.production.example
 frontend/.env.production.example
 apply_tickify_darkmode_patch.cjs
+apply_tickify_darkmode_patch_v2_safe.cjs
+apply_tickify_darkmode_patch_v3_hardcoded_surfaces.cjs
