@@ -42,3 +42,4 @@ backend/src/controllers/event.controller.ts.bak-event-status-v2-1
 backend/src/controllers/event.controller.ts.broken-event-status-v2-1
 tickify-ui-copy-update.patch
 apply-tickify-ui-fixes.cjs
+fix-organizer-hero-fields.cjs

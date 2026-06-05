@@ -977,3 +977,81 @@ html.dark img {
   }
 }
 /* === Tickify concert reskin v6 END === */
+
+/* === Organizer EventDetail hero editable fields fix START ===
+   The global dark-mode rule for input/select/textarea uses !important,
+   so these header fields need a more specific override to avoid the
+   white/dark input box look around the event title.
+*/
+.organizer-hero-field,
+.organizer-hero-field:disabled,
+.organizer-hero-field:hover,
+.organizer-hero-field:focus,
+html.dark .organizer-hero-field,
+html.dark .organizer-hero-field:disabled,
+html.dark .organizer-hero-field:hover,
+html.dark .organizer-hero-field:focus {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.organizer-hero-field::placeholder,
+html.dark .organizer-hero-field::placeholder {
+  color: rgba(255, 255, 255, 0.48) !important;
+}
+
+.organizer-hero-title,
+html.dark .organizer-hero-title {
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.organizer-hero-title:hover,
+html.dark .organizer-hero-title:hover {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.organizer-hero-title:focus,
+html.dark .organizer-hero-title:focus {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  background-color: transparent !important;
+}
+
+.organizer-hero-subtitle,
+html.dark .organizer-hero-subtitle {
+  border-color: transparent !important;
+}
+
+.organizer-hero-subtitle:hover,
+html.dark .organizer-hero-subtitle:hover {
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+.organizer-hero-subtitle:focus,
+html.dark .organizer-hero-subtitle:focus {
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  background-color: transparent !important;
+}
+
+.organizer-hero-genre,
+html.dark .organizer-hero-genre {
+  background-color: rgba(255, 255, 255, 0.055) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: none !important;
+}
+
+.organizer-hero-genre:hover,
+.organizer-hero-genre:focus,
+html.dark .organizer-hero-genre:hover,
+html.dark .organizer-hero-genre:focus {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+/* === Organizer EventDetail hero editable fields fix END === */
+
