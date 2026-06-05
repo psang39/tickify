@@ -134,7 +134,7 @@ export default function TicketBookingPage() {
         }).catch((err) => console.error("Lỗi tự động nhả ghế:", err));
       }
     };
-  }, [showId, isBookingClosed]);
+  }, [showId]);
   // ==========================================
   // FETCH DỮ LIỆU BẰNG TANSTACK QUERY
   // ==========================================
@@ -447,11 +447,11 @@ export default function TicketBookingPage() {
 
   const handleNext = () => {
     if (currentStep === 2) {
-    if (isBookingClosed) {
-      setErrorMessage(showAvailability.message);
-      clearCart();
-      return;
-    }
+      if (isBookingClosed) {
+        setErrorMessage(showAvailability.message);
+        clearCart();
+        return;
+      }
       if (selectedSeats.length === 0) {
         setErrorMessage("Vui lòng chọn ít nhất 1 ghế!");
         return;
@@ -547,15 +547,15 @@ export default function TicketBookingPage() {
 
 
   const renderStepContent = () => {
-  if (isBookingClosed) {
-    return (
-      <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center dark:border-amber-400/30 dark:bg-amber-500/10">
-        <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-600 dark:text-amber-300">{showAvailability.label}</p>
-        <h2 className="mt-3 text-2xl font-black text-slate-900 dark:text-white">Không thể đặt vé cho show này</h2>
-        <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">{showAvailability.message}</p>
-      </div>
-    );
-  }
+    if (isBookingClosed) {
+      return (
+        <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center dark:border-amber-400/30 dark:bg-amber-500/10">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-600 dark:text-amber-300">{showAvailability.label}</p>
+          <h2 className="mt-3 text-2xl font-black text-slate-900 dark:text-white">Không thể đặt vé cho show này</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">{showAvailability.message}</p>
+        </div>
+      );
+    }
     switch (currentStep) {
       case 1:
         return (
