@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { createClient } from 'redis';
-import { startAdminDashboardThrottler } from '../services/dashboardThrottler';
+import { startAdminDashboardThrottler, stopAdminDashboardThrottler } from '../services/dashboardThrottler';
 import { REDIS_URL } from '../config/index';
 const clients = new Map<string, Response[]>();
 const adminClients = new Map<string, Response[]>();

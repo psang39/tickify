@@ -94,7 +94,7 @@ export default function ShowDetail() {
                 setLiveMonitor(prev => ({
                     ...prev,
                     activeUsers: data.activeUsers ?? data.active_viewers ?? prev.activeUsers,
-                    holdingSeats: data.holdingCount ?? data.holding_seats ?? prev.holdingSeats,
+                    holdingSeats: data.holdingUserCount ?? data.holding_user_count ?? data.activeHoldingUsers ?? data.holdingCount ?? data.holding_seats ?? prev.holdingSeats,
                     totalRevenue: data.totalRevenue ?? data.total_revenue ?? prev.totalRevenue,
                     ticketsSoldLastMinute: data.soldCount ?? data.tickets_sold ?? prev.ticketsSoldLastMinute,
                     status: data.timestamp

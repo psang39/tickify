@@ -21,3 +21,8 @@ apply_tickify_darkmode_patch_v4_full_audit.cjs
 apply_tickify_concert_reskin_v5.cjs
 apply_tickify_concert_reskin_v6_lightmode_profile_fix.cjs
 apply_tickify_sale_window_v1.cjs
+backend/src/services/dashboardThrottler.ts.bak-sse-holding-v1
+.gitignore
+frontend/src/pages/organizer/ShowDetail.tsx.bak-sse-holding-v1
+apply_tickify_organizer_sse_holding_fix_v1.cjs
+backend/src/services/sse.service.ts.bak-sse-holding-v1
