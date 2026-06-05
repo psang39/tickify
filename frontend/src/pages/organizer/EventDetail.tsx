@@ -415,12 +415,28 @@ export default function EventDetail() {
 
                         <div className={`w-full relative ${isInfoTab && currentStatus === 'draft' ? 'group/title' : ''}`}>
                             {isInfoTab && currentStatus === 'draft' && <Edit3 size={20} className="absolute -left-8 top-3 text-white/50 opacity-0 group-hover/title:opacity-100 transition-opacity hidden md:block" />}
-                            <textarea
-                                rows={2}
-                                disabled={!isInfoTab || currentStatus !== 'draft'}
-                                className="organizer-hero-title-field !bg-transparent bg-transparent w-full border-b border-transparent hover:border-white/10 focus:border-white/20 outline-none text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight drop-shadow-md transition-colors py-1 placeholder-white/40 resize-none overflow-hidden"
-                                value={eventFormData.name} placeholder="Nhập tên sự kiện..." onChange={(e) => setEventFormData({ ...eventFormData, name: e.target.value })}
-                            />
+                            
+<h1
+  role="textbox"
+  aria-label="Tên sự kiện"
+  data-placeholder="Tên sự kiện..."
+  contentEditable={isInfoTab && currentStatus === 'draft'}
+  suppressContentEditableWarning
+  spellCheck={false}
+  className={`tickify-editable-title w-full border-b border-transparent outline-none text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight drop-shadow-md transition-colors py-1 break-words whitespace-pre-wrap min-h-[1.25em] ${isInfoTab && currentStatus === 'draft' ? 'cursor-text hover:border-white/10 focus:border-white/20' : 'cursor-default'}`}
+  onInput={(e) => {
+    const nextValue = e.currentTarget.innerText.replace(/\n/g, ' ').trimStart();
+    setEventFormData(prev => ({ ...prev, name: nextValue }));
+  }}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.currentTarget.blur();
+    }
+  }}
+>
+  {eventFormData.name}
+</h1>
                         </div>
 
                         <div className={`w-full relative ${isInfoTab && currentStatus === 'draft' ? 'group/artist' : ''} mt-[-8px]`}>

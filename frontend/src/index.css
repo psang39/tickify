@@ -1138,3 +1138,59 @@ html.dark input.organizer-hero-genre-field:focus {
   border-color: rgba(255, 255, 255, 0.20) !important;
 }
 /* === Tickify organizer EventDetail hero field fix END === */
+
+/* Tickify UI fix: transparent editable title/search fields */
+.tickify-editable-title,
+.tickify-editable-title:hover,
+.tickify-editable-title:focus,
+.tickify-editable-subtitle,
+.tickify-editable-subtitle:hover,
+.tickify-editable-subtitle:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.tickify-editable-title:empty::before,
+.tickify-editable-subtitle:empty::before,
+.tickify-editable-chip:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+}
+
+.tickify-editable-chip {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
+}
+
+.tickify-editable-chip:hover,
+.tickify-editable-chip:focus {
+  background-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+input.tickify-home-search-input,
+input.tickify-home-search-input:hover,
+input.tickify-home-search-input:focus,
+html.dark input.tickify-home-search-input,
+html.dark input.tickify-home-search-input:hover,
+html.dark input.tickify-home-search-input:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+/* Cho các field có bg-transparent thật sự trong suốt, không bị global input/textarea CSS ép nền. */
+input.bg-transparent,
+textarea.bg-transparent,
+select.bg-transparent,
+html.dark input.bg-transparent,
+html.dark textarea.bg-transparent,
+html.dark select.bg-transparent {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+

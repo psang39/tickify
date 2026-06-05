@@ -180,7 +180,7 @@ export default function HomePage() {
                                 onChange={(e) => setKeyword(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && goSearch()}
                                 placeholder="Tìm tên sự kiện, người biểu diễn/diễn giả, thể loại hoặc địa điểm..."
-                                className="flex-1 bg-transparent px-2 py-2 text-sm text-white outline-none placeholder:text-white/60"
+                                className="flex-1 bg-transparent px-2 py-2 text-sm text-white outline-none placeholder:text-white/60 tickify-home-search-input appearance-none"
                             />
                             <button onClick={goSearch} className="rounded-lg bg-[#FF0082] px-4 py-2 text-xs font-bold text-white">Tìm kiếm</button>
                         </div>

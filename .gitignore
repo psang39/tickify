@@ -45,3 +45,7 @@ apply-tickify-ui-fixes.cjs
 fix-organizer-hero-fields.cjs
 fix-organizer-eventdetail-textarea-bg-v2.cjs
 apply-organizer-hero-transparent-textarea.cjs
+apply-tickify-editable-title-and-search-fix.cjs
+frontend/src/index.css.bak-ui-fix
+frontend/src/pages/attendee/HomePage.tsx.bak-ui-fix
+frontend/src/pages/organizer/EventDetail.tsx.bak-ui-fix
