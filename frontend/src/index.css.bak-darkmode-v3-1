@@ -394,11 +394,11 @@ html.dark img {
   .dark .bg-zinc-50,
   .dark .bg-neutral-50,
   .dark .bg-stone-50,
-  .dark [class~="bg-white/50"],
-  .dark [class~="bg-white/60"],
-  .dark [class~="bg-white/70"],
-  .dark [class~="bg-white/80"],
-  .dark [class~="bg-white/90"],
+  .dark .bg-white/50,
+  .dark .bg-white/60,
+  .dark .bg-white/70,
+  .dark .bg-white/80,
+  .dark .bg-white/90,
   .dark [class~="bg-[#F8F7FF]"],
   .dark [class~="bg-[#F9FAFB]"],
   .dark [class~="bg-[#FAFAFA]"],
@@ -476,10 +476,10 @@ html.dark img {
     color: #94a3b8 !important;
   }
 
-  .dark [class~="placeholder:text-gray-400"]::placeholder,
-  .dark [class~="placeholder:text-slate-400"]::placeholder,
-  .dark [class~="placeholder:text-gray-500"]::placeholder,
-  .dark [class~="placeholder:text-slate-500"]::placeholder {
+  .dark .placeholder:text-gray-400::placeholder,
+  .dark .placeholder:text-slate-400::placeholder,
+  .dark .placeholder:text-gray-500::placeholder,
+  .dark .placeholder:text-slate-500::placeholder {
     color: rgba(203, 213, 225, 0.65) !important;
   }
 
@@ -501,11 +501,11 @@ html.dark img {
     --tw-ring-color: rgba(148, 163, 184, 0.24) !important;
   }
 
-  .dark [class~="hover:bg-gray-50"]:hover,
-  .dark [class~="hover:bg-gray-100"]:hover,
-  .dark [class~="hover:bg-slate-50"]:hover,
-  .dark [class~="hover:bg-slate-100"]:hover,
-  .dark [class~="hover:bg-white"]:hover {
+  .dark .hover:bg-gray-50:hover,
+  .dark .hover:bg-gray-100:hover,
+  .dark .hover:bg-slate-50:hover,
+  .dark .hover:bg-slate-100:hover,
+  .dark .hover:bg-white:hover {
     background-color: rgba(51, 65, 85, 0.78) !important;
   }
 
