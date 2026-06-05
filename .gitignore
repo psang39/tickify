@@ -40,3 +40,5 @@ apply_tickify_event_status_homepage_v2_1_backend_syntax_fix.cjs
 .gitignore
 backend/src/controllers/event.controller.ts.bak-event-status-v2-1
 backend/src/controllers/event.controller.ts.broken-event-status-v2-1
+tickify-ui-copy-update.patch
+apply-tickify-ui-fixes.cjs

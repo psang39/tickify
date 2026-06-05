@@ -401,7 +401,7 @@ export default function EventDetail() {
                                 <input
                                     disabled={!isInfoTab || currentStatus !== 'draft'}
                                     className="bg-transparent border-none outline-none text-white placeholder-white/70 w-36 px-2 py-1 text-sm font-semibold disabled:cursor-not-allowed"
-                                    value={eventFormData.genre} placeholder="Dòng nhạc..." onChange={(e) => setEventFormData({ ...eventFormData, genre: e.target.value })}
+                                    value={eventFormData.genre} placeholder="Thể loại sự kiện..." onChange={(e) => setEventFormData({ ...eventFormData, genre: e.target.value })}
                                 />
                             </div>
 
@@ -418,7 +418,7 @@ export default function EventDetail() {
                             <textarea
                                 rows={2}
                                 disabled={!isInfoTab || currentStatus !== 'draft'}
-                                className={`w-full bg-transparent border-b-2 border-transparent outline-none text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight drop-shadow-xl transition-all p-2 -ml-2 rounded-t-lg placeholder-white/50 resize-none overflow-hidden disabled:cursor-not-allowed ${isInfoTab && currentStatus === 'draft' ? 'hover:border-white/30 focus:border-white focus:bg-white/10' : ''}`}
+                                className={`w-full bg-transparent border-b border-transparent outline-none text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight drop-shadow-xl transition-all py-1 placeholder-white/50 resize-none overflow-hidden disabled:cursor-not-allowed ${isInfoTab && currentStatus === 'draft' ? 'hover:border-white/20 focus:border-white/50' : ''}`}
                                 value={eventFormData.name} placeholder="Nhập tên sự kiện..." onChange={(e) => setEventFormData({ ...eventFormData, name: e.target.value })}
                             />
                         </div>
@@ -429,7 +429,7 @@ export default function EventDetail() {
                                 type="text"
                                 disabled={!isInfoTab || currentStatus !== 'draft'}
                                 className={`w-full bg-transparent border-b border-transparent outline-none text-lg md:text-xl text-white/90 font-medium drop-shadow-md transition-all p-1 -ml-1 rounded placeholder-white/40 disabled:cursor-not-allowed ${isInfoTab && currentStatus === 'draft' ? 'hover:border-white/20 focus:border-white/50' : ''}`}
-                                value={eventFormData.artists} placeholder="Nghệ sĩ biểu diễn (Optional)..." onChange={(e) => setEventFormData({ ...eventFormData, artists: e.target.value })}
+                                value={eventFormData.artists} placeholder="Người biểu diễn/diễn giả (Optional)..." onChange={(e) => setEventFormData({ ...eventFormData, artists: e.target.value })}
                             />
                         </div>
                     </div>
