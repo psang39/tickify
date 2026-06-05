@@ -554,7 +554,7 @@ export default function TicketBookingPage() {
         return (
           <div ref={seatMapSectionRef} className="w-full scroll-mt-6">
             <div className="mb-3 flex justify-end">
-              <div className="flex items-center gap-5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 px-4 py-3 text-sm font-semibold text-slate-200 dark:text-slate-200 shadow-sm">
+              <div className="flex items-center gap-5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm">
                 <div className="flex items-center gap-2">
                   <span className="h-3 w-3 rounded-full bg-slate-950/700 inline-block" />
                   <span>Đã bán</span>
@@ -570,11 +570,11 @@ export default function TicketBookingPage() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-3xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 shadow-sm">
+            <div className="overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 shadow-sm">
               <div className="flex flex-col xl:flex-row">
                 <div className="relative flex-1 bg-white dark:bg-slate-900/90 h-[560px] xl:h-[640px] overflow-hidden">
                   <div className="absolute left-6 top-5 z-10 rounded-2xl bg-white/90 dark:bg-slate-950/90 px-4 py-3 shadow-sm backdrop-blur">
-                    <p className="text-base font-bold text-slate-100 dark:text-slate-100">
+                    <p className="text-base font-bold text-slate-800 dark:text-slate-100">
                       Chọn ghế của bạn
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -593,11 +593,11 @@ export default function TicketBookingPage() {
                   />
                 </div>
 
-                <aside className="w-full xl:w-[380px] border-t xl:border-t-0 xl:border-l border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 flex flex-col">
+                <aside className="w-full xl:w-[380px] border-t xl:border-t-0 xl:border-l border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 flex flex-col">
                   <div className="border-b border-slate-100 dark:border-white/10 p-5">
                     <div className="flex items-center justify-between gap-3 mb-4">
                       <div>
-                        <h3 className="text-lg font-bold text-slate-50 dark:text-slate-50">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50">
                           Bộ lọc vé
                         </h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -635,7 +635,7 @@ export default function TicketBookingPage() {
                     {activeFilterTab === "combo" && (
                       <div className="space-y-4">
                         <div>
-                          <p className="text-base font-bold text-slate-100 dark:text-slate-100">
+                          <p className="text-base font-bold text-slate-800 dark:text-slate-100">
                             Số vé muốn mua
                           </p>
                           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -643,7 +643,7 @@ export default function TicketBookingPage() {
                           </p>
                         </div>
                         <select
-                          className="h-12 w-full cursor-pointer rounded-xl border border-slate-300 bg-white dark:bg-slate-900/90 px-3 text-base font-medium text-slate-200 dark:text-slate-200 outline-none focus:border-primary"
+                          className="h-12 w-full cursor-pointer rounded-xl border border-slate-300 bg-white dark:bg-slate-900/90 px-3 text-base font-medium text-slate-700 dark:text-slate-200 outline-none focus:border-primary"
                           value={comboCount}
                           onChange={(e) =>
                             setComboCount(Number(e.target.value))
@@ -660,7 +660,7 @@ export default function TicketBookingPage() {
                     {activeFilterTab === "price" && (
                       <div className="space-y-5">
                         <div>
-                          <p className="text-base font-bold text-slate-100 dark:text-slate-100">
+                          <p className="text-base font-bold text-slate-800 dark:text-slate-100">
                             Khoảng giá
                           </p>
                           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -668,7 +668,7 @@ export default function TicketBookingPage() {
                             chọn.
                           </p>
                         </div>
-                        <div className="rounded-2xl bg-slate-950/70 dark:bg-slate-900/80 px-4 py-3 text-center text-base font-bold text-slate-100 dark:text-slate-100">
+                        <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 px-4 py-3 text-center text-base font-bold text-slate-800 dark:text-slate-100">
                           {(Number(filterMinPrice) || 0).toLocaleString(
                             "vi-VN",
                           )}{" "}
@@ -708,7 +708,7 @@ export default function TicketBookingPage() {
                                   : Number(e.target.value),
                               )
                             }
-                            className="h-11 w-full rounded-xl border border-white/10 px-3 text-center text-base outline-none focus:border-primary dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-pink-400"
+                            className="h-11 w-full rounded-xl border border-slate-200 dark:border-white/10 px-3 text-center text-base outline-none focus:border-primary dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-pink-400"
                             placeholder="Từ"
                           />
                           <input
@@ -722,7 +722,7 @@ export default function TicketBookingPage() {
                                   : Number(e.target.value),
                               )
                             }
-                            className="h-11 w-full rounded-xl border border-white/10 px-3 text-center text-base outline-none focus:border-primary dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-pink-400"
+                            className="h-11 w-full rounded-xl border border-slate-200 dark:border-white/10 px-3 text-center text-base outline-none focus:border-primary dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-pink-400"
                             placeholder="Đến"
                           />
                         </div>
@@ -732,7 +732,7 @@ export default function TicketBookingPage() {
                     {activeFilterTab === "ticketType" && (
                       <div className="space-y-4">
                         <div>
-                          <p className="text-base font-bold text-slate-100 dark:text-slate-100">
+                          <p className="text-base font-bold text-slate-800 dark:text-slate-100">
                             Hạng vé
                           </p>
                           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -770,7 +770,7 @@ export default function TicketBookingPage() {
                     {standingZones.length > 0 && (
                       <div className="mt-6 border-t border-slate-100 dark:border-white/10 pt-5">
                         <div className="mb-3">
-                          <p className="text-base font-bold text-slate-100 dark:text-slate-100">Vé GA / Standing</p>
+                          <p className="text-base font-bold text-slate-800 dark:text-slate-100">Vé GA / Standing</p>
                           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Nhấn khu GA trên sơ đồ hoặc dùng nút tăng/giảm bên dưới.</p>
                         </div>
                         <div className="space-y-3">
@@ -786,14 +786,14 @@ export default function TicketBookingPage() {
                               <div key={zoneId} className={`rounded-2xl border p-4 transition-colors ${isActive ? "border-primary bg-primary/5" : "border-white/10 bg-white"}`}>
                                 <div className="mb-3 flex items-start justify-between gap-3">
                                   <div>
-                                    <p className="text-sm font-bold text-slate-50 dark:text-slate-50">{zone.name}</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-slate-50">{zone.name}</p>
                                     <p className="text-xs text-slate-500 dark:text-slate-400">Còn {availableCount} vé · {ticketType?.name || "GA"}</p>
                                   </div>
                                   <p className="text-sm font-black text-pink-600">{Number(ticketType?.price || 0).toLocaleString("vi-VN")} đ</p>
                                 </div>
                                 <div className="flex items-center justify-between gap-3">
                                   <Button type="button" variant="outline" className="h-9 w-9 rounded-full p-0" onClick={() => updateStandingQuantity(zone, selectedCount - 1)} disabled={selectedCount <= 0}>-</Button>
-                                  <div className="min-w-[96px] rounded-xl bg-slate-950/70 dark:bg-slate-900/80 px-4 py-2 text-center text-sm font-bold text-slate-100 dark:text-slate-100">{selectedCount} vé</div>
+                                  <div className="min-w-[96px] rounded-xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 px-4 py-2 text-center text-sm font-bold text-slate-800 dark:text-slate-100">{selectedCount} vé</div>
                                   <Button type="button" variant="outline" className="h-9 w-9 rounded-full p-0" onClick={() => updateStandingQuantity(zone, selectedCount + 1)} disabled={selectedSeats.length >= 4 || selectedCount >= 4 || availableCount <= selectedCount}>+</Button>
                                 </div>
                               </div>
@@ -811,7 +811,7 @@ export default function TicketBookingPage() {
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div className="min-w-0 flex-1">
                     {selectedSeats.length === 0 ? (
-                      <div className="rounded-2xl border border-dashed border-white/10 dark:border-white/10 bg-slate-950/70 dark:bg-slate-900/80 px-5 py-4 text-sm text-slate-500 dark:text-slate-400">
+                      <div className="rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 px-5 py-4 text-sm text-slate-500 dark:text-slate-400">
                         Chọn ghế trên sơ đồ hoặc tăng số lượng vé GA.
                       </div>
                     ) : (
@@ -828,14 +828,14 @@ export default function TicketBookingPage() {
                           return (
                             <div
                               key={seat._id || seat.id || idx}
-                              className="group flex min-w-[260px] items-center justify-between gap-4 rounded-2xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 px-4 py-3 shadow-sm"
+                              className="group flex min-w-[260px] items-center justify-between gap-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 px-4 py-3 shadow-sm"
                             >
                               <div className="flex min-w-0 items-center gap-3">
                                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-white">
                                   {idx + 1}
                                 </span>
                                 <div className="min-w-0">
-                                  <p className="truncate text-sm font-bold text-slate-100 dark:text-slate-100">{seatLabel}</p>
+                                  <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">{seatLabel}</p>
                                   <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                                     {typeName} · {price.toLocaleString("vi-VN")} đ
                                   </p>
@@ -858,7 +858,7 @@ export default function TicketBookingPage() {
                   </div>
 
                   <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
-                    <div className="rounded-2xl bg-slate-950/70 dark:bg-slate-900/80 px-5 py-3 text-right">
+                    <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 px-5 py-3 text-right">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                         Tổng cộng · {selectedSeats.length} vé
                       </p>
@@ -882,11 +882,11 @@ export default function TicketBookingPage() {
       case 3:
         return (
           <div className="w-full min-h-[500px] bg-white dark:bg-slate-900/90 rounded-xl p-8 border border-gray-100 dark:border-white/10 flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-slate-100 dark:text-slate-100 mb-6">
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">
               Xác nhận thông tin vé
             </h2>
-            <div className="w-full max-w-2xl bg-slate-950/70 dark:bg-slate-900/80 rounded-xl p-6 border border-white/10 dark:border-white/10">
-              <div className="flex justify-between border-b border-white/10 dark:border-white/10 pb-4 mb-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <div className="w-full max-w-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 rounded-xl p-6 border border-slate-200 dark:border-white/10">
+              <div className="flex justify-between border-b border-slate-200 dark:border-white/10 pb-4 mb-4 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 <span>Vị trí ghế</span>
                 <span>Giá vé</span>
               </div>
@@ -908,7 +908,7 @@ export default function TicketBookingPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="font-mono font-bold text-slate-200 dark:text-slate-200">
+                    <span className="font-mono font-bold text-slate-700 dark:text-slate-200">
                       {(
                         ticketTypeDictionary[seat.ticket_type_id]?.price || 0
                       ).toLocaleString("vi-VN")}{" "}
@@ -917,7 +917,7 @@ export default function TicketBookingPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between items-center border-t border-white/10 dark:border-white/10 pt-6">
+              <div className="flex justify-between items-center border-t border-slate-200 dark:border-white/10 pt-6">
                 <span className="text-lg font-bold text-slate-600 dark:text-slate-300">
                   Tổng thanh toán:
                 </span>
@@ -930,8 +930,8 @@ export default function TicketBookingPage() {
         );
       case 4:
         return (
-          <div className=" w-full min-h-[500px] flex flex-col lg:flex-row gap-10 items-start py-8 ">
-            <div className="bg-white dark:bg-slate-900/90 flex-1 w-full flex flex-col gap-10 px-6 rounded-2xl border border-white/10 dark:border-white/10 py-8">
+          <div className="w-full min-h-[500px] flex flex-col lg:flex-row gap-10 items-start py-8">
+            <div className="bg-white dark:bg-slate-900/90 flex-1 w-full flex flex-col gap-10 px-6 rounded-2xl border border-slate-200 dark:border-white/10 py-8">
               <div>
                 <h3 className="text-l font-medium text-blue-700 mb-6 flex items-center gap-3">
                   1. Xác nhận thông tin{" "}
@@ -942,7 +942,7 @@ export default function TicketBookingPage() {
                 </h3>
 
                 <div className="ml-2 pl-6 border-l-4 border-pink-300 flex flex-col gap-5">
-                  <div className="flex items-center gap-4 text-slate-200 dark:text-slate-200">
+                  <div className="flex items-center gap-4 text-slate-700 dark:text-slate-200">
                     <User size={20} className="text-slate-400 shrink-0" />
                     <input
                       type="text"
@@ -953,7 +953,7 @@ export default function TicketBookingPage() {
                       placeholder="Nhập họ và tên người nhận vé"
                     />
                   </div>
-                  <div className="flex items-center gap-4 text-slate-200 dark:text-slate-200">
+                  <div className="flex items-center gap-4 text-slate-700 dark:text-slate-200">
                     <Phone size={20} className="text-slate-400 shrink-0" />
                     <input
                       type="tel"
@@ -964,7 +964,7 @@ export default function TicketBookingPage() {
                       placeholder="Nhập số điện thoại liên hệ"
                     />
                   </div>
-                  <div className="flex items-center gap-4 text-slate-200 dark:text-slate-200">
+                  <div className="flex items-center gap-4 text-slate-700 dark:text-slate-200">
                     <MapPin size={20} className="text-slate-400 shrink-0" />
                     <input
                       type="text"
@@ -973,7 +973,7 @@ export default function TicketBookingPage() {
                       defaultValue="Ho Chi Minh City, Vietnam"
                     />
                   </div>
-                  <div className="flex items-center gap-4 text-slate-200 dark:text-slate-200">
+                  <div className="flex items-center gap-4 text-slate-700 dark:text-slate-200">
                     <Mail size={20} className="text-slate-400 shrink-0" />
                     <input
                       type="email"
@@ -993,8 +993,8 @@ export default function TicketBookingPage() {
                   2. Chọn phương thức thanh toán
                 </h3>
 
-                <div className="border border-white/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-900/90">
-                  <div className="bg-slate-950/70 dark:bg-slate-900/80 px-5 py-4 border-b border-white/10 dark:border-white/10 flex items-center gap-3 text-slate-600 dark:text-slate-300 font-medium">
+                <div className="border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-900/90">
+                  <div className="bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 px-5 py-4 border-b border-slate-200 dark:border-white/10 flex items-center gap-3 text-slate-600 dark:text-slate-300 font-medium">
                     <CreditCard size={18} /> Các phương thức khả dụng
                   </div>
 
@@ -1014,7 +1014,7 @@ export default function TicketBookingPage() {
                       onClick={() => setPaymentMethod("MOCK")}
                       className={`w-32 h-24 rounded-xl border-2 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${paymentMethod === "MOCK" ? "border-blue-500 bg-blue-50/50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)] dark:border-blue-300/70 dark:bg-blue-500/15" : "border-white/10 hover:border-slate-300 dark:border-white/10 dark:hover:border-blue-300/50"}`}
                     >
-                      <div className="font-bold text-slate-200 dark:text-slate-200 text-lg">
+                      <div className="font-bold text-slate-700 dark:text-slate-200 text-lg">
                         MOCK
                       </div>
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
@@ -1068,7 +1068,7 @@ export default function TicketBookingPage() {
       {isBackConfirmOpen && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 px-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900/90 p-6 shadow-2xl">
-            <h3 className="text-xl font-bold text-slate-50 dark:text-slate-50">Hủy giữ chỗ?</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-50">Hủy giữ chỗ?</h3>
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
               Nếu quay lại bước chọn ghế, các ghế đang giữ cho đơn này sẽ được nhả ra để người khác có thể chọn.
             </p>
@@ -1116,7 +1116,7 @@ export default function TicketBookingPage() {
 
         {/* THANH ĐIỀU HƯỚNG CHUNG BÊN DƯỚI (Chỉ hiện ở bước 3) */}
         {currentStep !== 2 && currentStep !== 5 && currentStep !== 4 && (
-          <div className="mt-8 flex justify-between items-center border-t border-white/10 dark:border-white/10 pt-6 pb-10">
+          <div className="mt-8 flex justify-between items-center border-t border-slate-200 dark:border-white/10 pt-6 pb-10">
             {/* Nút lùi này là dự phòng ở dưới cùng màn hình */}
             <Button
               variant="ghost"

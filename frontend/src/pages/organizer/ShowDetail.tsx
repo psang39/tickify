@@ -350,22 +350,22 @@ export default function ShowDetail() {
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             {/* BAR TIÊU ĐỀ TRÊN CÙNG */}
-            <div className="bg-white dark:bg-slate-900/90 border-b border-white/10 dark:border-white/10 px-6 lg:px-12 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-40">
+            <div className="bg-white dark:bg-slate-900/90 border-b border-slate-200 dark:border-white/10 px-6 lg:px-12 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-40">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate(`/organizer/events/${eventId}`, { state: { activeTab: 'SHOWS' } })}
-                        className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors border border-white/10 dark:border-white/10"
+                        className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors border border-slate-200 dark:border-white/10"
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100 dark:text-slate-100">{formData.name || 'Đang cập nhật...'}</h1>
+                        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{formData.name || 'Đang cập nhật...'}</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">ID Đêm diễn: <span className="font-mono font-bold text-xs bg-slate-100 dark:bg-slate-800/80 px-1.5 py-0.5 rounded">{showId}</span></p>
                     </div>
                 </div>
 
                 {/* HỆ THỐNG PHÂN TAB PHẲNG (NO SHADOW) */}
-                <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl self-start md:self-center border border-white/10 dark:border-white/10">
+                <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl self-start md:self-center border border-slate-200 dark:border-white/10">
                     <button
                         onClick={() => setActiveTab('CONFIG')}
                         className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'CONFIG' ? 'bg-white text-primary' : 'text-slate-500 hover:text-slate-100'}`}
@@ -381,7 +381,7 @@ export default function ShowDetail() {
                 </div>
 
                 {/* TRẠNG THÁI CHỈ ĐỌC */}
-                <div className="flex items-center gap-2 px-3 py-1.5 border border-white/10 dark:border-white/10 rounded-lg bg-slate-950/70 dark:bg-slate-900/80 text-xs font-bold self-start md:self-center">
+                <div className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 dark:border-white/10 rounded-lg bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 text-xs font-bold self-start md:self-center">
                     <span className="text-gray-400 uppercase">Trạng thái:</span>
                     {currentStatus === 'draft' && <span className="text-slate-600 dark:text-slate-300 flex items-center gap-1"><EyeOff size={13} /> Bản nháp</span>}
                     {currentStatus === 'published' && <span className="text-green-600 flex items-center gap-1"><Globe size={13} /> Đang mở bán</span>}
@@ -412,21 +412,21 @@ export default function ShowDetail() {
                         )}
 
                         <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-white/10">
-                            <h2 className="text-lg font-bold text-slate-100 dark:text-slate-100 mb-6 flex items-center gap-2 border-b border-slate-50 dark:border-white/10 pb-3"><Info className="text-primary" size={18} /> Thông tin cơ bản</h2>
+                            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2 border-b border-slate-50 dark:border-white/10 pb-3"><Info className="text-primary" size={18} /> Thông tin cơ bản</h2>
                             <div className="space-y-5">
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-2">Tên Show diễn</label>
-                                    <input type="text" disabled={currentStatus === 'published' || currentStatus === 'cancelled'} className="w-full bg-slate-950/70 dark:bg-slate-900/80 border border-white/10 dark:border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary font-medium text-slate-100 dark:text-slate-100 disabled:opacity-60" value={formData.name} placeholder="VD: Đêm diễn 1 - Hà Nội" onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                                    <input type="text" disabled={currentStatus === 'published' || currentStatus === 'cancelled'} className="w-full bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary font-medium text-slate-800 dark:text-slate-100 disabled:opacity-60" value={formData.name} placeholder="VD: Đêm diễn 1 - Hà Nội" onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wide mb-2">Ghi chú đêm diễn (Tùy chọn)</label>
-                                    <textarea rows={3} disabled={currentStatus === 'published' || currentStatus === 'cancelled'} className="w-full bg-slate-950/70 dark:bg-slate-900/80 border border-white/10 dark:border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary font-medium text-slate-600 dark:text-slate-300 resize-none disabled:opacity-60" value={formData.description} placeholder="Yêu cầu cổng soát vé hoặc ghi chú riêng..." onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+                                    <textarea rows={3} disabled={currentStatus === 'published' || currentStatus === 'cancelled'} className="w-full bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary font-medium text-slate-600 dark:text-slate-300 resize-none disabled:opacity-60" value={formData.description} placeholder="Yêu cầu cổng soát vé hoặc ghi chú riêng..." onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
                                 </div>
                             </div>
                         </div>
 
                         <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-white/10">
-                            <h2 className="text-lg font-bold text-slate-100 dark:text-slate-100 mb-6 flex items-center gap-2 border-b border-slate-50 dark:border-white/10 pb-3"><Clock className="text-primary" size={18} /> Mốc lịch trình mở khóa</h2>
+                            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 flex items-center gap-2 border-b border-slate-50 dark:border-white/10 pb-3"><Clock className="text-primary" size={18} /> Mốc lịch trình mở khóa</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="bg-orange-50/40 border border-orange-100 p-4 rounded-xl space-y-4">
                                     <h3 className="font-bold text-orange-800 text-xs flex items-center gap-1.5"><Ticket size={14} /> Chiến dịch Bán vé</h3>
@@ -455,23 +455,23 @@ export default function ShowDetail() {
 
                         <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-white/10">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 border-b border-slate-50 dark:border-white/10 pb-3">
-                                <h2 className="text-lg font-bold text-slate-100 dark:text-slate-100 flex items-center gap-2"><Ticket className="text-primary" size={18} /> Loại vé & giá bán</h2>
+                                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2"><Ticket className="text-primary" size={18} /> Loại vé & giá bán</h2>
                                 <div className="text-[11px] font-medium text-slate-400">
                                     {ticketTypes.length} loại vé đang cấu hình
                                 </div>
                             </div>
 
                             {isTicketTypeLocked && (
-                                <div className="mb-4 bg-slate-950/70 dark:bg-slate-900/80 border border-white/10 dark:border-white/10 text-slate-600 dark:text-slate-300 p-3 rounded-xl flex items-start gap-2 text-xs font-medium">
+                                <div className="mb-4 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 p-3 rounded-xl flex items-start gap-2 text-xs font-medium">
                                     <Info size={15} className="shrink-0 mt-0.5" />
                                     <span>Show đang mở bán hoặc đã hủy nên không thể chỉnh giá vé. Hãy tạm dừng bán trước khi thay đổi cấu hình vé.</span>
                                 </div>
                             )}
 
                             <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-                                <div className="lg:col-span-2 bg-slate-950/70 dark:bg-slate-900/80 border border-slate-100 dark:border-white/10 rounded-xl p-4 space-y-3">
+                                <div className="lg:col-span-2 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 border border-slate-100 dark:border-white/10 rounded-xl p-4 space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-xs font-bold text-slate-200 dark:text-slate-200 uppercase tracking-wide">
+                                        <h3 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
                                             {editingTicketTypeId ? 'Chỉnh loại vé' : 'Thêm loại vé'}
                                         </h3>
                                         {editingTicketTypeId && (
@@ -486,7 +486,7 @@ export default function ShowDetail() {
                                         <input
                                             type="text"
                                             disabled={isTicketTypeLocked}
-                                            className="w-full bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
+                                            className="w-full bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
                                             placeholder="VD: Vé thường, VIP, Early Bird"
                                             value={ticketTypeForm.name}
                                             onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, name: e.target.value })}
@@ -500,7 +500,7 @@ export default function ShowDetail() {
                                                 type="number"
                                                 min={0}
                                                 disabled={isTicketTypeLocked}
-                                                className="w-full bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
+                                                className="w-full bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
                                                 placeholder="500000"
                                                 value={ticketTypeForm.price}
                                                 onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, price: e.target.value })}
@@ -511,7 +511,7 @@ export default function ShowDetail() {
                                             <input
                                                 type="text"
                                                 disabled={isTicketTypeLocked}
-                                                className="w-full bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
+                                                className="w-full bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
                                                 placeholder="VIP/A/B"
                                                 value={ticketTypeForm.target_tier}
                                                 onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, target_tier: e.target.value })}
@@ -525,7 +525,7 @@ export default function ShowDetail() {
                                             type="number"
                                             min={0}
                                             disabled={isTicketTypeLocked}
-                                            className="w-full bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
+                                            className="w-full bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary disabled:opacity-60"
                                             placeholder="Để trống nếu lấy theo sức chứa zone"
                                             value={ticketTypeForm.total_quantity}
                                             onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, total_quantity: e.target.value })}
@@ -548,7 +548,7 @@ export default function ShowDetail() {
                                             <input
                                                 type="datetime-local"
                                                 disabled={isTicketTypeLocked}
-                                                className="w-full bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-lg p-2 text-[11px] font-medium outline-none focus:border-primary disabled:opacity-60"
+                                                className="w-full bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-lg p-2 text-[11px] font-medium outline-none focus:border-primary disabled:opacity-60"
                                                 value={ticketTypeForm.sale_start}
                                                 onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, sale_start: e.target.value })}
                                             />
@@ -558,7 +558,7 @@ export default function ShowDetail() {
                                             <input
                                                 type="datetime-local"
                                                 disabled={isTicketTypeLocked}
-                                                className="w-full bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-lg p-2 text-[11px] font-medium outline-none focus:border-primary disabled:opacity-60"
+                                                className="w-full bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-lg p-2 text-[11px] font-medium outline-none focus:border-primary disabled:opacity-60"
                                                 value={ticketTypeForm.sale_end}
                                                 onChange={(e) => setTicketTypeForm({ ...ticketTypeForm, sale_end: e.target.value })}
                                             />
@@ -578,23 +578,23 @@ export default function ShowDetail() {
 
                                 <div className="lg:col-span-3 space-y-3">
                                     {isLoadingTicketTypes ? (
-                                        <div className="p-6 border border-dashed border-white/10 dark:border-white/10 rounded-xl text-center text-xs font-bold text-slate-400">Đang tải loại vé...</div>
+                                        <div className="p-6 border border-dashed border-slate-200 dark:border-white/10 rounded-xl text-center text-xs font-bold text-slate-400">Đang tải loại vé...</div>
                                     ) : ticketTypes.length === 0 ? (
-                                        <div className="p-6 border border-dashed border-white/10 dark:border-white/10 rounded-xl text-center text-xs font-bold text-slate-400">Chưa có loại vé nào. Hãy upload SVG/tạo show để hệ thống sinh loại vé tương ứng.</div>
+                                        <div className="p-6 border border-dashed border-slate-200 dark:border-white/10 rounded-xl text-center text-xs font-bold text-slate-400">Chưa có loại vé nào. Hãy upload SVG/tạo show để hệ thống sinh loại vé tương ứng.</div>
                                     ) : (
                                         ticketTypes.map((ticketType: any) => (
                                             <div key={ticketType._id} className="border border-slate-100 dark:border-white/10 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-primary/20 transition-colors">
                                                 <div className="space-y-1 min-w-0">
                                                     <div className="flex flex-wrap items-center gap-2">
-                                                        <h4 className="font-bold text-sm text-slate-100 dark:text-slate-100 truncate">{ticketType.name}</h4>
+                                                        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 truncate">{ticketType.name}</h4>
                                                         {ticketType.is_limited_promo && <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100 text-[10px] font-bold">Promo</span>}
                                                         {ticketType.target_tier && <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 text-[10px] font-bold">Tier {ticketType.target_tier}</span>}
                                                     </div>
                                                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                                                         <span className="font-bold text-primary">{Number(ticketType.price || 0).toLocaleString('vi-VN')}đ</span>
-                                                        <span className="mx-2 text-slate-300">•</span>
+                                                        <span className="mx-2 text-slate-600 dark:text-slate-300">•</span>
                                                         SL: {ticketType.total_quantity ?? 'Theo zone'}
-                                                        <span className="mx-2 text-slate-300">•</span>
+                                                        <span className="mx-2 text-slate-600 dark:text-slate-300">•</span>
                                                         Đã bán: {ticketType.sold_quantity || 0}
                                                     </div>
                                                     {(ticketType.sale_start || ticketType.sale_end) && (
@@ -610,7 +610,7 @@ export default function ShowDetail() {
                                                         variant="outline"
                                                         disabled={isTicketTypeLocked || isTicketTypePending}
                                                         onClick={() => startEditTicketType(ticketType)}
-                                                        className="h-8 px-3 rounded-full text-xs font-bold border-white/10 dark:border-white/10"
+                                                        className="h-8 px-3 rounded-full text-xs font-bold border-slate-200 dark:border-white/10"
                                                     >
                                                         <Pencil size={13} className="mr-1" /> Sửa
                                                     </Button>
@@ -628,7 +628,7 @@ export default function ShowDetail() {
 
                         {/* 🌟 PHÂN HỆ ĐỊA ĐIỂM (VENUE) ĐÃ ĐƯỢC ĐỔI SANG INLINE CREATION FLUID UX */}
                         <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-6 border border-gray-100 dark:border-white/10">
-                            <h3 className="font-bold text-sm mb-3 text-slate-100 dark:text-slate-100 flex items-center gap-2">
+                            <h3 className="font-bold text-sm mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-2">
                                 <MapPin size={16} className="text-primary" /> Nơi tổ chức
                             </h3>
 
@@ -639,7 +639,7 @@ export default function ShowDetail() {
                                         <input
                                             type="text"
                                             disabled={currentStatus === 'published' || currentStatus === 'cancelled'}
-                                            className="w-full border border-white/10 dark:border-white/10 rounded-lg py-2 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white disabled:opacity-60 transition-colors"
+                                            className="w-full border border-slate-200 dark:border-white/10 rounded-lg py-2 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white disabled:opacity-60 transition-colors"
                                             placeholder="Lọc tìm kiếm Venue..."
                                             value={venueSearch}
                                             onChange={e => { setVenueSearch(e.target.value); setFormData({ ...formData, venue_id: '' }); setIsVenueDropdownOpen(true); }}
@@ -647,10 +647,10 @@ export default function ShowDetail() {
                                             onBlur={() => setTimeout(() => setIsVenueDropdownOpen(false), 200)}
                                         />
                                         {isVenueDropdownOpen && !['published', 'cancelled'].includes(currentStatus) && (
-                                            <div className="absolute z-30 w-full mt-1 bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-lg max-h-48 overflow-y-auto bg-white dark:bg-slate-900/90">
+                                            <div className="absolute z-30 w-full mt-1 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-lg max-h-48 overflow-y-auto">
                                                 {filteredVenues.map((venue: any) => (
                                                     <div key={venue._id} className="px-3 py-2.5 hover:bg-slate-950/70 dark:hover:bg-slate-800 cursor-pointer border-b border-gray-50 text-xs" onMouseDown={() => { setFormData({ ...formData, venue_id: venue._id }); setVenueSearch(venue.name); setIsVenueDropdownOpen(false); }}>
-                                                        <div className="font-semibold text-slate-100 dark:text-slate-100">{venue.name} ({venue.city || 'Chưa rõ thành phố'})</div>
+                                                        <div className="font-semibold text-slate-800 dark:text-slate-100">{venue.name} ({venue.city || 'Chưa rõ thành phố'})</div>
                                                         <div className="text-[10px] text-gray-400 mt-0.5 truncate">{venue.address}</div>
                                                     </div>
                                                 ))}
@@ -666,7 +666,7 @@ export default function ShowDetail() {
                                         )}
                                     </div>
                                     {formData.venue_id && (
-                                        <div className="p-3 bg-slate-950/70 dark:bg-slate-900/80 border border-slate-100 dark:border-white/10 rounded-xl flex items-start gap-2 text-slate-600 dark:text-slate-300 animate-in fade-in">
+                                        <div className="p-3 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 border border-slate-100 dark:border-white/10 rounded-xl flex items-start gap-2 text-slate-600 dark:text-slate-300 animate-in fade-in">
                                             <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-primary" />
                                             <span className="text-[11px] font-medium leading-relaxed">
                                                 {isVenueVerified === false ? (
@@ -699,7 +699,7 @@ export default function ShowDetail() {
                                                 placeholder="VD: Hội trường Trung tâm Văn hóa"
                                                 value={newVenueForm.name}
                                                 onChange={(e) => setNewVenueForm({ ...newVenueForm, name: e.target.value })}
-                                                className="w-full border border-white/10 dark:border-white/10 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white transition-all text-slate-200 dark:text-slate-200"
+                                                className="w-full border border-slate-200 dark:border-white/10 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white transition-all text-slate-700 dark:text-slate-200"
                                             />
                                         </div>
 
@@ -710,7 +710,7 @@ export default function ShowDetail() {
                                                 placeholder="VD: 123 Đường Ba Tháng Hai, Quận 10"
                                                 value={newVenueForm.address}
                                                 onChange={(e) => setNewVenueForm({ ...newVenueForm, address: e.target.value })}
-                                                className="w-full border border-white/10 dark:border-white/10 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white transition-all text-slate-200 dark:text-slate-200"
+                                                className="w-full border border-slate-200 dark:border-white/10 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white transition-all text-slate-700 dark:text-slate-200"
                                             />
                                         </div>
 
@@ -723,7 +723,7 @@ export default function ShowDetail() {
                                                     placeholder="10.777"
                                                     value={newVenueForm.latitude}
                                                     onChange={(e) => setNewVenueForm({ ...newVenueForm, latitude: e.target.value })}
-                                                    className="w-full border border-white/10 dark:border-white/10 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white font-mono text-slate-200 dark:text-slate-200"
+                                                    className="w-full border border-slate-200 dark:border-white/10 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white font-mono text-slate-700 dark:text-slate-200"
                                                 />
                                             </div>
                                             <div>
@@ -734,7 +734,7 @@ export default function ShowDetail() {
                                                     placeholder="106.695"
                                                     value={newVenueForm.longitude}
                                                     onChange={(e) => setNewVenueForm({ ...newVenueForm, longitude: e.target.value })}
-                                                    className="w-full border border-white/10 dark:border-white/10 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white font-mono text-slate-200 dark:text-slate-200"
+                                                    className="w-full border border-slate-200 dark:border-white/10 rounded-lg py-1.5 px-3 outline-none focus:border-primary text-xs font-medium bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 focus:bg-white font-mono text-slate-700 dark:text-slate-200"
                                                 />
                                             </div>
                                         </div>
@@ -764,12 +764,12 @@ export default function ShowDetail() {
                         </div>
 
                         <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-6 border border-gray-100 dark:border-white/10">
-                            <h3 className="font-bold text-sm mb-3 text-slate-100 dark:text-slate-100">Sơ đồ ghế (SVG Map)</h3>
-                            <div className="w-full bg-slate-950/70 dark:bg-slate-900/80 border-2 border-dashed border-white/10 dark:border-white/10 rounded-xl p-4 text-center">
+                            <h3 className="font-bold text-sm mb-3 text-slate-800 dark:text-slate-100">Sơ đồ ghế (SVG Map)</h3>
+                            <div className="w-full bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl p-4 text-center">
                                 {formData.stadium_map_svg ? (
                                     <div className="flex flex-col items-center py-2">
                                         <CheckCircle2 size={20} className="text-emerald-600 mb-1" />
-                                        <span className="text-xs font-bold text-slate-200 dark:text-slate-200">Đã nhận diện file SVG</span>
+                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Đã nhận diện file SVG</span>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center py-2 opacity-50">
@@ -778,7 +778,7 @@ export default function ShowDetail() {
                                     </div>
                                 )}
                                 {!['published', 'cancelled'].includes(currentStatus) && (
-                                    <label className="mt-2 inline-flex items-center justify-center px-3 py-1.5 bg-white dark:bg-slate-900/90 border border-gray-300 rounded-md text-[11px] font-bold text-slate-200 dark:text-slate-200 hover:bg-slate-950/70 dark:hover:bg-slate-800 cursor-pointer transition-colors">
+                                    <label className="mt-2 inline-flex items-center justify-center px-3 py-1.5 bg-white dark:bg-slate-900/90 border border-gray-300 rounded-md text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-950/70 dark:hover:bg-slate-800 cursor-pointer transition-colors">
                                         Nạp File SVG <input type="file" accept=".svg" className="hidden" onChange={handleSVGUpload} />
                                     </label>
                                 )}
@@ -786,16 +786,16 @@ export default function ShowDetail() {
                         </div>
 
                         <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-6 border border-gray-100 dark:border-white/10 space-y-4">
-                            <h3 className="font-bold text-sm text-slate-100 dark:text-slate-100 flex items-center gap-2"><img src="" alt="" /><Users size={16} className="text-primary" /> Nhân viên điều phối ca</h3>
+                            <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2"><img src="" alt="" /><Users size={16} className="text-primary" /> Nhân viên điều phối ca</h3>
 
                             {currentStatus !== 'cancelled' && (
-                                <div className="p-3 bg-slate-950/70 dark:bg-slate-900/80 rounded-xl border border-slate-100 dark:border-white/10 space-y-2">
+                                <div className="p-3 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 rounded-xl border border-slate-100 dark:border-white/10 space-y-2">
                                     <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Bổ sung nhân sự trực cổng</label>
                                     <div className="flex gap-1.5">
                                         <select
                                             value={selectedStaffId}
                                             onChange={(e) => setSelectedStaffId(e.target.value)}
-                                            className="flex-1 bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary"
+                                            className="flex-1 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-lg p-2 text-xs font-medium outline-none focus:border-primary"
                                         >
                                             <option value="" disabled>-- Chọn nhân viên trống --</option>
                                             {availableStaff.map((s: any) => (
@@ -826,9 +826,9 @@ export default function ShowDetail() {
                                         <div className="text-center py-4 border border-dashed border-gray-100 dark:border-white/10 rounded-xl bg-slate-950/70/50 text-xs text-gray-400 font-medium">Chưa có nhân sự trực ca.</div>
                                     ) : (
                                         assignedStaff.map((s: any) => (
-                                            <div key={s._id} className="flex items-center justify-between p-2.5 bg-slate-950/70 dark:bg-slate-900/80 rounded-lg border border-gray-100 dark:border-white/10 text-xs">
+                                            <div key={s._id} className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 rounded-lg border border-gray-100 dark:border-white/10 text-xs">
                                                 <div className="min-w-0 flex-1 pr-2">
-                                                    <div className="font-bold text-slate-100 dark:text-slate-100 truncate">{s.first_name} {s.last_name}</div>
+                                                    <div className="font-bold text-slate-800 dark:text-slate-100 truncate">{s.first_name} {s.last_name}</div>
                                                     <div className="text-[10px] text-slate-400 font-mono truncate">{s.email}</div>
                                                 </div>
                                                 {currentStatus !== 'cancelled' && (
@@ -859,14 +859,14 @@ export default function ShowDetail() {
                 <div className="w-full max-w-4xl mx-auto px-6 lg:px-12 mt-8 space-y-6 animate-in fade-in duration-150">
 
                     {/* Hộp Trạng thái đường truyền Stream */}
-                    <div className="flex justify-between items-center bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 px-5 py-4 rounded-xl">
+                    <div className="flex justify-between items-center bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 px-5 py-4 rounded-xl">
                         <div className="space-y-0.5">
-                            <h3 className="font-bold text-sm text-slate-100 dark:text-slate-100 flex items-center gap-2">
+                            <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
                                 <Activity size={16} className="text-primary" /> Hạ tầng kênh thông tin
                             </h3>
                             <p className="text-xs text-slate-400">Đang lắng nghe dữ liệu phân tán Redis Pub/Sub thời gian thực</p>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-slate-950/70 dark:bg-slate-900/80 border border-white/10 dark:border-white/10 px-3 py-1.5 rounded-full text-xs font-bold">
+                        <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-full text-xs font-bold">
                             <span className={`w-2 h-2 rounded-full ${liveMonitor.status.includes('Live') ? 'bg-green-500 animate-pulse' : 'bg-slate-400'}`}></span>
                             <span className={liveMonitor.status.includes('Live') ? 'text-green-600' : 'text-slate-500 dark:text-slate-400'}>{liveMonitor.status}</span>
                         </div>
@@ -907,7 +907,7 @@ export default function ShowDetail() {
                 </div>
             )}
 
-            <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900/90 border-t border-white/10 dark:border-white/10 z-50">
+            <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900/90 border-t border-slate-200 dark:border-white/10 z-50">
                 <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
 
                     <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">

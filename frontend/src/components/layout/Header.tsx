@@ -25,7 +25,7 @@ export default function Header() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    className="w-full bg-gray-100/80 text-slate-200 dark:text-slate-200 rounded-full py-2.5 px-5 pl-5 pr-12 outline-none focus:bg-gray-100 focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+                    className="w-full bg-gray-100/80 text-slate-700 dark:text-slate-200 rounded-full py-2.5 px-5 pl-5 pr-12 outline-none focus:bg-gray-100 focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
                 />
                 <Search
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-primary"
@@ -42,7 +42,7 @@ export default function Header() {
                 )}
 
                 {/* CHỌN NGÔN NGỮ GIỮ NGUYÊN */}
-                <button className="flex items-center gap-1 border border-gray-300 rounded-full px-3 py-1.5 text-slate-200 dark:text-slate-200 text-xs font-bold hover:border-gray-400 transition-colors bg-white dark:bg-slate-900/90">
+                <button className="flex items-center gap-1 border border-gray-300 rounded-full px-3 py-1.5 text-slate-700 dark:text-slate-200 text-xs font-bold hover:border-gray-400 transition-colors bg-white dark:bg-slate-900/90">
                     VN <ChevronDown size={14} />
                 </button>
 
@@ -59,7 +59,7 @@ export default function Header() {
                     <div className="flex items-center gap-3">
                         {user?.role === 'Attendee' ? (
                             <Link to="/profile">
-                                <button className="bg-gray-100 dark:bg-slate-800/80 hover:bg-gray-200 text-slate-100 dark:text-slate-100 flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors border-none cursor-pointer">
+                                <button className="bg-gray-100 dark:bg-slate-800/80 hover:bg-gray-200 text-slate-800 dark:text-slate-100 flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors border-none cursor-pointer">
                                     <User size={16} />
                                     <span>Hồ sơ</span>
                                 </button>

@@ -55,7 +55,7 @@ export default function MockGatewayPage() {
         <div className="min-h-screen bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center p-4 font-sans">
             <LoadingOverlay isVisible={isLoading} message="Đang xử lý thanh toán..." />
             <ErrorModal message={errorMessage} onClose={() => { setErrorMessage(null); navigate(`/`); }} />
-            <div className="max-w-md w-full bg-white dark:bg-slate-900/90 rounded-2xl border border-white/10 dark:border-white/10 overflow-hidden">
+            <div className="max-w-md w-full bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
                 <div className="bg-blue-600 p-6 text-center text-white">
                     <h1 className="text-2xl font-bold tracking-wider">MOCK GATEWAY</h1>
                     <p className="text-blue-100 mt-1 text-sm">Môi trường giả lập thanh toán</p>
@@ -65,19 +65,19 @@ export default function MockGatewayPage() {
                 <div className="p-8">
                     <div className="text-center mb-8">
                         <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Số tiền thanh toán</p>
-                        <p className="text-4xl font-bold text-slate-100 dark:text-slate-100 font-mono">
+                        <p className="text-4xl font-bold text-slate-800 dark:text-slate-100 font-mono">
                             {Number(amount).toLocaleString('vi-VN')} đ
                         </p>
                     </div>
 
-                    <div className="space-y-3 bg-slate-950/70 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-100 dark:border-white/10 mb-8">
+                    <div className="space-y-3 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-100 dark:border-white/10 mb-8">
                         <div className="flex justify-between text-sm">
                             <span className="text-slate-500 dark:text-slate-400">Mã đơn hàng:</span>
-                            <span className="font-bold text-slate-200 dark:text-slate-200 font-mono">{orderId}</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-200 font-mono">{orderId}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-slate-500 dark:text-slate-400">Nhà cung cấp:</span>
-                            <span className="font-bold text-slate-200 dark:text-slate-200">TICKIFY (DỀ DÊ)</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-200">TICKIFY (DỀ DÊ)</span>
                         </div>
                     </div>
 

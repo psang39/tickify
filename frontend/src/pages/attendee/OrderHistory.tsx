@@ -89,14 +89,14 @@ export default function OrderHistoryPage() {
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             <header className="mb-10">
-                <h1 className="text-2xl font-bold text-slate-100 dark:text-slate-100 mb-2">Xin chào {userData?.first_name || 'bạn'},</h1>
+                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Xin chào {userData?.first_name || 'bạn'},</h1>
                 <p className="text-slate-500 dark:text-slate-400 text-sm">Dưới đây là toàn bộ lịch sử đơn đặt vé và trạng thái thanh toán của bạn.</p>
             </header>
 
             <section className="mb-12">
                 <h3 className="text-base font-bold text-primary uppercase tracking-wider mb-4">Show sắp diễn ra</h3>
                 {activeOrders.length === 0 ? (
-                    <p className="text-slate-400 text-sm italic py-6 border border-dashed border-white/10 dark:border-white/10 rounded-xl text-center bg-slate-950/70/50">
+                    <p className="text-slate-400 text-sm italic py-6 border border-dashed border-slate-200 dark:border-white/10 rounded-xl text-center bg-slate-950/70/50">
                         Bạn hiện không có lịch trình sự kiện âm nhạc nào sắp diễn ra.
                     </p>
                 ) : (
@@ -118,7 +118,7 @@ export default function OrderHistoryPage() {
             <section>
                 <h3 className="text-base font-bold text-slate-400 uppercase tracking-wider mb-4">Sự kiện đã tham gia</h3>
                 {pastOrders.length === 0 ? (
-                    <p className="text-slate-400 text-sm italic py-6 border border-dashed border-white/10 dark:border-white/10 rounded-xl text-center bg-slate-950/70/50">
+                    <p className="text-slate-400 text-sm italic py-6 border border-dashed border-slate-200 dark:border-white/10 rounded-xl text-center bg-slate-950/70/50">
                         Bạn chưa có lịch sử tham gia các đêm nhạc trước đây.
                     </p>
                 ) : (
@@ -198,7 +198,7 @@ function OrderCard({
     return (
         <article
             onClick={onClick}
-            className="group rounded-2xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 p-5 shadow-none transition-all hover:border-primary/40 hover:bg-slate-950/70/40 cursor-pointer"
+            className="group rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 p-5 shadow-none transition-all hover:border-primary/40 hover:bg-slate-950/70/40 cursor-pointer"
         >
             <div className="flex items-start gap-4">
                 <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800/80 shrink-0 border border-slate-100 dark:border-white/10">
@@ -212,7 +212,7 @@ function OrderCard({
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div className="min-w-0">
-                            <h4 className="font-black text-base text-slate-100 dark:text-slate-100 leading-snug break-words">{eventName}</h4>
+                            <h4 className="font-black text-base text-slate-800 dark:text-slate-100 leading-snug break-words">{eventName}</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1 break-words">{showName}</p>
                         </div>
 
@@ -236,8 +236,8 @@ function OrderCard({
                         </div>
 
                         <div className="flex items-center justify-between sm:justify-end gap-3">
-                            <span className="font-black text-base text-slate-50 dark:text-slate-50">{formatCurrency(order.total_price)}</span>
-                            <ChevronRight size={18} className="text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                            <span className="font-black text-base text-slate-900 dark:text-slate-50">{formatCurrency(order.total_price)}</span>
+                            <ChevronRight size={18} className="text-slate-600 dark:text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
                         </div>
                     </div>
                 </div>
@@ -253,7 +253,7 @@ function InfoPill({ icon, label, value, className = '' }: { icon: ReactNode; lab
                 <span className="text-slate-400">{icon}</span>
                 <span>{label}</span>
             </div>
-            <p className="text-sm font-semibold text-slate-200 dark:text-slate-200 break-words leading-snug">{value}</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 break-words leading-snug">{value}</p>
         </div>
     );
 }

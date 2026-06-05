@@ -30,24 +30,24 @@ export default function AttendeeLayout() {
     const currentPath = location.pathname;
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-50 dark:text-slate-50 py-12">
+        <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-900 dark:text-slate-50 py-12">
             <LoadingOverlay isVisible={isLoading} />
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             <div className="max-w-7xl mx-auto px-6 flex gap-8">
                 {/* SIDEBAR TRÁI DÙNG CHUNG */}
-                <aside className="w-64 bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-2xl flex flex-col justify-between shrink-0 h-[calc(100vh-140px)] sticky top-24 p-6">
+                <aside className="w-64 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col justify-between shrink-0 h-[calc(100vh-140px)] sticky top-24 p-6">
                     <div>
                         {/* Khu vực Avatar & Tên tài khoản */}
                         <div className="flex flex-col items-center text-center mb-10 pb-6 border-b border-slate-100 dark:border-white/10">
-                            <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-100 dark:border-white/10 mb-3 bg-slate-950/70 dark:bg-slate-900/80">
+                            <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-100 dark:border-white/10 mb-3 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80">
                                 <img
                                     src={userData?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Sylvie"}
                                     alt="Avatar"
                                     className="w-full h-full object-cover"
                                 />
                             </div>
-                            <h2 className="font-bold text-[15px] text-slate-100 dark:text-slate-100">
+                            <h2 className="font-bold text-[15px] text-slate-800 dark:text-slate-100">
                                 {userData ? `${userData.first_name || ''} ${userData.last_name || ''}` : 'Đang tải...'}
                             </h2>
                         </div>
@@ -80,7 +80,7 @@ export default function AttendeeLayout() {
                 </aside>
 
                 {/* KHU VỰC CHỨA NỘI DUNG TRANG CON BÊN PHẢI */}
-                <main className="flex-1 bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-2xl p-10">
+                <main className="flex-1 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-2xl p-10">
                     <Outlet context={{ userData }} />
                 </main>
             </div>

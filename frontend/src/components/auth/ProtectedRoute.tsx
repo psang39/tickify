@@ -15,8 +15,8 @@ const OrganizerPendingApprovalGate: React.FC = () => {
     const { user } = useAuthStore();
 
     return (
-        <main className="min-h-[calc(100vh-80px)] bg-slate-950/70 dark:bg-slate-900/80 px-4 py-10">
-            <section className="mx-auto flex max-w-3xl flex-col items-center rounded-3xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 px-6 py-12 text-center shadow-sm">
+        <main className="min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 px-4 py-10">
+            <section className="mx-auto flex max-w-3xl flex-col items-center rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 px-6 py-12 text-center shadow-sm">
                 <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 text-3xl">
                     <Lock size={24} className="text-amber-600" />
                 </div>
@@ -25,7 +25,7 @@ const OrganizerPendingApprovalGate: React.FC = () => {
                     Tài khoản đang chờ duyệt
                 </p>
 
-                <h1 className="text-2xl font-bold text-slate-50 dark:text-slate-50 md:text-3xl">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 md:text-3xl">
                     Dashboard Organizer hiện đang bị khóa
                 </h1>
 
@@ -34,11 +34,11 @@ const OrganizerPendingApprovalGate: React.FC = () => {
                     tính năng quản lý sự kiện, show, vé, nhân viên và báo cáo.
                 </p>
 
-                <div className="mt-7 w-full max-w-xl rounded-2xl border border-white/10 dark:border-white/10 bg-slate-950/70 dark:bg-slate-900/80 p-4 text-left">
-                    <div className="grid gap-3 text-sm text-slate-200 dark:text-slate-200 md:grid-cols-2">
+                <div className="mt-7 w-full max-w-xl rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 p-4 text-left">
+                    <div className="grid gap-3 text-sm text-slate-700 dark:text-slate-200 md:grid-cols-2">
                         <div>
                             <p className="text-xs font-medium uppercase text-slate-400">Công ty</p>
-                            <p className="mt-1 font-semibold text-slate-100 dark:text-slate-100">
+                            <p className="mt-1 font-semibold text-slate-800 dark:text-slate-100">
                                 {user?.company_name || 'Chưa có thông tin'}
                             </p>
                         </div>

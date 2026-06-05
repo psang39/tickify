@@ -29,7 +29,7 @@ export function PaymentSuccessPanel({ email, onBackHome, onViewTickets }: Paymen
           <Button
             variant="outline"
             onClick={onBackHome}
-            className="px-8 py-6 rounded-full border-gray-300 text-slate-200 dark:text-slate-200 font-semibold hover:bg-slate-950/70 dark:hover:bg-slate-800 w-full sm:w-auto text-base h-14"
+            className="px-8 py-6 rounded-full border-gray-300 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-950/70 dark:hover:bg-slate-800 w-full sm:w-auto text-base h-14"
           >
             Về trang chủ
           </Button>

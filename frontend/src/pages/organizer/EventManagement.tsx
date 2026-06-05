@@ -18,13 +18,13 @@ const statusLabel: Record<string, string> = {
 
 function SummaryCard({ title, value, icon, hint }: { title: string; value: string | number; icon: ReactNode; hint?: string }) {
     return (
-        <Card className="border-white/10 dark:border-white/10 rounded-2xl shadow-none">
+        <Card className="border-slate-200 dark:border-white/10 rounded-2xl shadow-none">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{title}</CardTitle>
                 <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-primary">{icon}</div>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold text-slate-50 dark:text-slate-50">{value}</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-50">{value}</div>
                 {hint && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{hint}</p>}
             </CardContent>
         </Card>
@@ -114,7 +114,7 @@ export default function EventManagement() {
 
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-50 dark:text-slate-50">Quản lý sự kiện</h1>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">Quản lý sự kiện</h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
                         Theo dõi các sự kiện đã tạo, trạng thái xuất bản và truy cập nhanh vào phần quản lý show.
                     </p>
@@ -136,10 +136,10 @@ export default function EventManagement() {
                 <SummaryCard title="Riêng tư" value={summary.privateEvents} icon={<Lock size={20} />} hint="Chỉ dùng nội bộ hoặc tạm ẩn" />
             </div>
 
-            <Card className="border-white/10 dark:border-white/10 rounded-2xl shadow-none overflow-hidden">
+            <Card className="border-slate-200 dark:border-white/10 rounded-2xl shadow-none overflow-hidden">
                 <CardHeader className="border-b border-slate-100 dark:border-white/10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
-                        <CardTitle className="text-base font-bold text-slate-100 dark:text-slate-100 flex items-center gap-2">
+                        <CardTitle className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                             Danh sách sự kiện
                         </CardTitle>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -153,7 +153,7 @@ export default function EventManagement() {
                             value={searchTerm}
                             onChange={(event) => setSearchTerm(event.target.value)}
                             placeholder="Tìm theo tên, mô tả, trạng thái..."
-                            className="w-full border border-white/10 dark:border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm bg-white dark:bg-slate-900/90 focus:outline-primary"
+                            className="w-full border border-slate-200 dark:border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm bg-white dark:bg-slate-900/90 focus:outline-primary"
                         />
                     </div>
                 </CardHeader>
@@ -185,7 +185,7 @@ export default function EventManagement() {
                                                 <div className="flex gap-4">
                                                     <button
                                                         type="button"
-                                                        className="w-[152px] h-[86px] rounded-xl overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800/80 relative border border-white/10 dark:border-white/10 text-left"
+                                                        className="w-[152px] h-[86px] rounded-xl overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800/80 relative border border-slate-200 dark:border-white/10 text-left"
                                                         onClick={() => navigate(`/organizer/events/${event._id}`)}
                                                     >
                                                         <img
@@ -199,7 +199,7 @@ export default function EventManagement() {
                                                         <button
                                                             type="button"
                                                             onClick={() => navigate(`/organizer/events/${event._id}`)}
-                                                            className="text-left text-slate-50 dark:text-slate-50 font-bold text-base line-clamp-1 hover:text-primary hover:underline"
+                                                            className="text-left text-slate-900 dark:text-slate-50 font-bold text-base line-clamp-1 hover:text-primary hover:underline"
                                                         >
                                                             {event.name}
                                                         </button>
@@ -217,7 +217,7 @@ export default function EventManagement() {
                                             </td>
                                             <td className="px-6 py-4 align-top text-slate-600 dark:text-slate-300">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="font-semibold text-slate-200 dark:text-slate-200">{formatDate(event.start_date)}</span>
+                                                    <span className="font-semibold text-slate-700 dark:text-slate-200">{formatDate(event.start_date)}</span>
                                                     <span className="text-xs text-slate-500 dark:text-slate-400">Đến: {formatDate(event.end_date)}</span>
                                                 </div>
                                             </td>

@@ -68,8 +68,8 @@ export default function HomePage() {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-900/90 font-sans text-slate-50 dark:text-slate-50">
-            <section className="relative overflow-hidden bg-[#070A18] text-slate-50 concert-page-shell dark:bg-[#050510]">
+        <div className="bg-white dark:bg-slate-900/90 font-sans text-slate-900 dark:text-slate-50">
+            <section className="relative overflow-hidden bg-[#F7F7FA] dark:bg-[#070A18] text-slate-900 dark:text-slate-50 concert-page-shell dark:bg-[#050510]">
                 <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-6 py-10 lg:grid-cols-2 lg:px-8 lg:py-8">
                     <div className="space-y-6 lg:pr-8">
                         <span className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-4 py-2 text-xs font-bold text-[#FF0082]">
@@ -89,7 +89,7 @@ export default function HomePage() {
                                 </div>
                             ) : (
                                 <>
-                                    <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-slate-50 dark:text-slate-50 md:text-5xl">
+                                    <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-slate-900 dark:text-slate-50 md:text-5xl">
                                         {heroEvent?.name || 'Khám phá show diễn bạn yêu thích'}
                                     </h1>
                                     <p className="mt-4 max-w-lg text-sm leading-7 text-slate-500 dark:text-slate-400">
@@ -132,7 +132,7 @@ export default function HomePage() {
                             <button
                                 onClick={() => navigate('/search')}
                                 disabled={isPageLoading}
-                                className="rounded-xl border border-white/10 dark:border-white/10 bg-white dark:bg-slate-900/90 px-7 py-3 text-sm font-bold text-slate-200 dark:text-slate-200 transition hover:border-[#FF0082] hover:text-[#FF0082] disabled:cursor-not-allowed disabled:text-slate-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:text-pink-200"
+                                className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 px-7 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 transition hover:border-[#FF0082] hover:text-[#FF0082] disabled:cursor-not-allowed disabled:text-slate-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:text-pink-200"
                             >
                                 Xem thêm show
                             </button>
@@ -190,7 +190,7 @@ export default function HomePage() {
 
             <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
                 <div className="mb-5 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-slate-50 dark:text-slate-50">Show sắp diễn ra</h2>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Show sắp diễn ra</h2>
                     <Link to="/search?sort=upcoming" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FF0082]">Xem tất cả</Link>
                 </div>
 
@@ -203,7 +203,7 @@ export default function HomePage() {
                         {visibleUpcomingEvents.slice(0, 4).map((event: any) => <PublicEventCard key={event._id} event={event} />)}
                     </div>
                 ) : (
-                    <div className="rounded-2xl border border-dashed border-white/10 dark:border-white/10 bg-slate-950/70 dark:bg-slate-900/80 px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+                    <div className="rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                         Hiện chưa có show nào được hiển thị.
                     </div>
                 )}
@@ -212,7 +212,7 @@ export default function HomePage() {
             {(isPageLoading || genres.length > 0) && (
                 <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
                     <div className="mb-5 flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-slate-50 dark:text-slate-50">Khám phá theo dòng nhạc</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Khám phá theo dòng nhạc</h2>
                         <Link to="/search" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FF0082]">Xem thêm</Link>
                     </div>
 
@@ -226,10 +226,10 @@ export default function HomePage() {
                                 <button
                                     key={genre}
                                     onClick={() => navigate(`/search?genre=${encodeURIComponent(genre)}`)}
-                                    className="rounded-2xl border border-white/10 bg-white dark:bg-slate-900/90 px-5 py-6 text-left transition hover:border-[#FF0082] hover:shadow-md dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:shadow-pink-500/10"
+                                    className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 px-5 py-6 text-left transition hover:border-[#FF0082] hover:shadow-md dark:bg-slate-900/80 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:shadow-pink-500/10"
                                 >
                                     <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Dòng nhạc</span>
-                                    <span className="mt-2 block text-lg font-black text-slate-50 dark:text-slate-50">{genre}</span>
+                                    <span className="mt-2 block text-lg font-black text-slate-900 dark:text-slate-50">{genre}</span>
                                 </button>
                             ))}
                         </div>
@@ -251,7 +251,7 @@ export default function HomePage() {
                         {isPageLoading ? (
                             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                                 {Array.from({ length: 3 }).map((_, index) => (
-                                    <article key={index} className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-50 dark:text-slate-50">
+                                    <article key={index} className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-50">
                                         <div className="h-40 animate-pulse bg-slate-300" />
                                         <div className="space-y-3 p-4">
                                             <SkeletonLine className="h-3 w-20" />
@@ -265,7 +265,7 @@ export default function HomePage() {
                         ) : (
                             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                                 {newestEvents.slice(0, 3).map((event: any) => (
-                                    <article key={event._id} onClick={() => navigate(`/events/${event._id}`)} className="ticket-card cursor-pointer overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-50 dark:text-slate-50 dark:border dark:border-white/10 dark:bg-slate-900/85 dark:text-slate-100 concert-ticket-card">
+                                    <article key={event._id} onClick={() => navigate(`/events/${event._id}`)} className="ticket-card cursor-pointer overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-50 dark:border dark:border-white/10 dark:bg-slate-900/85 dark:text-slate-100 concert-ticket-card">
                                         <img src={event.banner_url || event.poster_url || heroImage} alt={event.name} className="h-40 w-full object-cover" />
                                         <div className="p-4">
                                             <p className="text-[11px] font-semibold text-slate-400">{event.genre || 'Sự kiện'}</p>

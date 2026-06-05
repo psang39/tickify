@@ -32,14 +32,14 @@ export default function ManageUsersPage() {
 
         if (lowerRole === 'attendee') {
             return (
-                <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-white/10 dark:border-white/10">
+                <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-slate-200 dark:border-white/10">
                     <UserIcon size={12} /> Attendee
                 </span>
             );
         }
         if (lowerRole === 'staff') {
             return (
-                <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-white/10 dark:border-white/10">
+                <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-md text-[11px] font-black tracking-widest uppercase border border-slate-200 dark:border-white/10">
                     <UserIcon size={12} /> Staff
                 </span>
             );
@@ -55,7 +55,7 @@ export default function ManageUsersPage() {
 
             <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-100 dark:text-slate-100 mb-2">Quản lý Tài khoản</h1>
+                    <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Quản lý Tài khoản</h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm">Hệ thống ghi nhận tổng cộng <span className="font-bold text-primary">{total}</span> tài khoản đăng ký.</p>
                 </div>
 
@@ -64,16 +64,16 @@ export default function ManageUsersPage() {
                     <input
                         type="text"
                         placeholder="Tìm kiếm email..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors"
                     />
                 </div>
             </header>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-[24px] overflow-hidden shadow-none concert-poster-card">
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-[24px] overflow-hidden shadow-none concert-poster-card">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-white/10 dark:border-white/10 text-xs uppercase tracking-wider text-slate-400 font-bold bg-slate-950/70/50">
+                            <tr className="border-b border-slate-200 dark:border-white/10 text-xs uppercase tracking-wider text-slate-400 font-bold bg-slate-50 dark:bg-slate-950/70/50">
                                 <th className="px-6 py-4">Tài khoản</th>
                                 <th className="px-6 py-4">Vai trò (Role)</th>
                                 <th className="px-6 py-4">Trạng thái</th>
@@ -85,10 +85,10 @@ export default function ManageUsersPage() {
                                 <tr><td colSpan={4} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">Không có dữ liệu.</td></tr>
                             ) : (
                                 users.map((user: any) => (
-                                    <tr key={user._id} className="border-b border-slate-100 dark:border-white/10 hover:bg-slate-950/70/50 transition-colors">
+                                    <tr key={user._id} className="border-b border-slate-100 dark:border-white/10 hover:bg-slate-50 dark:bg-slate-950/70/50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
-                                                <span className="font-bold text-slate-100 dark:text-slate-100 text-sm">{user.first_name} {user.last_name}</span>
+                                                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm">{user.first_name} {user.last_name}</span>
                                                 <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{user.email}</span>
                                             </div>
                                         </td>
@@ -109,22 +109,22 @@ export default function ManageUsersPage() {
                 </div>
 
                 {/* TRÌNH PHÂN TRANG (PAGINATION) */}
-                <div className="px-6 py-4 border-t border-white/10 dark:border-white/10 bg-slate-950/70/30 flex items-center justify-between">
+                <div className="px-6 py-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/70/30 flex items-center justify-between">
                     <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                        Trang <span className="font-bold text-slate-100 dark:text-slate-100">{page + 1}</span>
+                        Trang <span className="font-bold text-slate-800 dark:text-slate-100">{page + 1}</span>
                     </span>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setPage(p => Math.max(0, p - 1))}
                             disabled={page === 0}
-                            className="p-2 border border-white/10 dark:border-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary disabled:opacity-50 disabled:hover:bg-transparent transition-colors bg-white dark:bg-slate-900/90"
+                            className="p-2 border border-slate-200 dark:border-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary disabled:opacity-50 disabled:hover:bg-transparent transition-colors bg-white dark:bg-slate-900/90"
                         >
                             <ChevronLeft size={18} />
                         </button>
                         <button
                             onClick={() => setPage(p => p + 1)}
                             disabled={!hasMore}
-                            className="p-2 border border-white/10 dark:border-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary disabled:opacity-50 disabled:hover:bg-transparent transition-colors bg-white dark:bg-slate-900/90"
+                            className="p-2 border border-slate-200 dark:border-white/10 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary disabled:opacity-50 disabled:hover:bg-transparent transition-colors bg-white dark:bg-slate-900/90"
                         >
                             <ChevronRight size={18} />
                         </button>

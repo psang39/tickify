@@ -571,308 +571,409 @@ html.dark img {
 }
 /* === Tickify dark full frontend audit patch v4 END === */
 
-/* === Tickify concert reskin v5 START === */
-:root {
-  --concert-primary: #FF0082;
-  --concert-secondary: #262880;
-  --concert-ink: #070A18;
-  --concert-panel: rgba(10, 15, 37, 0.86);
-  --concert-panel-strong: rgba(8, 11, 28, 0.94);
-  --concert-border: rgba(255, 255, 255, 0.11);
-  --concert-muted: #94a3b8;
-  --concert-stage-bg:
-    radial-gradient(circle at 12% 0%, rgba(255, 0, 130, 0.26), transparent 34%),
-    radial-gradient(circle at 88% 8%, rgba(38, 40, 128, 0.56), transparent 36%),
-    radial-gradient(circle at 50% 100%, rgba(255, 0, 130, 0.16), transparent 32%),
-    linear-gradient(135deg, #070A18 0%, #0B1026 45%, #17113A 100%);
+/* === Tickify concert reskin v6 START === */
+@layer base {
+  :root {
+    --concert-primary: #FF0082;
+    --concert-secondary: #262880;
+    --concert-light-bg: #F7F7FA;
+    --concert-light-panel: #ffffff;
+    --concert-light-muted: #64748b;
+    --concert-stage-bg:
+      radial-gradient(circle at 12% 0%, rgba(255, 0, 130, 0.26), transparent 34%),
+      radial-gradient(circle at 88% 8%, rgba(38, 40, 128, 0.56), transparent 36%),
+      radial-gradient(circle at 50% 100%, rgba(255, 0, 130, 0.16), transparent 32%),
+      linear-gradient(135deg, #070A18 0%, #0B1026 45%, #17113A 100%);
+    --concert-panel: rgba(10, 15, 37, 0.86);
+    --concert-panel-strong: rgba(8, 11, 28, 0.94);
+    --concert-border: rgba(255, 255, 255, 0.11);
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(255, 0, 130, 0.08), transparent 28rem),
+      radial-gradient(circle at 90% 8%, rgba(38, 40, 128, 0.08), transparent 30rem),
+      var(--concert-light-bg) !important;
+    color: #0f172a;
+    overflow-x: hidden;
+  }
+
+  html.dark body {
+    background: var(--concert-stage-bg) !important;
+    color: #f8fafc;
+    color-scheme: dark;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.25;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(255, 0, 130, 0.08), transparent 34%),
+      linear-gradient(115deg, rgba(38, 40, 128, 0.05) 0 1px, transparent 1px 92px);
+    mask-image: linear-gradient(to bottom, black, transparent 88%);
+  }
+
+  html.dark body::before {
+    opacity: 1;
+    background:
+      linear-gradient(115deg, rgba(255, 255, 255, 0.055) 0 1px, transparent 1px 84px),
+      linear-gradient(65deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 96px),
+      radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.10), transparent 28%);
+    mask-image: linear-gradient(to bottom, black, rgba(0, 0, 0, 0.3), transparent 95%);
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+
+  ::selection {
+    background: rgba(255, 0, 130, 0.24);
+    color: #111827;
+  }
+
+  html.dark ::selection {
+    background: rgba(255, 0, 130, 0.35);
+    color: white;
+  }
+
+  input,
+  select,
+  textarea {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  html.dark input,
+  html.dark select,
+  html.dark textarea {
+    background: rgba(8, 11, 28, 0.78) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.13) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  html.dark input::placeholder,
+  html.dark textarea::placeholder {
+    color: rgba(203, 213, 225, 0.66) !important;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: rgba(255, 0, 130, 0.65) !important;
+    box-shadow: 0 0 0 3px rgba(255, 0, 130, 0.14) !important;
+  }
+
+  html.dark input:focus,
+  html.dark select:focus,
+  html.dark textarea:focus {
+    border-color: rgba(255, 0, 130, 0.75) !important;
+    box-shadow: 0 0 0 3px rgba(255, 0, 130, 0.18) !important;
+  }
+
+  html:not(.dark) header,
+  html:not(.dark) footer,
+  html:not(.dark) [class*="sticky"][class*="top-0"],
+  html:not(.dark) [class*="fixed"][class*="top-0"] {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-color: rgba(148, 163, 184, 0.28) !important;
+    color: #0f172a !important;
+    backdrop-filter: blur(18px);
+  }
+
+  html.dark header,
+  html.dark footer,
+  html.dark [class*="sticky"][class*="top-0"],
+  html.dark [class*="fixed"][class*="top-0"] {
+    background: rgba(7, 10, 24, 0.82) !important;
+    border-color: var(--concert-border) !important;
+    color: #f8fafc !important;
+    backdrop-filter: blur(18px);
+  }
 }
 
-html, body, #root {
-  min-height: 100%;
-}
+@layer utilities {
+  /* Light-mode repair for v5 direct dark replacements. */
+  html:not(.dark) .concert-page-shell,
+  html:not(.dark) [class~="bg-[#070A18]"] {
+    background: var(--concert-light-bg) !important;
+    color: #0f172a !important;
+  }
 
-body {
-  background: var(--concert-stage-bg) !important;
-  color: #f8fafc;
-  overflow-x: hidden;
-}
+  html:not(.dark) main [class~="bg-[#0B1026]"],
+  html:not(.dark) section [class~="bg-[#0B1026]"],
+  html:not(.dark) aside [class~="bg-[#0B1026]"],
+  html:not(.dark) article [class~="bg-[#0B1026]"],
+  html:not(.dark) main [class~="bg-slate-950/70"],
+  html:not(.dark) section [class~="bg-slate-950/70"],
+  html:not(.dark) aside [class~="bg-slate-950/70"],
+  html:not(.dark) article [class~="bg-slate-950/70"],
+  html:not(.dark) main [class~="bg-slate-950/80"],
+  html:not(.dark) section [class~="bg-slate-950/80"],
+  html:not(.dark) main [class~="bg-slate-950/85"],
+  html:not(.dark) section [class~="bg-slate-950/85"] {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(10px);
+  }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.055) 0 1px, transparent 1px 84px),
-    linear-gradient(65deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 96px),
-    radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.10), transparent 28%);
-  mask-image: linear-gradient(to bottom, black, rgba(0, 0, 0, 0.3), transparent 95%);
-}
+  html:not(.dark) [class~="bg-[#140B22]"] {
+    background: #fff5fb !important;
+    color: #0f172a !important;
+  }
 
-#root {
-  position: relative;
-  z-index: 1;
-}
+  html:not(.dark) [class~="border-white/10"],
+  html:not(.dark) [class~="border-white/15"] {
+    border-color: #e2e8f0 !important;
+  }
 
-::selection {
-  background: rgba(255, 0, 130, 0.35);
-  color: white;
-}
+  html:not(.dark) :where(main, section, article, aside, div, span, p, h1, h2, h3, h4, label, td, th, li)[class~="text-slate-50"],
+  html:not(.dark) :where(main, section, article, aside, div, span, p, h1, h2, h3, h4, label, td, th, li)[class~="text-slate-100"] {
+    color: #0f172a !important;
+  }
 
-.concert-page-shell,
-[class~="bg-[#F7F7FA]"],
-[class~="bg-[#F8F7FF]"],
-[class~="bg-[#F9FAFB]"],
-[class~="bg-[#FAFAFA]"],
-[class~="bg-[#FFF5FB]"],
-[class~="bg-[#fff5fb]"],
-[class~="bg-[#FDF2F8]"],
-[class~="bg-[#fdf2f8]"],
-[class~="bg-slate-50"],
-[class~="bg-gray-50"],
-[class~="bg-zinc-50"],
-[class~="bg-neutral-50"],
-[class~="bg-stone-50"] {
-  background: var(--concert-stage-bg) !important;
-  color: #f8fafc !important;
-}
+  html:not(.dark) :where(main, section, article, aside, div, span, p, h1, h2, h3, h4, label, td, th, li)[class~="text-slate-200"],
+  html:not(.dark) :where(main, section, article, aside, div, span, p, h1, h2, h3, h4, label, td, th, li)[class~="text-slate-300"] {
+    color: #475569 !important;
+  }
 
-main [class~="bg-white"],
-section [class~="bg-white"],
-aside [class~="bg-white"],
-article [class~="bg-white"],
-main [class~="bg-slate-50"],
-section [class~="bg-slate-50"],
-aside [class~="bg-slate-50"],
-main [class~="bg-gray-50"],
-section [class~="bg-gray-50"],
-aside [class~="bg-gray-50"] {
-  background: var(--concert-panel) !important;
-  color: #f8fafc !important;
-  border-color: var(--concert-border) !important;
-  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(14px);
-}
+  html:not(.dark) [class~="bg-[#FF0082]"],
+  html:not(.dark) [class~="bg-primary"],
+  html:not(.dark) button[class*="bg-primary"],
+  html:not(.dark) a[class*="bg-primary"] {
+    background: linear-gradient(135deg, var(--concert-primary), #B00067) !important;
+    color: white !important;
+    box-shadow: 0 14px 34px rgba(255, 0, 130, 0.24);
+  }
 
-header,
-footer,
-[class*="sticky"][class*="top-0"],
-[class*="fixed"][class*="top-0"] {
-  background: rgba(7, 10, 24, 0.82) !important;
-  border-color: var(--concert-border) !important;
-  color: #f8fafc !important;
-  backdrop-filter: blur(18px);
-}
+  html:not(.dark) [class~="bg-[#262880]"],
+  html:not(.dark) [class~="bg-secondary"] {
+    background: linear-gradient(135deg, var(--concert-secondary), #10134F) !important;
+    color: white !important;
+  }
 
-h1, h2, h3,
-[class~="text-slate-900"],
-[class~="text-gray-900"],
-[class~="text-slate-800"],
-[class~="text-gray-800"] {
-  color: #f8fafc !important;
-}
+  html:not(.dark) .ticket-card,
+  html:not(.dark) .concert-ticket-card,
+  html:not(.dark) .concert-poster-card {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 18px 46px rgba(15, 23, 42, 0.10);
+  }
 
-[class~="text-slate-700"],
-[class~="text-gray-700"],
-[class~="text-slate-600"],
-[class~="text-gray-600"],
-[class~="text-neutral-600"] {
-  color: #cbd5e1 !important;
-}
+  html.dark .concert-page-shell,
+  html.dark [class~="bg-[#F7F7FA]"],
+  html.dark [class~="bg-[#F8F7FF]"],
+  html.dark [class~="bg-[#F9FAFB]"],
+  html.dark [class~="bg-[#FAFAFA]"],
+  html.dark [class~="bg-[#FFF5FB]"],
+  html.dark [class~="bg-[#fff5fb]"],
+  html.dark [class~="bg-[#FDF2F8]"],
+  html.dark [class~="bg-[#fdf2f8]"],
+  html.dark [class~="bg-slate-50"],
+  html.dark [class~="bg-gray-50"],
+  html.dark [class~="bg-zinc-50"],
+  html.dark [class~="bg-neutral-50"],
+  html.dark [class~="bg-stone-50"] {
+    background: var(--concert-stage-bg) !important;
+    color: #f8fafc !important;
+  }
 
-[class~="text-slate-500"],
-[class~="text-gray-500"],
-[class~="text-neutral-500"] {
-  color: #94a3b8 !important;
-}
+  html.dark main [class~="bg-white"],
+  html.dark section [class~="bg-white"],
+  html.dark aside [class~="bg-white"],
+  html.dark article [class~="bg-white"],
+  html.dark main [class~="bg-slate-50"],
+  html.dark section [class~="bg-slate-50"],
+  html.dark aside [class~="bg-slate-50"],
+  html.dark main [class~="bg-gray-50"],
+  html.dark section [class~="bg-gray-50"],
+  html.dark aside [class~="bg-gray-50"] {
+    background: var(--concert-panel) !important;
+    color: #f8fafc !important;
+    border-color: var(--concert-border) !important;
+    box-shadow: 0 18px 70px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(14px);
+  }
 
-[class~="border-gray-200"],
-[class~="border-slate-200"],
-[class~="border-gray-100"],
-[class~="border-slate-100"] {
-  border-color: var(--concert-border) !important;
-}
+  html.dark h1,
+  html.dark h2,
+  html.dark h3,
+  html.dark [class~="text-slate-900"],
+  html.dark [class~="text-gray-900"],
+  html.dark [class~="text-slate-800"],
+  html.dark [class~="text-gray-800"] {
+    color: #f8fafc !important;
+  }
 
-input,
-select,
-textarea {
-  background: rgba(8, 11, 28, 0.78) !important;
-  color: #f8fafc !important;
-  border-color: rgba(255, 255, 255, 0.13) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
+  html.dark [class~="text-slate-700"],
+  html.dark [class~="text-gray-700"],
+  html.dark [class~="text-slate-600"],
+  html.dark [class~="text-gray-600"],
+  html.dark [class~="text-neutral-600"] {
+    color: #cbd5e1 !important;
+  }
 
-input::placeholder,
-textarea::placeholder {
-  color: rgba(203, 213, 225, 0.66) !important;
-}
+  html.dark [class~="text-slate-500"],
+  html.dark [class~="text-gray-500"],
+  html.dark [class~="text-neutral-500"] {
+    color: #94a3b8 !important;
+  }
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: rgba(255, 0, 130, 0.75) !important;
-  box-shadow: 0 0 0 3px rgba(255, 0, 130, 0.18) !important;
-}
+  html.dark [class~="border-gray-200"],
+  html.dark [class~="border-slate-200"],
+  html.dark [class~="border-gray-100"],
+  html.dark [class~="border-slate-100"] {
+    border-color: var(--concert-border) !important;
+  }
 
-table {
-  color: #e2e8f0;
-}
+  html.dark thead,
+  html.dark thead tr,
+  html.dark [class~="bg-slate-100"],
+  html.dark [class~="bg-gray-100"] {
+    background: rgba(15, 23, 42, 0.86) !important;
+    color: #f8fafc !important;
+  }
 
-thead,
-thead tr,
-[class~="bg-slate-100"],
-[class~="bg-gray-100"] {
-  background: rgba(15, 23, 42, 0.86) !important;
-  color: #f8fafc !important;
-}
+  html.dark tbody tr,
+  html.dark [class~="divide-y"] > * {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
 
-tbody tr,
-[class~="divide-y"] > * {
-  border-color: rgba(255, 255, 255, 0.08) !important;
-}
+  html.dark tbody tr:hover,
+  html.dark [class~="hover:bg-slate-50"]:hover,
+  html.dark [class~="hover:bg-slate-100"]:hover,
+  html.dark [class~="hover:bg-gray-50"]:hover,
+  html.dark [class~="hover:bg-gray-100"]:hover,
+  html.dark [class~="hover:bg-white"]:hover {
+    background: rgba(255, 0, 130, 0.09) !important;
+  }
 
-tbody tr:hover,
-[class~="hover:bg-slate-50"]:hover,
-[class~="hover:bg-slate-100"]:hover,
-[class~="hover:bg-gray-50"]:hover,
-[class~="hover:bg-gray-100"]:hover,
-[class~="hover:bg-white"]:hover {
-  background: rgba(255, 0, 130, 0.09) !important;
-}
+  html.dark .ticket-card,
+  html.dark .concert-ticket-card,
+  html.dark .concert-poster-card,
+  html.dark main [class*="rounded-[24px]"][class*="overflow-hidden"],
+  html.dark main [class*="rounded-2xl"][class*="overflow-hidden"][class*="bg-white"],
+  html.dark main [class*="rounded-3xl"][class*="bg-white"],
+  html.dark main [class*="rounded-2xl"][class*="bg-white"] {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(16, 21, 54, 0.96), rgba(7, 10, 24, 0.96)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.11) !important;
+    color: #f8fafc !important;
+    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(255, 0, 130, 0.04);
+  }
 
-.ticket-card,
-.concert-ticket-card,
-.concert-poster-card,
-main [class*="rounded-[24px]"][class*="overflow-hidden"],
-main [class*="rounded-2xl"][class*="overflow-hidden"][class*="bg-white"],
-main [class*="rounded-3xl"][class*="bg-white"],
-main [class*="rounded-2xl"][class*="bg-white"] {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(16, 21, 54, 0.96), rgba(7, 10, 24, 0.96)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.11) !important;
-  color: #f8fafc !important;
-  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(255, 0, 130, 0.04);
-}
+  html.dark .ticket-card::before,
+  html.dark .concert-ticket-card::before,
+  html.dark .concert-poster-card::before,
+  html.dark main [class*="rounded-[24px]"][class*="overflow-hidden"]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    border-top: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--concert-primary), var(--concert-secondary), var(--concert-primary)) 1;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(255, 0, 130, 0.16), transparent 34%),
+      linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.24));
+  }
 
-.ticket-card::before,
-.concert-ticket-card::before,
-.concert-poster-card::before,
-main [class*="rounded-[24px]"][class*="overflow-hidden"]::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  border-top: 3px solid transparent;
-  border-image: linear-gradient(90deg, var(--concert-primary), var(--concert-secondary), var(--concert-primary)) 1;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(255, 0, 130, 0.16), transparent 34%),
-    linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.24));
-}
+  html.dark .ticket-card:hover,
+  html.dark .concert-ticket-card:hover,
+  html.dark .concert-poster-card:hover,
+  html.dark main [class*="rounded-[24px]"][class*="overflow-hidden"]:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 0, 130, 0.42) !important;
+    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.46), 0 0 34px rgba(255, 0, 130, 0.16);
+  }
 
-.ticket-card:hover,
-.concert-ticket-card:hover,
-.concert-poster-card:hover,
-main [class*="rounded-[24px]"][class*="overflow-hidden"]:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 0, 130, 0.42) !important;
-  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.46), 0 0 34px rgba(255, 0, 130, 0.16);
-}
+  html.dark [class~="bg-[#FF0082]"],
+  html.dark [class~="bg-primary"],
+  html.dark button[class*="bg-primary"],
+  html.dark a[class*="bg-primary"] {
+    background: linear-gradient(135deg, var(--concert-primary), #B00067) !important;
+    color: white !important;
+    box-shadow: 0 14px 34px rgba(255, 0, 130, 0.28);
+  }
 
-main img {
-  filter: saturate(1.08) contrast(1.06);
-}
+  html.dark [class~="bg-[#262880]"],
+  html.dark [class~="bg-secondary"] {
+    background: linear-gradient(135deg, var(--concert-secondary), #10134F) !important;
+    color: white !important;
+  }
 
-[class~="rounded-full"],
-[class~="rounded-xl"],
-[class~="rounded-2xl"],
-[class~="rounded-3xl"] {
-  border-color: rgba(255, 255, 255, 0.11);
-}
+  html.dark [class~="bg-pink-50"],
+  html.dark [class~="bg-rose-50"],
+  html.dark [class~="bg-fuchsia-50"] {
+    background: rgba(255, 0, 130, 0.12) !important;
+    color: #fbcfe8 !important;
+    border-color: rgba(255, 0, 130, 0.25) !important;
+  }
 
-[class~="bg-[#FF0082]"],
-[class~="bg-primary"],
-button[class*="bg-primary"],
-a[class*="bg-primary"] {
-  background: linear-gradient(135deg, var(--concert-primary), #B00067) !important;
-  color: white !important;
-  box-shadow: 0 14px 34px rgba(255, 0, 130, 0.28);
-}
+  html.dark [class~="bg-blue-50"],
+  html.dark [class~="bg-indigo-50"],
+  html.dark [class~="bg-violet-50"] {
+    background: rgba(38, 40, 128, 0.28) !important;
+    color: #c7d2fe !important;
+    border-color: rgba(129, 140, 248, 0.25) !important;
+  }
 
-[class~="bg-[#262880]"],
-[class~="bg-secondary"] {
-  background: linear-gradient(135deg, var(--concert-secondary), #10134F) !important;
-  color: white !important;
-}
+  html.dark [class~="bg-green-50"],
+  html.dark [class~="bg-emerald-50"] {
+    background: rgba(16, 185, 129, 0.12) !important;
+    color: #a7f3d0 !important;
+    border-color: rgba(16, 185, 129, 0.22) !important;
+  }
 
-[class~="bg-pink-50"],
-[class~="bg-rose-50"],
-[class~="bg-fuchsia-50"] {
-  background: rgba(255, 0, 130, 0.12) !important;
-  color: #fbcfe8 !important;
-  border-color: rgba(255, 0, 130, 0.25) !important;
-}
+  html.dark [class~="bg-yellow-50"],
+  html.dark [class~="bg-amber-50"] {
+    background: rgba(245, 158, 11, 0.13) !important;
+    color: #fde68a !important;
+    border-color: rgba(245, 158, 11, 0.22) !important;
+  }
 
-[class~="bg-blue-50"],
-[class~="bg-indigo-50"],
-[class~="bg-violet-50"] {
-  background: rgba(38, 40, 128, 0.28) !important;
-  color: #c7d2fe !important;
-  border-color: rgba(129, 140, 248, 0.25) !important;
-}
+  html.dark [class~="bg-red-50"],
+  html.dark [class~="bg-rose-100"] {
+    background: rgba(244, 63, 94, 0.13) !important;
+    color: #fecdd3 !important;
+    border-color: rgba(244, 63, 94, 0.24) !important;
+  }
 
-[class~="bg-green-50"],
-[class~="bg-emerald-50"] {
-  background: rgba(16, 185, 129, 0.12) !important;
-  color: #a7f3d0 !important;
-  border-color: rgba(16, 185, 129, 0.22) !important;
-}
+  html.dark [class~="shadow-sm"],
+  html.dark [class~="shadow"],
+  html.dark [class~="shadow-md"] {
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24) !important;
+  }
 
-[class~="bg-yellow-50"],
-[class~="bg-amber-50"] {
-  background: rgba(245, 158, 11, 0.13) !important;
-  color: #fde68a !important;
-  border-color: rgba(245, 158, 11, 0.22) !important;
-}
+  html.dark [class~="ring-gray-200"],
+  html.dark [class~="ring-slate-200"] {
+    --tw-ring-color: rgba(255, 255, 255, 0.12) !important;
+  }
 
-[class~="bg-red-50"],
-[class~="bg-rose-100"] {
-  background: rgba(244, 63, 94, 0.13) !important;
-  color: #fecdd3 !important;
-  border-color: rgba(244, 63, 94, 0.24) !important;
+  html.dark main img {
+    filter: saturate(1.08) contrast(1.06);
+  }
 }
-
-[class~="shadow-sm"],
-[class~="shadow"],
-[class~="shadow-md"] {
-  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24) !important;
-}
-
-[class~="ring-gray-200"],
-[class~="ring-slate-200"] {
-  --tw-ring-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Seat-map / booking surfaces: keep the stage feel instead of pale product-card panels. */
-[class*="seat" i],
-[class*="stage" i],
-[class*="map" i] {
-  --concert-seat-glow: 0 0 18px rgba(255, 0, 130, 0.18);
-}
-
-svg {
-  filter: drop-shadow(0 18px 45px rgba(0, 0, 0, 0.28));
-}
-
-/* Admin and organizer should look like a backstage control room, not a generic white dashboard. */
-[class*="Dashboard"],
-[class*="Management"],
-[class*="Organizer"],
-[class*="Admin"] {
-  color-scheme: dark;
-}
-/* === Tickify concert reskin v5 END === */
+/* === Tickify concert reskin v6 END === */

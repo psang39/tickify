@@ -23,7 +23,7 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
         : '--:--';
 
     return (
-        <div className="flex w-full bg-white dark:bg-slate-900/90 rounded-2xl border border-white/10 dark:border-white/10 overflow-hidden mt-8 mb-6">
+        <div className="flex w-full bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden mt-8 mb-6">
 
             <div className="bg-[#2d3092] text-white w-32 shrink-0 flex flex-col items-center justify-center py-8 gap-1">
                 <span className="text-4xl font-bold">{day}</span>
@@ -37,7 +37,7 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
             <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center p-6 lg:px-8 gap-6 bg-white dark:bg-slate-900/90">
 
                 <div className="flex flex-col gap-4">
-                    <h1 className="text-2xl font-bold text-slate-100 dark:text-slate-100">
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                         {isLoadingShow ? "Đang tải sự kiện..." : showInfo?.name}
                     </h1>
 
@@ -74,7 +74,7 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
                     {/* <Button
                         variant="outline"
                         onClick={onBack}
-                        className="px-6 py-5 rounded-xl border-slate-300 text-slate-200 dark:text-slate-200 font-semibold hover:bg-slate-950/70 dark:hover:bg-slate-800 transition-colors"
+                        className="px-6 py-5 rounded-xl border-slate-300 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-950/70 dark:hover:bg-slate-800 transition-colors"
                     >
                         Đổi ngày
                     </Button> */}

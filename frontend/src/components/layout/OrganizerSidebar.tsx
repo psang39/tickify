@@ -39,7 +39,7 @@ export default function OrganizerSidebar() {
                 {/* Nút Toggle Đóng/Mở */}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="p-1.5 rounded-lg bg-slate-950/70 dark:bg-slate-900/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 border border-white/10 dark:border-white/10 transition-colors"
+                    className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 transition-colors"
                 >
                     {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
                 </button>

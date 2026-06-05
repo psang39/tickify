@@ -206,14 +206,14 @@ export default function CreateEvent() {
                         <h2 className="text-xl font-bold text-secondary mb-3 flex items-center gap-2">
                             <Calendar className="text-primary" size={20} /> Thiết lập thời gian chung
                         </h2>
-                        <div className="bg-white dark:bg-slate-900/90 border border-white/10 dark:border-white/10 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center bg-gradient-to-r from-slate-50 to-white">
+                        <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center bg-gradient-to-r from-slate-50 to-white">
                             <div className="flex-1 w-full space-y-1.5">
-                                <label className="text-xs font-bold text-slate-200 dark:text-slate-200 uppercase tracking-wide">Ngày khai mạc</label>
+                                <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">Ngày khai mạc</label>
                                 <input type="date" className="w-full bg-white dark:bg-slate-900/90 border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm text-secondary" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} />
                             </div>
                             <div className="hidden md:block text-gray-300"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg></div>
                             <div className="flex-1 w-full space-y-1.5">
-                                <label className="text-xs font-bold text-slate-200 dark:text-slate-200 uppercase tracking-wide">Ngày bế mạc</label>
+                                <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">Ngày bế mạc</label>
                                 <input type="date" className="w-full bg-white dark:bg-slate-900/90 border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm text-secondary" value={formData.end_date} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} />
                             </div>
                         </div>
@@ -225,7 +225,7 @@ export default function CreateEvent() {
                         <h3 className="font-bold text-lg mb-1 text-secondary flex items-center gap-2">Ảnh Poster (Dọc)</h3>
                         <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">Tỉ lệ chuẩn 3:4. Dùng để hiển thị ở trang danh sách sự kiện.</p>
 
-                        <div className="w-full flex-1 min-h-[300px] bg-slate-950/70 dark:bg-slate-900/80 rounded-xl overflow-hidden relative border-2 border-dashed border-white/10 dark:border-white/10 transition-colors group">
+                        <div className="w-full flex-1 min-h-[300px] bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 rounded-xl overflow-hidden relative border-2 border-dashed border-slate-200 dark:border-white/10 transition-colors group">
                             {formData.poster_url ? (
                                 <img src={formData.poster_url} className="w-full h-full object-cover" alt="Poster" />
                             ) : (
@@ -246,7 +246,7 @@ export default function CreateEvent() {
                 </div>
             </div>
 
-            <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900/90 border-t border-white/10 dark:border-white/10 z-50">
+            <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900/90 border-t border-slate-200 dark:border-white/10 z-50">
                 <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
                     <div>
                         <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Chế độ khởi tạo</p>

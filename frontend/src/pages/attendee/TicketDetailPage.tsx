@@ -131,7 +131,7 @@ export default function TicketDetailPage() {
     const isTicketUsable = ticketStatus === 'VALID';
 
     return (
-        <div className="min-h-screen font-sans text-slate-50 dark:text-slate-50  flex flex-col items-center justify-center">
+        <div className="min-h-screen font-sans text-slate-900 dark:text-slate-50 flex flex-col items-center justify-center">
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             {/* THANH ĐIỀU HƯỚNG QUAY LẠI ĐƠN HÀNG */}
@@ -146,7 +146,7 @@ export default function TicketDetailPage() {
             </div>
 
             {/* TẤM VÉ HAI PHẦN ĐỈNH CAO (MÔ PHỎNG THEO IMAGE_26F1EA.JPG) */}
-            <div className="w-full max-w-4xl bg-white dark:bg-slate-900/90 rounded-[24px] border border-white/10 dark:border-white/10 overflow-hidden flex flex-col md:flex-row relative shadow-none concert-poster-card">
+            <div className="w-full max-w-4xl bg-white dark:bg-slate-900/90 rounded-[24px] border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col md:flex-row relative shadow-none concert-poster-card">
 
                 {/* ------------------- PHẦN 1: MAIN STUB (THÂN VÉ CHÍNH - CHIẾM 2/3) ------------------- */}
                 <div className="flex-1 p-8 relative flex flex-col justify-between min-h-[340px] overflow-hidden bg-slate-900">
@@ -161,7 +161,7 @@ export default function TicketDetailPage() {
                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-6 w-full">
                         {/* Chi tiết thông tin Đêm nhạc */}
                         <div className="space-y-4 text-white flex-1">
-                            <span className="bg-white/20 text-white font-black text-[10px] tracking-widest uppercase px-3 py-1 rounded-full border border-white/10">
+                            <span className="bg-white/20 text-white font-black text-[10px] tracking-widest uppercase px-3 py-1 rounded-full border border-slate-200 dark:border-white/10">
                                 VÉ VÀO CỔNG CHÍNH
                             </span>
                             <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-tight uppercase drop-shadow-sm">
@@ -202,9 +202,9 @@ export default function TicketDetailPage() {
                                     </div>
                                 </>
                             ) : (
-                                <div className="w-[150px] h-[150px] rounded-xl border border-white/10 dark:border-white/10 bg-slate-950/70 dark:bg-slate-900/80 flex flex-col items-center justify-center text-center p-4">
+                                <div className="w-[150px] h-[150px] rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 flex flex-col items-center justify-center text-center p-4">
                                     <StatusIcon size={36} className={ticketStatus === 'USED' ? 'text-slate-500 dark:text-slate-400 mb-2' : 'text-red-500 mb-2'} />
-                                    <p className="text-sm font-black text-slate-100 dark:text-slate-100">{statusConfig.label}</p>
+                                    <p className="text-sm font-black text-slate-800 dark:text-slate-100">{statusConfig.label}</p>
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">Không còn hiển thị QR</p>
                                 </div>
                             )}
@@ -212,7 +212,7 @@ export default function TicketDetailPage() {
                     </div>
 
                     {/* Vị trí số ghế định vị lớn chân vé */}
-                    <div className="relative z-10 pt-6 border-t border-white/10 mt-6 flex gap-6 text-white text-xs font-bold uppercase tracking-wider">
+                    <div className="relative z-10 pt-6 border-t border-slate-200 dark:border-white/10 mt-6 flex gap-6 text-white text-xs font-bold uppercase tracking-wider">
                         <div><p className="text-white/50 text-[10px] font-medium mb-0.5">HÀNG GHẾ</p><p className="text-sm font-black text-white">{ticketDetail.seat_id?.row || '---'}</p></div>
                         <div><p className="text-white/50 text-[10px] font-medium mb-0.5">SỐ GHẾ</p><p className="text-sm font-black text-white">{ticketDetail.seat_id?.seat_number || '---'}</p></div>
                         <div><p className="text-white/50 text-[10px] font-medium mb-0.5">LOẠI VÉ</p><p className="text-sm font-black text-pink-300">{ticketDetail.ticket_type_id?.name || 'Standard'}</p></div>
@@ -220,7 +220,7 @@ export default function TicketDetailPage() {
                     </div>
 
                     {/* Hiệu ứng đục lỗ cắt góc vé răng cưa tại điểm nối */}
-                    <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-white/10 dark:border-white/10 hidden md:block z-20"></div>
+                    <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-slate-200 dark:border-white/10 hidden md:block z-20"></div>
                 </div>
 
                 {/* ĐƯỜNG RÃNH XÉ VÉ NÉT ĐỨT PHÂN TÁCH */}
@@ -230,13 +230,13 @@ export default function TicketDetailPage() {
                 <div className="w-full md:w-1/3 bg-gradient-to-br from-blue-700 to-indigo-900 p-8 text-white flex flex-col justify-between min-h-[300px] md:min-h-auto relative">
 
                     {/* Đục lỗ đối xứng cuống vé bên phải */}
-                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-white/10 dark:border-white/10 hidden md:block z-20"></div>
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-slate-200 dark:border-white/10 hidden md:block z-20"></div>
 
                     <div className="space-y-4">
                         <div className="flex justify-between items-start">
                             <span className="text-[10px] font-black tracking-widest text-blue-200 uppercase">CUỐNG VÉ SOÁT RE-CHECK</span>
                             {/* Huy hiệu Badge Giá tiền hiển thị sang xịn mịn y mẫu */}
-                            <span className="bg-white/10 text-white font-bold text-xs px-2.5 py-1 rounded-md border border-white/10 font-mono">
+                            <span className="bg-white dark:bg-white/10 text-white font-bold text-xs px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 font-mono">
                                 {formatCurrency(ticketDetail.ticket_type_id?.price)}
                             </span>
                         </div>
@@ -249,7 +249,7 @@ export default function TicketDetailPage() {
                     </div>
 
                     {/* Tái hiển thị thông số ghế ở cuống vé phục vụ đối chiếu tại chỗ ngồi */}
-                    <div className="pt-6 border-t border-white/10 space-y-3">
+                    <div className="pt-6 border-t border-slate-200 dark:border-white/10 space-y-3">
                         <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-blue-100">
                             <div><p className="text-blue-300 text-[10px] font-medium uppercase">Khu vực</p><p className="font-bold text-white text-sm">{ticketDetail.zone_id?.name || 'N/A'}</p></div>
                             <div>

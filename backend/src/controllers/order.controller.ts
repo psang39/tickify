@@ -18,7 +18,7 @@ const HOLD_DURATION_SECONDS = 600;
 
 const holdSeatsLuaScript = `
     local rowKey = KEYS[1]
-    local userCountKey = KEYS[2] -- Key mới để đếm số vé user đang giữ
+    local userCountKey = KEYS[2]
     local lockTTL = tonumber(ARGV[1])
     local userId = ARGV[2]
 
@@ -574,13 +574,13 @@ export const getOrders = async (req: Request, res: Response) => {
         if (attendee.id !== user_id) {
             return res.status(403).json({ message: 'Unauthorized to view orders' });
         }
-        const orders = await Order.find({ user_id: user_id }).populate('event_id', 'name').sort({ createdAt: -1 }).populate({
-            path: 'show_id', 
-            select: 'name venue_id start_time', 
+        const orders = await Order.find({ user_id: user_id }).populate('event_id', 'name').sort({ created_at: -1 }).populate({
+            path: 'show_id',
+            select: 'name venue_id start_time',
             populate: {
                 path: 'venue_id',
-                model: 'Venue',    
-                select: 'name'    
+                model: 'Venue',
+                select: 'name'
             }
         });
         const ticketNumbers = orders.flatMap(order => order.items.map(item => item.seat_id));
