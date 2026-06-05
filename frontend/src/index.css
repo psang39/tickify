@@ -1194,3 +1194,69 @@ html.dark select.bg-transparent {
   -webkit-box-shadow: none !important;
 }
 
+/* Tickify hero editable fields v3 */
+.tickify-hero-title {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  background: rgba(2, 6, 23, 0.54) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 24px;
+  padding: 0.45rem 0.85rem;
+  margin-left: -0.85rem;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35), 0 3px 18px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(14px);
+}
+
+.tickify-hero-title:focus {
+  background: rgba(2, 6, 23, 0.62) !important;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.tickify-hero-pill {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: rgba(2, 6, 23, 0.42) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+}
+
+.tickify-hero-pill:focus {
+  background: rgba(2, 6, 23, 0.56) !important;
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.tickify-hero-subtitle {
+  color: rgba(255, 255, 255, 0.92) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.92) !important;
+  background: rgba(2, 6, 23, 0.34) !important;
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  border-radius: 16px;
+  padding: 0.25rem 0.7rem;
+  margin-left: -0.7rem;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+}
+
+.tickify-hero-subtitle:focus {
+  background: rgba(2, 6, 23, 0.48) !important;
+}
+
+.tickify-home-search-input,
+html.dark .tickify-home-search-input {
+  background: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.tickify-home-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.62) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.62) !important;
+}
+

@@ -15,9 +15,9 @@ export default function CreateEvent() {
 
     const [formData, setFormData] = useState({
         name: 'Tên sự kiện của bạn',
-        artists: 'Nghệ sĩ sẽ biểu diễn',
+        artists: 'Người biểu diễn/diễn giả',
         description: 'Nhấp vào đây để chỉnh sửa mô tả chi tiết về sự kiện của bạn...',
-        genre: 'Pop / Concert',
+        genre: 'Thể loại sự kiện',
         start_date: '',
         end_date: '',
         poster_url: '',
@@ -166,24 +166,44 @@ export default function CreateEvent() {
                     <div className="w-full max-w-6xl flex flex-col justify-end gap-2">
                         <div className="bg-white/20 backdrop-blur-md text-white px-1 py-0.5 rounded-full font-semibold border border-white/30 flex items-center w-fit focus-within:bg-white/40 transition-all">
                             <Info size={14} className="ml-2 opacity-80" />
-                            <input
-                                className="bg-transparent border-none outline-none text-white placeholder-white/70 w-32 px-2 py-1 text-sm font-semibold"
-                                value={formData.genre} placeholder="Dòng nhạc..." onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+                            <div
+  contentEditable
+  suppressContentEditableWarning
+  spellCheck={false}
+  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+  onBlur={(e) => setFormData({ ...formData, genre: (e.currentTarget.textContent || '').trim() })}
+  className="tickify-hero-pill inline-flex min-h-[2rem] max-w-full cursor-text items-center rounded-full border border-white/15 bg-black/35 px-4 py-1.5 text-sm font-bold text-white !text-white outline-none backdrop-blur-md transition-colors"
+>
+  {formData.genre || 'Thể loại sự kiện'}
+</div> setFormData({ ...formData, genre: e.target.value })}
                             />
                         </div>
                         <div className="w-full relative group/title">
                             <Edit3 size={20} className="absolute -left-8 top-3 text-white/50 opacity-0 group-hover/title:opacity-100 transition-opacity hidden md:block" />
-                            <textarea
-                                rows={2}
-                                className="w-full bg-transparent border-b-2 border-transparent hover:border-white/30 focus:border-white focus:bg-white/10 outline-none text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight drop-shadow-xl transition-all p-2 -ml-2 rounded-t-lg placeholder-white/50 resize-none overflow-hidden"
-                                value={formData.name} placeholder="Nhập tên sự kiện..." onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            <h1
+  contentEditable
+  suppressContentEditableWarning
+  spellCheck={false}
+  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+  onBlur={(e) => setFormData({ ...formData, name: (e.currentTarget.textContent || '').trim() })}
+  className="tickify-hero-title min-h-[1.1em] max-w-5xl cursor-text outline-none text-2xl md:text-3xl lg:text-4xl font-black leading-tight text-white !text-white transition-colors"
+>
+  {formData.name || 'Tên sự kiện'}
+</h1> setFormData({ ...formData, name: e.target.value })}
                             />
                         </div>
                         <div className="w-full relative group/artist mt-[-8px]">
                             <Mic2 size={16} className="absolute -left-7 top-3 text-white/50 opacity-0 group-hover/artist:opacity-100 transition-opacity hidden md:block" />
-                            <input
-                                type="text" className="w-full bg-transparent border-b border-transparent hover:border-white/20 focus:border-white/50 outline-none text-lg md:text-xl text-white/90 font-medium drop-shadow-md transition-all p-1 -ml-1 rounded placeholder-white/40"
-                                value={formData.artists} placeholder="Nghệ sĩ biểu diễn (Optional)..." onChange={(e) => setFormData({ ...formData, artists: e.target.value })}
+                            <div
+  contentEditable
+  suppressContentEditableWarning
+  spellCheck={false}
+  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+  onBlur={(e) => setFormData({ ...formData, artists: (e.currentTarget.textContent || '').trim() })}
+  className="tickify-hero-subtitle min-h-[1.75rem] max-w-4xl cursor-text outline-none text-base md:text-lg font-medium text-white/90 !text-white transition-colors"
+>
+  {formData.artists || 'Người biểu diễn/diễn giả (Optional)...'}
+</div> setFormData({ ...formData, artists: e.target.value })}
                             />
                         </div>
                     </div>

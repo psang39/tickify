@@ -49,3 +49,4 @@ apply-tickify-editable-title-and-search-fix.cjs
 frontend/src/index.css.bak-ui-fix
 frontend/src/pages/attendee/HomePage.tsx.bak-ui-fix
 frontend/src/pages/organizer/EventDetail.tsx.bak-ui-fix
+apply-organizer-hero-editable-fields-v3.cjs

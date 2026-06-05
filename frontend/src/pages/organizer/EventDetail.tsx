@@ -38,7 +38,7 @@ export default function EventDetail() {
     const { showSuccess, showError } = useFeedbackStore();
     const [activeTab, setActiveTab] = useState<'INFO' | 'SHOWS'>('INFO');
     const [eventFormData, setEventFormData] = useState({
-        name: '', description: '', genre: 'Pop / Concert', artists: '', poster_url: '', banner_url: '', banner_offset_y: 50,
+        name: '', description: '', genre: 'Thể loại sự kiện', artists: '', poster_url: '', banner_url: '', banner_offset_y: 50,
         start_date: '', end_date: ''
     });
     const [currentStatus, setCurrentStatus] = useState<'draft' | 'published' | 'cancelled'>('draft');
@@ -62,7 +62,7 @@ export default function EventDetail() {
             setEventFormData({
                 name: eventData.name || '',
                 description: eventData.description || '',
-                genre: eventData.genre || 'Pop / Concert',
+                genre: eventData.genre || 'Thể loại sự kiện',
                 artists: Array.isArray(eventData.artists) ? eventData.artists.join(', ') : (eventData.artists || ''),
                 poster_url: eventData.poster_url || '',
                 banner_url: eventData.banner_url || '',
@@ -398,10 +398,16 @@ export default function EventDetail() {
                         <div className="flex flex-wrap items-center justify-between gap-4 w-full">
                             <div className={`bg-white/20 backdrop-blur-md text-white px-1 py-0.5 rounded-full font-semibold border border-white/30 flex items-center w-fit focus-within:bg-white/40 transition-all ${isInfoTab && currentStatus === 'draft' ? '' : 'pointer-events-none opacity-90'}`}>
                                 <Info size={14} className="ml-2 opacity-80" />
-                                <input
-                                    disabled={!isInfoTab || currentStatus !== 'draft'}
-                                    className="organizer-hero-genre-field w-auto max-w-xs border border-white/10 rounded-full px-4 py-1.5 text-xs md:text-sm font-bold uppercase tracking-[0.22em] text-white/90 backdrop-blur-sm outline-none transition-colors placeholder-white/35"
-                                    value={eventFormData.genre} placeholder="Thể loại sự kiện..." onChange={(e) => setEventFormData({ ...eventFormData, genre: e.target.value })}
+                                <div
+  contentEditable={isInfoTab && currentStatus === 'draft'}
+  suppressContentEditableWarning
+  spellCheck={false}
+  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+  onBlur={(e) => setEventFormData({ ...eventFormData, genre: (e.currentTarget.textContent || '').trim() })}
+  className="tickify-hero-pill inline-flex min-h-[2rem] max-w-full cursor-text items-center rounded-full border border-white/15 bg-black/35 px-4 py-1.5 text-sm font-bold text-white !text-white outline-none backdrop-blur-md transition-colors"
+>
+  {eventFormData.genre || 'Thể loại sự kiện'}
+</div> setEventFormData({ ...eventFormData, genre: e.target.value })}
                                 />
                             </div>
 
@@ -441,11 +447,16 @@ export default function EventDetail() {
 
                         <div className={`w-full relative ${isInfoTab && currentStatus === 'draft' ? 'group/artist' : ''} mt-[-8px]`}>
                             {isInfoTab && currentStatus === 'draft' && <Mic2 size={16} className="absolute -left-7 top-3 text-white/50 opacity-0 group-hover/artist:opacity-100 transition-opacity hidden md:block" />}
-                            <input
-                                type="text"
-                                disabled={!isInfoTab || currentStatus !== 'draft'}
-                                className="organizer-hero-artist-field !bg-transparent bg-transparent w-full border-b border-transparent hover:border-white/10 focus:border-white/20 outline-none text-base md:text-lg text-white/85 font-medium drop-shadow-sm transition-colors py-1 placeholder-white/35"
-                                value={eventFormData.artists} placeholder="Người biểu diễn/diễn giả (Optional)..." onChange={(e) => setEventFormData({ ...eventFormData, artists: e.target.value })}
+                            <div
+  contentEditable={isInfoTab && currentStatus === 'draft'}
+  suppressContentEditableWarning
+  spellCheck={false}
+  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+  onBlur={(e) => setEventFormData({ ...eventFormData, artists: (e.currentTarget.textContent || '').trim() })}
+  className="tickify-hero-subtitle min-h-[1.75rem] max-w-4xl cursor-text outline-none text-base md:text-lg font-medium text-white/90 !text-white transition-colors"
+>
+  {eventFormData.artists || 'Người biểu diễn/diễn giả (Optional)...'}
+</div> setEventFormData({ ...eventFormData, artists: e.target.value })}
                             />
                         </div>
                     </div>
