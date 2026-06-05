@@ -407,8 +407,7 @@ export default function EventDetail() {
   className="tickify-hero-pill inline-flex min-h-[2rem] max-w-full cursor-text items-center rounded-full border border-white/15 bg-black/35 px-4 py-1.5 text-sm font-bold text-white !text-white outline-none backdrop-blur-md transition-colors"
 >
   {eventFormData.genre || 'Thể loại sự kiện'}
-</div> setEventFormData({ ...eventFormData, genre: e.target.value })}
-                                />
+</div>
                             </div>
 
                             <div className="flex items-center gap-2 px-3 py-1.5 border border-white/20 rounded-md bg-black/40 text-white backdrop-blur-md text-xs font-bold uppercase tracking-wider select-none">
@@ -456,8 +455,7 @@ export default function EventDetail() {
   className="tickify-hero-subtitle min-h-[1.75rem] max-w-4xl cursor-text outline-none text-base md:text-lg font-medium text-white/90 !text-white transition-colors"
 >
   {eventFormData.artists || 'Người biểu diễn/diễn giả (Optional)...'}
-</div> setEventFormData({ ...eventFormData, artists: e.target.value })}
-                            />
+</div>
                         </div>
                     </div>
                 </div>

@@ -175,8 +175,7 @@ export default function CreateEvent() {
   className="tickify-hero-pill inline-flex min-h-[2rem] max-w-full cursor-text items-center rounded-full border border-white/15 bg-black/35 px-4 py-1.5 text-sm font-bold text-white !text-white outline-none backdrop-blur-md transition-colors"
 >
   {formData.genre || 'Thể loại sự kiện'}
-</div> setFormData({ ...formData, genre: e.target.value })}
-                            />
+</div>
                         </div>
                         <div className="w-full relative group/title">
                             <Edit3 size={20} className="absolute -left-8 top-3 text-white/50 opacity-0 group-hover/title:opacity-100 transition-opacity hidden md:block" />
@@ -189,8 +188,7 @@ export default function CreateEvent() {
   className="tickify-hero-title min-h-[1.1em] max-w-5xl cursor-text outline-none text-2xl md:text-3xl lg:text-4xl font-black leading-tight text-white !text-white transition-colors"
 >
   {formData.name || 'Tên sự kiện'}
-</h1> setFormData({ ...formData, name: e.target.value })}
-                            />
+</h1>
                         </div>
                         <div className="w-full relative group/artist mt-[-8px]">
                             <Mic2 size={16} className="absolute -left-7 top-3 text-white/50 opacity-0 group-hover/artist:opacity-100 transition-opacity hidden md:block" />
@@ -203,8 +201,7 @@ export default function CreateEvent() {
   className="tickify-hero-subtitle min-h-[1.75rem] max-w-4xl cursor-text outline-none text-base md:text-lg font-medium text-white/90 !text-white transition-colors"
 >
   {formData.artists || 'Người biểu diễn/diễn giả (Optional)...'}
-</div> setFormData({ ...formData, artists: e.target.value })}
-                            />
+</div>
                         </div>
                     </div>
                 </div>

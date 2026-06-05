@@ -1260,3 +1260,139 @@ html.dark .tickify-home-search-input {
   -webkit-text-fill-color: rgba(255, 255, 255, 0.62) !important;
 }
 
+/* === Tickify hero editable fields patch start === */
+.tickify-hero-editable {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tickify-hero-title,
+html.dark .tickify-hero-title {
+  color: #ffffff !important;
+  background: rgba(15, 23, 42, 0.46) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+  display: inline-block;
+  max-width: min(100%, 860px);
+  padding: 0.38rem 0.75rem;
+  margin-top: 0.75rem;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.tickify-hero-pill,
+html.dark .tickify-hero-pill {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.tickify-hero-subtitle,
+html.dark .tickify-hero-subtitle {
+  color: rgba(255, 255, 255, 0.92) !important;
+  width: fit-content;
+  max-width: min(100%, 760px);
+  border-radius: 0.85rem;
+  padding: 0.25rem 0.55rem;
+  background: rgba(15, 23, 42, 0.26) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.tickify-hero-editable[contenteditable="true"]:focus {
+  outline: none !important;
+}
+
+.tickify-hero-editable[contenteditable="true"]:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.tickify-home-search-input,
+html.dark .tickify-home-search-input {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #0f172a !important;
+  border-color: rgba(148, 163, 184, 0.36) !important;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.10) !important;
+}
+
+html.dark .tickify-home-search-input {
+  background: rgba(15, 23, 42, 0.86) !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.tickify-home-search-input::placeholder {
+  color: rgba(100, 116, 139, 0.88) !important;
+}
+
+html.dark .tickify-home-search-input::placeholder {
+  color: rgba(203, 213, 225, 0.72) !important;
+}
+/* === Tickify hero editable fields patch end === */
+
+/* === Tickify hero editable fields fix v5 === */
+.tickify-hero-title-card,
+html:not(.dark) .tickify-hero-title-card,
+html.dark .tickify-hero-title-card {
+  background: rgba(0, 0, 0, 0.46) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+}
+
+.tickify-hero-editable-title,
+.tickify-hero-editable-title *,
+html:not(.dark) .tickify-hero-editable-title,
+html:not(.dark) .tickify-hero-editable-title *,
+html.dark .tickify-hero-editable-title,
+html.dark .tickify-hero-editable-title * {
+  color: #ffffff !important;
+  background: transparent !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.tickify-hero-editable-pill,
+.tickify-hero-editable-subtitle,
+html:not(.dark) .tickify-hero-editable-pill,
+html:not(.dark) .tickify-hero-editable-subtitle,
+html.dark .tickify-hero-editable-pill,
+html.dark .tickify-hero-editable-subtitle {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.tickify-hero-editable-pill:empty::before,
+.tickify-hero-editable-subtitle:empty::before,
+.tickify-hero-editable-title:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.55) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+input.tickify-home-search-input,
+html:not(.dark) input.tickify-home-search-input,
+html.dark input.tickify-home-search-input {
+  background: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+input.tickify-home-search-input::placeholder,
+html:not(.dark) input.tickify-home-search-input::placeholder,
+html.dark input.tickify-home-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.62) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.62) !important;
+}
+/* === Tickify hero editable fields fix v5 END === */
