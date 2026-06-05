@@ -345,7 +345,7 @@ export default function ShowDetail() {
     const isVenueVerified = currentVenueData ? currentVenueData.is_verified : true;
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
+        <div className="min-h-screen  relative pb-24 font-sans w-full overflow-x-hidden">
             <LoadingOverlay isVisible={isAnyActionPending} message="Đang xử lý thao tác..." />
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 

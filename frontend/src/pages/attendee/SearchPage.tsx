@@ -50,7 +50,7 @@ export default function SearchPage() {
         : (searchResponse?.data?.docs || searchResponse?.data || searchResponse?.docs || []);
 
     return (
-        <div className="w-full min-h-screen bg-[#F8F9FA] font-sans pb-20">
+        <div className="w-full min-h-screen  font-sans pb-20">
             {/* KHU VỰC TIÊU ĐỀ TRANG TÌM KIẾM */}
             <div className="bg-white dark:bg-slate-900/90 border-b border-gray-100 dark:border-white/10 py-10 px-8">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">

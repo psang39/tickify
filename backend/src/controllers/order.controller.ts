@@ -1,3 +1,4 @@
+import { computeShowAvailability } from '../utils/showAvailability';
 import { Request, Response } from 'express';
 import redisClient from '../utils/redisClient';
 import Order from '../models/order.model';
@@ -279,6 +280,26 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
     if (!event_id || !show_id || !Array.isArray(items) || items.length === 0) {
         res.status(400).json({ message: 'Dữ liệu đầu vào không hợp lệ.' });
         return;
+    }
+
+    const targetShow = await Show.findById(show_id)
+      .select('event_id status sale_start sale_end start_time end_time')
+      .lean();
+
+    if (!targetShow) {
+      res.status(404).json({ message: 'Show diễn không tồn tại.' });
+      return;
+    }
+
+    if (String((targetShow as any).event_id) !== String(event_id)) {
+      res.status(400).json({ message: 'Checkout token không khớp với show hiện tại.' });
+      return;
+    }
+
+    const availability = computeShowAvailability(targetShow);
+    if (!availability.is_bookable) {
+      res.status(403).json({ message: availability.booking_message, availability });
+      return;
     }
 
     const seat_ids = items.map(item => item.seat_id);

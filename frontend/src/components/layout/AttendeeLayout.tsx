@@ -30,7 +30,7 @@ export default function AttendeeLayout() {
     const currentPath = location.pathname;
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] font-sans text-slate-900 dark:text-slate-50 py-12">
+        <div className="min-h-screen  font-sans text-slate-900 dark:text-slate-50 py-12">
             <LoadingOverlay isVisible={isLoading} />
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 

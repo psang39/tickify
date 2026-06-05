@@ -337,7 +337,7 @@ export default function EventDetail() {
     if (!eventData) return <div className="p-10 text-center font-bold text-red-500">Không tìm thấy sự kiện!</div>;
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
+        <div className="min-h-screen  relative pb-24 font-sans w-full overflow-x-hidden">
             <LoadingOverlay isVisible={isAnyActionPending || isSubmittingShow} message="Đang xử lý thao tác..." />
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 

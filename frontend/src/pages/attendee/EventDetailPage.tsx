@@ -1,3 +1,4 @@
+import { getShowAvailability } from '@/lib/showAvailability';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, ImageIcon, MapPin, Music2, Ticket } from 'lucide-react';
@@ -116,7 +117,8 @@ export default function EventDetailPage() {
                                 <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 p-8 text-center text-sm font-medium text-slate-400 md:col-span-2">Hiện chưa có show nào đang mở bán công khai.</div>
                             ) : shows.map((show: any) => {
                                 const venue = show.venue_id || show.venue_info;
-                                const isBookable = show.status === 'published';
+                                const availability = getShowAvailability(show);
+  const isBookable = availability.isBookable;
                                 return (
                                     <article key={show._id} className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90">
                                         <div className="flex">
@@ -130,10 +132,10 @@ export default function EventDetailPage() {
                                                 <p className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400"><MapPin size={14} />{venue?.name || 'Địa điểm đang cập nhật'}{venue?.city ? `, ${venue.city}` : ''}</p>
                                                 <button
                                                     disabled={!isBookable}
-                                                    onClick={() => navigate(`/shows/${show._id}/booking`)}
+                                                    onClick={() => isBookable && navigate(`/shows/${show._id}/booking`)} title={availability.message}
                                                     className="mt-2 self-end rounded-xl bg-[#FF0082] px-5 py-2 text-xs font-bold text-white transition hover:bg-pink-700 disabled:bg-slate-200 disabled:text-slate-400"
                                                 >
-                                                    {isBookable ? 'Xem vé' : 'Chưa mở'}
+                                                    {availability.buttonLabel}
                                                 </button>
                                             </div>
                                         </div>

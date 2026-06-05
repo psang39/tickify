@@ -107,7 +107,7 @@ export default function CreateEvent() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] relative pb-24 font-sans w-full overflow-x-hidden">
+        <div className="min-h-screen  relative pb-24 font-sans w-full overflow-x-hidden">
             <LoadingOverlay isVisible={isPending} message="Đang tạo sự kiện..." />
 
             {/* NÚT BACK GÓC TRÁI QUAY LẠI DANH SÁCH THEO THIẾT KẾ TRANG DETAIL */}

@@ -1,3 +1,4 @@
+import { getShowAvailability } from '@/lib/showAvailability';
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -74,7 +75,7 @@ export default function TicketBookingPage() {
   }, [orderData, currentStep, showId, clearCart, navigate]);
 
   useEffect(() => {
-    if (!showId) return;
+    if (!showId || isBookingClosed) return;
 
     const checkoutToken = localStorage.getItem(`checkoutToken_${showId}`);
     if (!checkoutToken) {
@@ -133,7 +134,7 @@ export default function TicketBookingPage() {
         }).catch((err) => console.error("Lỗi tự động nhả ghế:", err));
       }
     };
-  }, [showId]);
+  }, [showId, isBookingClosed]);
   // ==========================================
   // FETCH DỮ LIỆU BẰNG TANSTACK QUERY
   // ==========================================
@@ -191,6 +192,8 @@ export default function TicketBookingPage() {
   }, [seatsData]);
 
   const showInfo = showDataPayload?.show_info;
+  const showAvailability = getShowAvailability(showInfo);
+  const isBookingClosed = Boolean(showInfo) && !showAvailability.isBookable;
   const zonesData = showDataPayload?.zones || [];
   useEffect(() => {
     if (showDataPayload?.zone_summaries) {
@@ -372,7 +375,7 @@ export default function TicketBookingPage() {
     onError: (error: any) => {
       const errorMsg = error.response?.data?.message || "Lỗi khi giữ ghế.";
       setErrorMessage(errorMsg);
-      if (error.response?.status === 409 || error.response?.status === 400) {
+      if (error.response?.status === 409 || error.response?.status === 400 || error.response?.status === 403) {
         setCurrentStep(2);
         clearCart();
       }
@@ -444,6 +447,11 @@ export default function TicketBookingPage() {
 
   const handleNext = () => {
     if (currentStep === 2) {
+    if (isBookingClosed) {
+      setErrorMessage(showAvailability.message);
+      clearCart();
+      return;
+    }
       if (selectedSeats.length === 0) {
         setErrorMessage("Vui lòng chọn ít nhất 1 ghế!");
         return;
@@ -539,6 +547,15 @@ export default function TicketBookingPage() {
 
 
   const renderStepContent = () => {
+  if (isBookingClosed) {
+    return (
+      <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center dark:border-amber-400/30 dark:bg-amber-500/10">
+        <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-600 dark:text-amber-300">{showAvailability.label}</p>
+        <h2 className="mt-3 text-2xl font-black text-slate-900 dark:text-white">Không thể đặt vé cho show này</h2>
+        <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">{showAvailability.message}</p>
+      </div>
+    );
+  }
     switch (currentStep) {
       case 1:
         return (
@@ -868,7 +885,7 @@ export default function TicketBookingPage() {
                     </div>
                     <Button
                       onClick={handleNext}
-                      disabled={selectedSeats.length === 0 || holdSeatsMutation.isPending}
+                      disabled={isBookingClosed || selectedSeats.length === 0 || holdSeatsMutation.isPending}
                       className="h-12 rounded-2xl bg-primary px-10 text-base font-bold text-white hover:bg-primary/90"
                     >
                       Tiếp tục

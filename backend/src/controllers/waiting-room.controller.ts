@@ -1,3 +1,4 @@
+import { computeShowAvailability } from '../utils/showAvailability';
 import { Request, Response } from 'express';
 import { WaitingRoomService } from '../services/waiting-room.service';
 import redisClient from '../utils/redisClient';
@@ -14,7 +15,12 @@ export const joinWaitingRoom = async (req: Request, res: Response) => {
             res.status(404).json({ message: "Sự kiện hoặc buổi diễn không tồn tại" });
             return;
         }
-        const user = req.user;
+        const availability = computeShowAvailability(show);
+    if (!availability.is_bookable) {
+      return res.status(403).json({ message: availability.booking_message, availability });
+    }
+
+    const user = req.user;
         if (!user || !user.id) {
             return res.status(401).json({ error: "Bạn cần đăng nhập để thực hiện hành động này" });
         }
@@ -51,7 +57,13 @@ export const checkMyTurn = async (req: Request, res: Response) => {
         if (!show || !event) {
             return res.status(404).json({ message: "Sự kiện hoặc buổi diễn không tồn tại" });
         }
-        const result = await WaitingRoomService.checkStatus(show_id, user_id);
+        const turnAvailability = computeShowAvailability(show);
+    if (!turnAvailability.is_bookable) {
+      await WaitingRoomService.leaveQueue(show_id, user_id);
+      return res.status(403).json({ message: turnAvailability.booking_message, availability: turnAvailability });
+    }
+
+    const result = await WaitingRoomService.checkStatus(show_id, user_id);
         if (result.status === 'YOUR_TURN') {
             const checkoutToken = jwt.sign(
                 {

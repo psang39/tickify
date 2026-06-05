@@ -220,7 +220,7 @@ export default function TicketDetailPage() {
                     </div>
 
                     {/* Hiệu ứng đục lỗ cắt góc vé răng cưa tại điểm nối */}
-                    <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-slate-200 dark:border-white/10 hidden md:block z-20"></div>
+                    <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6  rounded-full border border-slate-200 dark:border-white/10 hidden md:block z-20"></div>
                 </div>
 
                 {/* ĐƯỜNG RÃNH XÉ VÉ NÉT ĐỨT PHÂN TÁCH */}
@@ -230,7 +230,7 @@ export default function TicketDetailPage() {
                 <div className="w-full md:w-1/3 bg-gradient-to-br from-blue-700 to-indigo-900 p-8 text-white flex flex-col justify-between min-h-[300px] md:min-h-auto relative">
 
                     {/* Đục lỗ đối xứng cuống vé bên phải */}
-                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-slate-200 dark:border-white/10 hidden md:block z-20"></div>
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6  rounded-full border border-slate-200 dark:border-white/10 hidden md:block z-20"></div>
 
                     <div className="space-y-4">
                         <div className="flex justify-between items-start">

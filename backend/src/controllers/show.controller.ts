@@ -1,3 +1,4 @@
+import { attachShowAvailability } from '../utils/showAvailability';
 import Show from '../models/show.model';
 import Event from '../models/event.model';
 import Zone from '../models/zone.model';
@@ -211,7 +212,10 @@ export const getShowsByEvent = async (req: Request, res: Response) => {
             select: '-stadium_map_svg -encrypted_private_key'
         };
         const shows = await Show.paginate(filter, options);
-        res.status(200).json(shows);
+    const docs = Array.isArray((shows as any).docs)
+      ? (shows as any).docs.map((show: any) => attachShowAvailability(show))
+      : [];
+    res.status(200).json({ ...(shows as any), docs, server_time: new Date().toISOString() });
     } catch (error) {
         res.status(500).json({ message: "Error fetching shows", error });
     }
@@ -259,7 +263,8 @@ export const getShowById = async (req: Request, res: Response) => {
             return res.status(403).json({ message: "Show is not published" });
         }
 
-        const zones = await Zone.find({ show_id })
+        const showForAttendee = attachShowAvailability(show as any);
+    const zones = await Zone.find({ show_id })
             .select('_id name path_data overall_map_svg_id capacity is_standing ticket_type_id')
             .lean();
         const zoneSummariesDict: Record<string, any> = {};
@@ -288,10 +293,7 @@ export const getShowById = async (req: Request, res: Response) => {
             }
         });
         res.status(200).json({
-            show_info: show,
-            zones: zones,
-            ticket_types: ticketTypes,
-            zone_summaries: zoneSummariesDict
+            show_info: showForAttendee, zones: zones, ticket_types: ticketTypes, zone_summaries: zoneSummariesDict
         });
 
 
