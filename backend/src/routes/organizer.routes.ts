@@ -1,5 +1,5 @@
 import { getOrganizerEvents, createEvent, getOrganizerEventById, publishEvent, unpublishEvent, deleteEvent, cancelEvent, updateEvent } from "../controllers/event.controller";
-import { getOrganizerShowsByEvent, publishShow, unpublishShow, cancelShow, createShow } from "../controllers/show.controller";
+import { getOrganizerShowsByEvent, publishShow, unpublishShow, cancelShow, createShow, updateShow } from "../controllers/show.controller";
 import { getOrganizerShowById } from "../controllers/show.controller";
 import { streamAdminDashboard } from "../controllers/organizer-sse.controller";
 import { createStaffAccount, getOrganizerStaffs, assignStaffToShow, removeStaffFromShow, getOrganizerDashboard, getOrganizerAnalyticsDashboard, getOrganizerCheckInHistory, getOrganizerStaffDetail } from "../controllers/organizer.controller";
@@ -10,10 +10,12 @@ const organizerRouter = express.Router();
 
 organizerRouter.get('/events', getOrganizerEvents);
 organizerRouter.post('/events', eventImageUpload.fields([{ name: 'poster', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), createEvent);
-organizerRouter.get('/events/:event_id', getOrganizerEventById)
+organizerRouter.get('/events/:event_id', getOrganizerEventById);
+organizerRouter.put('/events/:event_id', eventImageUpload.fields([{ name: 'poster', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), updateEvent);
 organizerRouter.post('/events/:event_id/shows', createShow);
 organizerRouter.get('/events/:event_id/shows', getOrganizerShowsByEvent);
 organizerRouter.get('/shows/:show_id', getOrganizerShowById);
+organizerRouter.put('/shows/:show_id', updateShow);
 organizerRouter.post('/shows/:show_id/publish', publishShow);
 organizerRouter.post('/shows/:show_id/unpublish', unpublishShow);
 organizerRouter.post('/shows/:show_id/cancel', cancelShow);
