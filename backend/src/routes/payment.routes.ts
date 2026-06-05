@@ -5,6 +5,6 @@ import { Verify, verifyCheckoutToken } from '../middleware/auth.middleware';
 
 const paymentRouter = express.Router();
 
-paymentRouter.post('/create-url', Verify, verifyCheckoutToken, createPaymentUrl);
+paymentRouter.post('/create-url', Verify, createPaymentUrl);
 paymentRouter.post('/mock/generate-return-url', generateMockReturnUrl);
 export default paymentRouter;
