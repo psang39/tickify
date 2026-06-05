@@ -162,46 +162,86 @@ export default function CreateEvent() {
                     )}
                 </div>
 
-                <div className={`absolute bottom-8 left-0 w-full px-6 lg:px-12 flex justify-center transition-all duration-300 ${isRepositioning ? 'opacity-20 pointer-events-none blur-sm' : 'opacity-100'}`}>
-                    <div className="w-full max-w-6xl flex flex-col justify-end gap-2">
-                        <div className="bg-white/20 backdrop-blur-md text-white px-1 py-0.5 rounded-full font-semibold border border-white/30 flex items-center w-fit focus-within:bg-white/40 transition-all">
-                            <Info size={14} className="ml-2 opacity-80" />
-                            <div
-  contentEditable
-  suppressContentEditableWarning
-  spellCheck={false}
-  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
-  onBlur={(e) => setFormData({ ...formData, genre: (e.currentTarget.textContent || '').trim() })}
-  className="tickify-hero-pill inline-flex min-h-[2rem] max-w-full cursor-text items-center rounded-full border border-white/15 bg-black/35 px-4 py-1.5 text-sm font-bold text-white !text-white outline-none backdrop-blur-md transition-colors"
->
-  {formData.genre || 'Thể loại sự kiện'}
-</div>
-                        </div>
-                        <div className="w-full relative group/title">
-                            <Edit3 size={20} className="absolute -left-8 top-3 text-white/50 opacity-0 group-hover/title:opacity-100 transition-opacity hidden md:block" />
-                            <h1
-  contentEditable
-  suppressContentEditableWarning
-  spellCheck={false}
-  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
-  onBlur={(e) => setFormData({ ...formData, name: (e.currentTarget.textContent || '').trim() })}
-  className="tickify-hero-title min-h-[1.1em] max-w-5xl cursor-text outline-none text-2xl md:text-3xl lg:text-4xl font-black leading-tight text-white !text-white transition-colors"
->
-  {formData.name || 'Tên sự kiện'}
-</h1>
-                        </div>
-                        <div className="w-full relative group/artist mt-[-8px]">
-                            <Mic2 size={16} className="absolute -left-7 top-3 text-white/50 opacity-0 group-hover/artist:opacity-100 transition-opacity hidden md:block" />
-                            <div
-  contentEditable
-  suppressContentEditableWarning
-  spellCheck={false}
-  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
-  onBlur={(e) => setFormData({ ...formData, artists: (e.currentTarget.textContent || '').trim() })}
-  className="tickify-hero-subtitle min-h-[1.75rem] max-w-4xl cursor-text outline-none text-base md:text-lg font-medium text-white/90 !text-white transition-colors"
->
-  {formData.artists || 'Người biểu diễn/diễn giả (Optional)...'}
-</div>
+                <div className={`absolute bottom-6 left-0 w-full px-6 lg:px-12 flex justify-center transition-all duration-300 ${isRepositioning ? 'opacity-20 pointer-events-none blur-sm' : 'opacity-100'}`}>
+                    <div className="w-full max-w-6xl flex justify-start">
+                        <div
+                            className="tickify-hero-info-card w-full max-w-4xl rounded-3xl border border-white/15 p-5 md:p-6 shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur-md"
+                            style={{
+                                backgroundColor: 'rgba(0, 0, 0, 0.58)',
+                                color: '#ffffff',
+                                backdropFilter: 'blur(16px) saturate(1.08)',
+                                WebkitBackdropFilter: 'blur(16px) saturate(1.08)',
+                            }}
+                        >
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-white shadow-sm">
+                                    <Info size={14} className="opacity-80" />
+                                    <div
+                                        contentEditable
+                                        suppressContentEditableWarning
+                                        spellCheck={false}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                e.currentTarget.blur();
+                                            }
+                                        }}
+                                        onBlur={(e) => {
+                                            const nextValue = (e.currentTarget.textContent || '').trim();
+                                            setFormData({ ...formData, genre: nextValue || 'Sự kiện' });
+                                        }}
+                                        className="min-w-[72px] cursor-text outline-none text-sm font-bold uppercase tracking-[0.18em] text-white"
+                                    >
+                                        {formData.genre || 'Sự kiện'}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 w-full relative group/title">
+                                <Edit3 size={20} className="absolute -left-8 top-3 text-white/50 opacity-0 group-hover/title:opacity-100 transition-opacity hidden md:block" />
+                                <h1
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    spellCheck={false}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            e.currentTarget.blur();
+                                        }
+                                    }}
+                                    onBlur={(e) => {
+                                        const nextValue = (e.currentTarget.textContent || '').replace(/\s+/g, ' ').trim();
+                                        setFormData({ ...formData, name: nextValue || 'Tên sự kiện' });
+                                    }}
+                                    className="min-h-[1.15em] max-w-5xl cursor-text outline-none text-2xl md:text-3xl lg:text-4xl font-black leading-tight text-white drop-shadow-lg transition-colors"
+                                    style={{ color: '#ffffff' }}
+                                >
+                                    {formData.name || 'Tên sự kiện'}
+                                </h1>
+                            </div>
+
+                            <div className="mt-3 w-full relative group/artist">
+                                <Mic2 size={16} className="absolute -left-7 top-3 text-white/50 opacity-0 group-hover/artist:opacity-100 transition-opacity hidden md:block" />
+                                <div
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    spellCheck={false}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            e.currentTarget.blur();
+                                        }
+                                    }}
+                                    onBlur={(e) => {
+                                        const nextValue = (e.currentTarget.textContent || '').trim();
+                                        setFormData({ ...formData, artists: nextValue });
+                                    }}
+                                    className="min-h-[1.75rem] max-w-4xl cursor-text rounded-2xl border border-white/10 bg-white/10 px-4 py-2 outline-none text-base md:text-lg font-medium text-white/90 transition-colors hover:bg-white/15 focus:bg-white/15"
+                                    data-placeholder="Người biểu diễn/diễn giả"
+                                >
+                                    {formData.artists || 'Người biểu diễn/diễn giả'}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
