@@ -1,0 +1,90 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, Ticket, ChevronDown, User, LayoutDashboard, LogOut } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore'; // Import Store của bạn
+
+export default function Header() {
+    const navigate = useNavigate();
+    const { user, isAuthenticated, logout } = useAuthStore();
+    const [searchQuery, setSearchQuery] = useState('');
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && searchQuery.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
+
+    return (
+        <header className="w-full bg-white py-4 px-8 shadow-sm flex items-center justify-between sticky top-0 z-50 font-sans">
+            <Link to="/" className="text-3xl font-black tracking-tight bg-gradient-to-r from-purple-700 via-pink-500 to-pink-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                Tickify
+            </Link>
+            <div className="flex-1 max-w-xl mx-8 relative hidden md:block">
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm nghệ sĩ, sự kiện, địa điểm..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
+                    className="w-full bg-gray-100/80 text-gray-700 rounded-full py-2.5 px-5 pl-5 pr-12 outline-none focus:bg-gray-100 focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+                />
+                <Search
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-primary"
+                    size={18}
+                    onClick={() => searchQuery.trim() && navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)}
+                />
+            </div>
+            <div className="flex items-center gap-6">
+                {(!user || user.role === 'Attendee') && (
+                    <Link to="/orders" className="flex items-center gap-2 text-gray-600 hover:text-primary font-bold text-sm transition-colors">
+                        <Ticket size={18} />
+                        <span>Lịch sử đặt vé</span>
+                    </Link>
+                )}
+
+                {/* CHỌN NGÔN NGỮ GIỮ NGUYÊN */}
+                <button className="flex items-center gap-1 border border-gray-300 rounded-full px-3 py-1.5 text-gray-700 text-xs font-bold hover:border-gray-400 transition-colors bg-white">
+                    VN <ChevronDown size={14} />
+                </button>
+
+
+                {!isAuthenticated ? (
+
+                    <Link to="/login">
+                        <button className="bg-[#4C4DCC] hover:bg-[#3b3ca3] text-white flex items-center gap-2 rounded-full px-6 py-2 text-sm font-bold transition-colors shadow-sm border-none cursor-pointer">
+                            Đăng nhập
+                        </button>
+                    </Link>
+                ) : (
+
+                    <div className="flex items-center gap-3">
+                        {user?.role === 'Attendee' ? (
+                            <Link to="/profile">
+                                <button className="bg-gray-100 hover:bg-gray-200 text-gray-800 flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors border-none cursor-pointer">
+                                    <User size={16} />
+                                    <span>Hồ sơ</span>
+                                </button>
+                            </Link>
+                        ) : (
+                            /* 2B. ADMIN / ORGANIZER: Hiện Trang quản trị điều hướng thẳng về hệ thống */
+                            <Link to={user?.role === 'Admin' ? '/admin/dashboard' : '/organizer/dashboard'}>
+                                <button className="bg-[#4C4DCC] hover:bg-[#3b3ca3] text-white flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors shadow-sm border-none cursor-pointer">
+                                    <LayoutDashboard size={16} />
+                                    <span>Trang quản trị</span>
+                                </button>
+                            </Link>
+                        )}
+
+                        {/* Nút đăng xuất nhanh bên cạnh */}
+                        <button
+                            onClick={() => { if (window.confirm("Xác nhận đăng xuất khỏi hệ thống?")) logout(); }}
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors border-none bg-transparent cursor-pointer"
+                            title="Đăng xuất"
+                        >
+                            <LogOut size={16} />
+                        </button>
+                    </div>
+                )}
+            </div>
+        </header>
+    );
+}

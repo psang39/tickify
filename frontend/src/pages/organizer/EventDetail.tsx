@@ -361,7 +361,7 @@ export default function EventDetail() {
                         style={{ objectPosition: `50% ${eventFormData.banner_offset_y}%` }}
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-500"><ImageIcon size={64} /></div>
+                    <div className="w-full h-full flex items-center justify-center text-gray-500 dark:text-slate-400"><ImageIcon size={64} /></div>
                 )}
 
                 {isRepositioning && (
@@ -375,16 +375,16 @@ export default function EventDetail() {
                         {isRepositioning ? (
                             <div className="flex gap-2 bg-black/60 p-1.5 rounded-lg backdrop-blur-md animate-in fade-in">
                                 <span className="flex items-center text-white text-sm font-medium px-3"><Move size={16} className="mr-2" /> Kéo để căn chỉnh</span>
-                                <Button size="sm" className="bg-white text-black hover:bg-gray-200" onClick={() => setIsRepositioning(false)}>
+                                <Button size="sm" className="bg-white dark:bg-slate-900/90 text-black hover:bg-gray-200" onClick={() => setIsRepositioning(false)}>
                                     <Check size={16} className="mr-1" /> Xong
                                 </Button>
                             </div>
                         ) : (
                             <>
-                                <Button variant="outline" className="bg-black/50 text-white border-white/30 backdrop-blur-md hover:bg-white hover:text-black transition-all opacity-0 group-hover:opacity-100" onClick={() => setIsRepositioning(true)}>
+                                <Button variant="outline" className="bg-black/50 text-white border-white/30 backdrop-blur-md hover:bg-white dark:hover:bg-slate-800 hover:text-black transition-all opacity-0 group-hover:opacity-100" onClick={() => setIsRepositioning(true)}>
                                     <Move size={16} className="mr-2" /> Chỉnh vị trí
                                 </Button>
-                                <label className="inline-flex items-center justify-center px-4 py-2 bg-black/50 text-white border border-white/30 rounded-md backdrop-blur-md hover:bg-white hover:text-black transition-all opacity-0 group-hover:opacity-100 cursor-pointer text-sm font-medium shadow-none">
+                                <label className="inline-flex items-center justify-center px-4 py-2 bg-black/50 text-white border border-white/30 rounded-md backdrop-blur-md hover:bg-white dark:hover:bg-slate-800 hover:text-black transition-all opacity-0 group-hover:opacity-100 cursor-pointer text-sm font-medium shadow-none">
                                     <UploadCloud size={16} className="mr-2" /> Đổi Banner
                                     <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'banner')} />
                                 </label>
@@ -438,9 +438,9 @@ export default function EventDetail() {
 
             {/* TAB NAVIGATION */}
             <div className="w-full max-w-6xl mx-auto px-6 lg:px-12 mt-8">
-                <div className="flex gap-4 border-b border-gray-200">
-                    <button onClick={() => setActiveTab('INFO')} className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'INFO' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}><Settings size={18} /> Chỉnh sửa Thông tin</button>
-                    <button onClick={() => setActiveTab('SHOWS')} className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'SHOWS' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-800'}`}><ListVideo size={18} /> Quản lý Shows</button>
+                <div className="flex gap-4 border-b border-gray-200 dark:border-white/10">
+                    <button onClick={() => setActiveTab('INFO')} className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'INFO' ? 'border-primary text-primary' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-800'}`}><Settings size={18} /> Chỉnh sửa Thông tin</button>
+                    <button onClick={() => setActiveTab('SHOWS')} className={`flex items-center gap-2 px-6 py-4 font-semibold text-base transition-colors border-b-2 ${activeTab === 'SHOWS' ? 'border-primary text-primary' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-800'}`}><ListVideo size={18} /> Quản lý Shows</button>
                 </div>
             </div>
 
@@ -451,27 +451,27 @@ export default function EventDetail() {
                             {currentStatus === 'published' && (
                                 <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl flex items-start gap-2.5 text-sm font-medium"><Info size={18} className="shrink-0 mt-0.5" /><span>Sự kiện này hiện đang mở hiển thị công khai trên sàn. Để điều chỉnh thông tin mô tả chi tiết hoặc mốc ngày bế mạc, vui lòng lựa chọn hành động "Tạm dừng sự kiện" bên dưới.</span></div>
                             )}
-                            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 relative group/desc">
+                            <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-6 sm:p-8 border border-gray-100 dark:border-white/10 relative group/desc">
                                 {currentStatus === 'draft' && <div className="absolute top-6 right-6 text-gray-300 opacity-0 group-hover/desc:opacity-100"><Edit3 size={18} /></div>}
                                 <h2 className="text-xl font-bold text-secondary mb-3">Giới thiệu sự kiện</h2>
-                                <textarea disabled={currentStatus !== 'draft'} className="w-full bg-transparent outline-none border-2 border-transparent hover:border-gray-100 focus:border-primary/30 focus:bg-gray-50 rounded-xl p-3 -ml-3 text-gray-600 leading-relaxed text-base resize-none min-h-[150px] transition-all disabled:opacity-70" value={eventFormData.description} placeholder="Viết vài lời giới thiệu hấp dẫn về sự kiện của bạn..." onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })} />
+                                <textarea disabled={currentStatus !== 'draft'} className="w-full bg-transparent outline-none border-2 border-transparent hover:border-gray-100 focus:border-primary/30 focus:bg-gray-50 rounded-xl p-3 -ml-3 text-gray-600 dark:text-slate-300 leading-relaxed text-base resize-none min-h-[150px] transition-all disabled:opacity-70" value={eventFormData.description} placeholder="Viết vài lời giới thiệu hấp dẫn về sự kiện của bạn..." onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })} />
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-secondary mb-3 flex items-center gap-2"><Calendar className="text-primary" size={20} /> Thiết lập thời gian chung</h2>
-                                <div className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center bg-gradient-to-r from-slate-50 to-white">
-                                    <div className="flex-1 w-full space-y-1.5"><label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Ngày khai mạc</label><input type="datetime-local" disabled={currentStatus !== 'draft'} className="w-full bg-white border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm disabled:opacity-60" value={eventFormData.start_date} onChange={(e) => setEventFormData({ ...eventFormData, start_date: e.target.value })} /></div>
+                                <div className="bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center bg-gradient-to-r from-slate-50 to-white">
+                                    <div className="flex-1 w-full space-y-1.5"><label className="text-xs font-bold text-gray-700 dark:text-slate-200 uppercase tracking-wide">Ngày khai mạc</label><input type="datetime-local" disabled={currentStatus !== 'draft'} className="w-full bg-white dark:bg-slate-900/90 border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm disabled:opacity-60" value={eventFormData.start_date} onChange={(e) => setEventFormData({ ...eventFormData, start_date: e.target.value })} /></div>
                                     <div className="hidden md:block text-gray-300"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg></div>
-                                    <div className="flex-1 w-full space-y-1.5"><label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Ngày bế mạc</label><input type="datetime-local" disabled={currentStatus !== 'draft'} className="w-full bg-white border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm disabled:opacity-60" value={eventFormData.end_date} onChange={(e) => setEventFormData({ ...eventFormData, end_date: e.target.value })} /></div>
+                                    <div className="flex-1 w-full space-y-1.5"><label className="text-xs font-bold text-gray-700 dark:text-slate-200 uppercase tracking-wide">Ngày bế mạc</label><input type="datetime-local" disabled={currentStatus !== 'draft'} className="w-full bg-white dark:bg-slate-900/90 border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 font-medium text-sm disabled:opacity-60" value={eventFormData.end_date} onChange={(e) => setEventFormData({ ...eventFormData, end_date: e.target.value })} /></div>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-6">
-                            <div className="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col h-full">
+                            <div className="bg-white dark:bg-slate-900/90 rounded-2xl p-6 border border-gray-100 dark:border-white/10 flex flex-col h-full">
                                 <h3 className="font-bold text-lg mb-1 text-secondary flex items-center gap-2">Ảnh Poster (Dọc)</h3>
-                                <p className="text-xs text-gray-500 mb-4">Tỉ lệ chuẩn 3:4. Dùng để hiển thị ở trang danh sách sự kiện.</p>
-                                <div className="w-full flex-1 min-h-[300px] bg-slate-50 rounded-xl overflow-hidden relative border-2 border-dashed border-gray-200 transition-colors group">
+                                <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">Tỉ lệ chuẩn 3:4. Dùng để hiển thị ở trang danh sách sự kiện.</p>
+                                <div className="w-full flex-1 min-h-[300px] bg-slate-50 dark:bg-slate-900/80 rounded-xl overflow-hidden relative border-2 border-dashed border-gray-200 dark:border-white/10 transition-colors group">
                                     {eventFormData.poster_url ? (<img src={eventFormData.poster_url} className="w-full h-full object-cover" alt="Poster" />) : (<div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400"><ImageIcon size={40} className="mb-2 opacity-50" /><span className="text-sm font-medium">Chưa có Poster</span></div>)}
-                                    {currentStatus === 'draft' && (<label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"><span className="bg-white text-secondary font-bold text-sm px-4 py-2 rounded-full flex items-center"><UploadCloud size={16} className="mr-2" /> Chọn Ảnh</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'poster')} /></label>)}
+                                    {currentStatus === 'draft' && (<label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"><span className="bg-white dark:bg-slate-900/90 text-secondary font-bold text-sm px-4 py-2 rounded-full flex items-center"><UploadCloud size={16} className="mr-2" /> Chọn Ảnh</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'poster')} /></label>)}
                                 </div>
                             </div>
                         </div>
@@ -481,10 +481,10 @@ export default function EventDetail() {
                 {/* TAB 2: QUẢN LÝ SHOWS */}
                 {activeTab === 'SHOWS' && (
                     <div className="space-y-6 animate-in fade-in">
-                        <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200">
+                        <div className="flex justify-between items-center bg-white dark:bg-slate-900/90 p-6 rounded-2xl border border-slate-200 dark:border-white/10">
                             <div>
-                                <h2 className="text-xl font-bold text-slate-800">Danh sách Shows</h2>
-                                <p className="text-slate-500 text-sm mt-1">Quản lý lịch diễn và cấu hình vé cho sự kiện này.</p>
+                                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Danh sách Shows</h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Quản lý lịch diễn và cấu hình vé cho sự kiện này.</p>
                             </div>
                             <Button disabled={currentStatus === 'draft'} className="bg-secondary hover:bg-slate-800 text-white rounded-full px-6 disabled:opacity-40" onClick={() => setShowForm(!showForm)}>
                                 {showForm ? "Đóng Form" : <><Plus size={18} className="mr-2" /> Thêm Show Mới</>}
@@ -497,7 +497,7 @@ export default function EventDetail() {
 
                         {/* FORM TẠO SHOW */}
                         {showForm && currentStatus !== 'draft' && (
-                            <form onSubmit={handleCreateAllShow} className="bg-white p-8 rounded-2xl border border-slate-200 space-y-6 animate-in slide-in-from-top-4">
+                            <form onSubmit={handleCreateAllShow} className="bg-white dark:bg-slate-900/90 p-8 rounded-2xl border border-slate-200 dark:border-white/10 space-y-6 animate-in slide-in-from-top-4">
                                 <h2 className="text-xl font-bold text-secondary border-b pb-3">Thông tin Show mới</h2>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -522,18 +522,18 @@ export default function EventDetail() {
                                                     onBlur={() => setTimeout(() => setIsVenueDropdownOpen(false), 200)} />
 
                                                 {isVenueDropdownOpen && (
-                                                    <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg max-h-48 overflow-y-auto">
+                                                    <div className="absolute z-20 w-full mt-1 bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-lg max-h-48 overflow-y-auto">
                                                         {filteredVenues.map((venue: any) => (
-                                                            <div key={venue._id} className="px-4 py-2.5 hover:bg-slate-50 cursor-pointer border-b border-gray-50"
+                                                            <div key={venue._id} className="px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer border-b border-gray-50"
                                                                 onMouseDown={() => { setShowData({ ...showData, venue_id: venue._id }); setVenueSearch(venue.name); setIsVenueDropdownOpen(false); }}>
-                                                                <div className="font-semibold text-gray-800 text-xs">{venue.name}</div>
+                                                                <div className="font-semibold text-gray-800 dark:text-slate-100 text-xs">{venue.name}</div>
                                                                 {/* ✨ ĐÃ SỬA: Chuỗi địa chỉ gộp nối Address + City liền mạch */}
                                                                 <div className="text-[10px] text-gray-400 mt-0.5 truncate">{venue.address}{venue.city ? `, ${venue.city}` : ''}</div>
                                                             </div>
                                                         ))}
                                                         {/* ✨ ĐÃ SỬA: Nút khởi động panel tạo nhanh tại chân kết quả tìm kiếm */}
                                                         <div
-                                                            className="px-4 py-2.5 hover:bg-slate-100 cursor-pointer border-t border-slate-100 text-[11px] font-bold text-primary text-center bg-slate-50/60 sticky bottom-0 z-10 transition-colors"
+                                                            className="px-4 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer border-t border-slate-100 dark:border-white/10 text-[11px] font-bold text-primary text-center bg-slate-50/60 sticky bottom-0 z-10 transition-colors"
                                                             onMouseDown={() => setIsCreatingNewVenue(true)}
                                                         >
                                                             Không thấy Venue bạn muốn? Hãy tạo ngay!
@@ -543,8 +543,8 @@ export default function EventDetail() {
                                             </div>
                                         ) : (
                                             /* BƯỚC 2: FORM PHẲNG ĐIỀN ĐỦ THÔNG TIN ĐỊA ĐIỂM KÈM TRƯỜNG CITY */
-                                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 animate-in fade-in duration-200">
-                                                <div className="flex justify-between items-center border-b border-slate-200 pb-1.5">
+                                            <div className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-xl p-4 space-y-3 animate-in fade-in duration-200">
+                                                <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-1.5">
                                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Đề xuất địa điểm mới</span>
                                                     <button
                                                         type="button"
@@ -557,27 +557,27 @@ export default function EventDetail() {
                                                 <div className="space-y-2">
                                                     <div>
                                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Tên địa điểm *</label>
-                                                        <input type="text" placeholder="VD: Khách sạn Mường Thanh" value={newVenueForm.name} onChange={e => setNewVenueForm({ ...newVenueForm, name: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700" />
+                                                        <input type="text" placeholder="VD: Khách sạn Mường Thanh" value={newVenueForm.name} onChange={e => setNewVenueForm({ ...newVenueForm, name: e.target.value })} className="w-full border border-gray-300 bg-white dark:bg-slate-900/90 rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700 dark:text-slate-200" />
                                                     </div>
                                                     <div className="grid grid-cols-3 gap-2">
                                                         <div className="col-span-2">
                                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Địa chỉ chi tiết *</label>
-                                                            <input type="text" placeholder="VD: 78 Khúc Thừa Dụ" value={newVenueForm.address} onChange={e => setNewVenueForm({ ...newVenueForm, address: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700" />
+                                                            <input type="text" placeholder="VD: 78 Khúc Thừa Dụ" value={newVenueForm.address} onChange={e => setNewVenueForm({ ...newVenueForm, address: e.target.value })} className="w-full border border-gray-300 bg-white dark:bg-slate-900/90 rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700 dark:text-slate-200" />
                                                         </div>
                                                         {/* ✨ ĐÃ SỬA: Có ô nhập trường thành phố cho đối tác */}
                                                         <div className="col-span-1">
                                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Thành phố *</label>
-                                                            <input type="text" placeholder="Hà Nội" value={newVenueForm.city} onChange={e => setNewVenueForm({ ...newVenueForm, city: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700" />
+                                                            <input type="text" placeholder="Hà Nội" value={newVenueForm.city} onChange={e => setNewVenueForm({ ...newVenueForm, city: e.target.value })} className="w-full border border-gray-300 bg-white dark:bg-slate-900/90 rounded-lg py-1.5 px-3 outline-none text-xs text-slate-700 dark:text-slate-200" />
                                                         </div>
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-2">
                                                         <div>
                                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Vĩ độ (Latitude)</label>
-                                                            <input type="number" step="any" placeholder="21.028" value={newVenueForm.latitude} onChange={e => setNewVenueForm({ ...newVenueForm, latitude: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs font-mono" />
+                                                            <input type="number" step="any" placeholder="21.028" value={newVenueForm.latitude} onChange={e => setNewVenueForm({ ...newVenueForm, latitude: e.target.value })} className="w-full border border-gray-300 bg-white dark:bg-slate-900/90 rounded-lg py-1.5 px-3 outline-none text-xs font-mono" />
                                                         </div>
                                                         <div>
                                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 block">Kinh độ (Longitude)</label>
-                                                            <input type="number" step="any" placeholder="105.834" value={newVenueForm.longitude} onChange={e => setNewVenueForm({ ...newVenueForm, longitude: e.target.value })} className="w-full border border-gray-300 bg-white rounded-lg py-1.5 px-3 outline-none text-xs font-mono" />
+                                                            <input type="number" step="any" placeholder="105.834" value={newVenueForm.longitude} onChange={e => setNewVenueForm({ ...newVenueForm, longitude: e.target.value })} className="w-full border border-gray-300 bg-white dark:bg-slate-900/90 rounded-lg py-1.5 px-3 outline-none text-xs font-mono" />
                                                         </div>
                                                     </div>
                                                     <Button
@@ -631,12 +631,12 @@ export default function EventDetail() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start pt-4 border-t border-slate-100">
-                                    <div className="xl:col-span-4 border-2 border-dashed border-gray-200 bg-slate-50/50 hover:bg-slate-50 p-8 rounded-2xl text-center h-full flex flex-col justify-center">
+                                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start pt-4 border-t border-slate-100 dark:border-white/10">
+                                    <div className="xl:col-span-4 border-2 border-dashed border-gray-200 dark:border-white/10 bg-slate-50/50 hover:bg-slate-50 dark:hover:bg-slate-800 p-8 rounded-2xl text-center h-full flex flex-col justify-center">
                                         <UploadCloud size={40} className="mx-auto text-primary mb-3" />
-                                        <h3 className="text-base font-bold text-gray-900 mb-1">Sơ đồ ghế (Seat Map)</h3>
-                                        <p className="text-sm text-gray-500 mb-6 mx-auto">Tải lên SVG có ID <code className="bg-white px-1 border rounded">Type-VIP</code>; khu <code className="bg-white px-1 border rounded">zone_GA</code>, <code className="bg-white px-1 border rounded">zone_standing</code> hoặc <code className="bg-white px-1 border rounded">zone_floor</code> sẽ được nhận diện là vé đứng.</p>
-                                        <label className="inline-flex items-center justify-center bg-white border border-gray-200 text-slate-700 px-6 py-2.5 rounded-full font-semibold cursor-pointer hover:bg-slate-50 transition-all text-xs">
+                                        <h3 className="text-base font-bold text-gray-900 dark:text-slate-50 mb-1">Sơ đồ ghế (Seat Map)</h3>
+                                        <p className="text-sm text-gray-500 dark:text-slate-400 mb-6 mx-auto">Tải lên SVG có ID <code className="bg-white dark:bg-slate-900/90 px-1 border rounded">Type-VIP</code>; khu <code className="bg-white dark:bg-slate-900/90 px-1 border rounded">zone_GA</code>, <code className="bg-white dark:bg-slate-900/90 px-1 border rounded">zone_standing</code> hoặc <code className="bg-white dark:bg-slate-900/90 px-1 border rounded">zone_floor</code> sẽ được nhận diện là vé đứng.</p>
+                                        <label className="inline-flex items-center justify-center bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 text-slate-700 dark:text-slate-200 px-6 py-2.5 rounded-full font-semibold cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs">
                                             <span>Chọn File SVG</span>
                                             <input type="file" accept=".svg" className="hidden" onChange={handleSVGUpload} />
                                         </label>
@@ -647,29 +647,29 @@ export default function EventDetail() {
                                         )}
                                     </div>
 
-                                    <div className="xl:col-span-8 bg-slate-50 border border-slate-200 rounded-2xl p-6 h-full">
+                                    <div className="xl:col-span-8 bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 h-full">
                                         <div className="flex justify-between items-center mb-4">
-                                            <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
                                                 <Ticket size={20} className="text-primary" /> Cấu hình Loại Vé
                                             </h3>
-                                            <Button type="button" variant="outline" size="sm" className="h-8 text-xs font-bold bg-white"
+                                            <Button type="button" variant="outline" size="sm" className="h-8 text-xs font-bold bg-white dark:bg-slate-900/90"
                                                 onClick={() => setTicketTypes([...ticketTypes, { name: '', target_tier: 'NEW', description: '', price: '', is_limited_promo: false, total_quantity: '', sale_start: showData.sale_start, sale_end: showData.sale_end }])}>
                                                 <Plus size={14} className="mr-1" /> Thêm vé thủ công
                                             </Button>
                                         </div>
 
                                         {ticketTypes.length === 0 ? (
-                                            <div className="text-center py-10 text-sm text-slate-400 bg-white rounded-xl border border-dashed border-slate-300">
+                                            <div className="text-center py-10 text-sm text-slate-400 bg-white dark:bg-slate-900/90 rounded-xl border border-dashed border-slate-300">
                                                 Vui lòng upload Sơ đồ SVG hoặc bấm "Thêm vé" để thiết lập giá vé.
                                             </div>
                                         ) : (
                                             <div className="space-y-4 max-h-[450px] overflow-y-auto pr-2">
                                                 {ticketTypes.map((ticket, index) => (
-                                                    <div key={index} className="bg-white p-4 rounded-xl border border-slate-200 relative group">
-                                                        <div className="flex items-center gap-2 mb-3 bg-slate-100 px-3 py-2 rounded-lg w-fit border border-slate-200">
-                                                            <Tag size={14} className="text-slate-500" />
-                                                            <span className="text-xs font-bold text-slate-600 uppercase">Mã Hạng (Tier):</span>
-                                                            <span className="text-xs font-black text-primary font-mono bg-white px-2 py-0.5 rounded border border-primary/20">{ticket.target_tier}</span>
+                                                    <div key={index} className="bg-white dark:bg-slate-900/90 p-4 rounded-xl border border-slate-200 dark:border-white/10 relative group">
+                                                        <div className="flex items-center gap-2 mb-3 bg-slate-100 dark:bg-slate-800/80 px-3 py-2 rounded-lg w-fit border border-slate-200 dark:border-white/10">
+                                                            <Tag size={14} className="text-slate-500 dark:text-slate-400" />
+                                                            <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase">Mã Hạng (Tier):</span>
+                                                            <span className="text-xs font-black text-primary font-mono bg-white dark:bg-slate-900/90 px-2 py-0.5 rounded border border-primary/20">{ticket.target_tier}</span>
                                                             {isStandingTier(ticket.target_tier) && (
                                                                 <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">GA / Standing</span>
                                                             )}
@@ -677,25 +677,25 @@ export default function EventDetail() {
 
                                                         <div className="grid grid-cols-12 gap-4 mb-3">
                                                             <div className="col-span-12">
-                                                                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Tên hiển thị vé</label>
-                                                                <input required type="text" placeholder="VD: Vé VIP Khu Vực A" className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50 font-bold text-slate-800"
+                                                                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 block">Tên hiển thị vé</label>
+                                                                <input required type="text" placeholder="VD: Vé VIP Khu Vực A" className="w-full text-xs border border-slate-200 dark:border-white/10 rounded p-2 outline-none focus:border-primary bg-slate-50 dark:bg-slate-900/80 font-bold text-slate-800 dark:text-slate-100"
                                                                     value={ticket.name} onChange={e => { const arr = [...ticketTypes]; arr[index].name = e.target.value; setTicketTypes(arr); }} />
                                                             </div>
                                                         </div>
 
                                                         <div className="grid grid-cols-12 gap-4 mb-3">
                                                             <div className="col-span-5">
-                                                                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Giá vé (VNĐ)</label>
-                                                                <input required type="number" min="0" placeholder="0" className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary font-bold text-orange-600 bg-slate-50"
+                                                                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 block">Giá vé (VNĐ)</label>
+                                                                <input required type="number" min="0" placeholder="0" className="w-full text-xs border border-slate-200 dark:border-white/10 rounded p-2 outline-none focus:border-primary font-bold text-orange-600 bg-slate-50 dark:bg-slate-900/80"
                                                                     value={ticket.price} onChange={e => { const arr = [...ticketTypes]; arr[index].price = e.target.value ? Number(e.target.value) : ''; setTicketTypes(arr); }} />
                                                             </div>
                                                             <div className="col-span-4">
-                                                                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{isStandingTier(ticket.target_tier) ? 'Sức chứa GA' : 'SL Giới hạn'}</label>
-                                                                <input type="number" min="1" placeholder={isStandingTier(ticket.target_tier) ? 'VD: 500' : 'Theo số ghế'} className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50"
+                                                                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 block">{isStandingTier(ticket.target_tier) ? 'Sức chứa GA' : 'SL Giới hạn'}</label>
+                                                                <input type="number" min="1" placeholder={isStandingTier(ticket.target_tier) ? 'VD: 500' : 'Theo số ghế'} className="w-full text-xs border border-slate-200 dark:border-white/10 rounded p-2 outline-none focus:border-primary bg-slate-50 dark:bg-slate-900/80"
                                                                     value={ticket.total_quantity} onChange={e => { const arr = [...ticketTypes]; arr[index].total_quantity = e.target.value ? Number(e.target.value) : ''; setTicketTypes(arr); }} />
                                                             </div>
                                                             <div className="col-span-3 flex items-center pt-5">
-                                                                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-slate-600 hover:text-primary transition-colors">
+                                                                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">
                                                                     <input type="checkbox" className="w-4 h-4 rounded text-primary"
                                                                         checked={ticket.is_limited_promo} onChange={e => { const arr = [...ticketTypes]; arr[index].is_limited_promo = e.target.checked; setTicketTypes(arr); }} />
                                                                     Vé Promo
@@ -705,24 +705,24 @@ export default function EventDetail() {
 
                                                         <div className="grid grid-cols-2 gap-4 mb-3">
                                                             <div>
-                                                                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 flex items-center gap-1"><CalendarClock size={10} /> Mở bán</label>
-                                                                <input required type="datetime-local" className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50"
+                                                                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1"><CalendarClock size={10} /> Mở bán</label>
+                                                                <input required type="datetime-local" className="w-full text-xs border border-slate-200 dark:border-white/10 rounded p-2 outline-none focus:border-primary bg-slate-50 dark:bg-slate-900/80"
                                                                     value={ticket.sale_start} onChange={e => { const arr = [...ticketTypes]; arr[index].sale_start = e.target.value; setTicketTypes(arr); }} />
                                                             </div>
                                                             <div>
-                                                                <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 flex items-center gap-1"><CalendarClock size={10} /> Đóng bán</label>
-                                                                <input required type="datetime-local" className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50"
+                                                                <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1"><CalendarClock size={10} /> Đóng bán</label>
+                                                                <input required type="datetime-local" className="w-full text-xs border border-slate-200 dark:border-white/10 rounded p-2 outline-none focus:border-primary bg-slate-50 dark:bg-slate-900/80"
                                                                     value={ticket.sale_end} onChange={e => { const arr = [...ticketTypes]; arr[index].sale_end = e.target.value; setTicketTypes(arr); }} />
                                                             </div>
                                                         </div>
 
                                                         <div>
-                                                            <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Mô tả thêm</label>
-                                                            <input type="text" placeholder="Nhập các quyền lợi đi kèm..." className="w-full text-xs border border-slate-200 rounded p-2 outline-none focus:border-primary bg-slate-50"
+                                                            <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 block">Mô tả thêm</label>
+                                                            <input type="text" placeholder="Nhập các quyền lợi đi kèm..." className="w-full text-xs border border-slate-200 dark:border-white/10 rounded p-2 outline-none focus:border-primary bg-slate-50 dark:bg-slate-900/80"
                                                                 value={ticket.description} onChange={e => { const arr = [...ticketTypes]; arr[index].description = e.target.value; setTicketTypes(arr); }} />
                                                         </div>
 
-                                                        <button type="button" className="absolute top-2 right-2 text-slate-400 hover:text-white hover:bg-red-500 bg-slate-100 rounded-md p-1.5 transition-all opacity-0 group-hover:opacity-100 border-none cursor-pointer"
+                                                        <button type="button" className="absolute top-2 right-2 text-slate-400 hover:text-white hover:bg-red-500 bg-slate-100 dark:bg-slate-800/80 rounded-md p-1.5 transition-all opacity-0 group-hover:opacity-100 border-none cursor-pointer"
                                                             onClick={() => setTicketTypes(ticketTypes.filter((_, i) => i !== index))}>
                                                             <Trash2 size={14} />
                                                         </button>
@@ -733,7 +733,7 @@ export default function EventDetail() {
                                     </div>
                                 </div>
 
-                                <div className="pt-2 flex justify-end gap-3 border-t border-slate-100 mt-6">
+                                <div className="pt-2 flex justify-end gap-3 border-t border-slate-100 dark:border-white/10 mt-6">
                                     <Button type="button" variant="outline" className="px-6 rounded-full" onClick={() => setShowForm(false)}>Hủy</Button>
                                     <Button type="submit" disabled={isSubmittingShow || isAnyActionPending} className="bg-primary text-white px-8 rounded-full border-none">
                                         {isSubmittingShow ? "Đang xử lý..." : "Lưu Show & Cấu hình Vé"}
@@ -744,11 +744,11 @@ export default function EventDetail() {
 
                         {/* DANH SÁCH SHOWS HIỆN CÓ */}
                         {isLoadingShows ? (
-                            <p className="text-gray-500 animate-pulse text-center py-10">Đang tải danh sách show...</p>
+                            <p className="text-gray-500 dark:text-slate-400 animate-pulse text-center py-10">Đang tải danh sách show...</p>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {shows.length === 0 ? (
-                                    <p className="text-gray-500 col-span-full bg-white p-12 text-center rounded-2xl border border-dashed border-slate-300 text-sm">
+                                    <p className="text-gray-500 dark:text-slate-400 col-span-full bg-white dark:bg-slate-900/90 p-12 text-center rounded-2xl border border-dashed border-slate-300 text-sm">
                                         Chưa có show nào được tạo cho sự kiện này.<br />Bấm "+ Thêm Show Mới" để bắt đầu!
                                     </p>
                                 ) : (
@@ -756,10 +756,10 @@ export default function EventDetail() {
                                         <div
                                             key={show._id}
                                             onClick={() => navigate(`/organizer/events/${eventId}/shows/${show._id}`)}
-                                            className="bg-white border border-slate-200 rounded-2xl p-6 hover:border-primary/50 cursor-pointer transition-all group shadow-none"
+                                            className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 rounded-2xl p-6 hover:border-primary/50 cursor-pointer transition-all group shadow-none"
                                         >
                                             <div className="flex justify-between items-start mb-4">
-                                                <h3 className="font-bold text-base text-slate-800 group-hover:text-primary transition-colors line-clamp-2">{show.name}</h3>
+                                                <h3 className="font-bold text-base text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors line-clamp-2">{show.name}</h3>
                                                 <div className="flex shrink-0 flex-col items-end gap-1">
                                                     <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${show.status === 'published' ? 'bg-green-100 text-green-700' :
                                                         show.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'
@@ -788,13 +788,13 @@ export default function EventDetail() {
                                             </div>
 
                                             <div className="space-y-2 mb-6">
-                                                <p className="text-xs text-slate-500 flex items-center gap-2">
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
                                                     <CalendarClock size={15} className="text-slate-400" />
                                                     {new Date(show.start_time).toLocaleString('vi-VN')}
                                                 </p>
                                             </div>
 
-                                            <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
+                                            <div className="pt-4 border-t border-slate-100 dark:border-white/10 flex justify-between items-center">
                                                 <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-md ${show.seatmap_status === 'processing'
                                                     ? 'text-amber-700 bg-amber-100'
                                                     : show.seatmap_status === 'failed'
@@ -830,7 +830,7 @@ export default function EventDetail() {
 
             {/* BAR ĐIỀU KHIỂN CHẠY DƯỚI ĐÁY TRANG */}
             {activeTab === 'INFO' && (
-                <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50">
+                <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900/90 border-t border-gray-200 dark:border-white/10 z-50">
                     <div className="max-w-6xl mx-auto px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
                             {currentStatus === 'draft' && (

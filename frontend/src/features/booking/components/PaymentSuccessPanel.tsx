@@ -8,7 +8,7 @@ type PaymentSuccessPanelProps = {
 
 export function PaymentSuccessPanel({ email, onBackHome, onViewTickets }: PaymentSuccessPanelProps) {
   return (
-    <div className="w-full min-h-[500px] bg-[#f8fafc] rounded-xl relative overflow-hidden flex flex-col items-center justify-center p-8 border border-slate-100">
+    <div className="w-full min-h-[500px] bg-[#f8fafc] rounded-xl relative overflow-hidden flex flex-col items-center justify-center p-8 border border-slate-100 dark:border-white/10">
       <div className="absolute top-[15%] left-[20%] w-2 h-2 bg-emerald-400 rotate-45 opacity-60" />
       <div className="absolute top-[25%] right-[25%] w-2.5 h-2.5 bg-emerald-300 opacity-50" />
       <div className="absolute bottom-[20%] left-[28%] w-1.5 h-1.5 bg-emerald-500 opacity-60 rounded-full" />
@@ -29,7 +29,7 @@ export function PaymentSuccessPanel({ email, onBackHome, onViewTickets }: Paymen
           <Button
             variant="outline"
             onClick={onBackHome}
-            className="px-8 py-6 rounded-full border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 w-full sm:w-auto text-base h-14"
+            className="px-8 py-6 rounded-full border-gray-300 text-gray-700 dark:text-slate-200 font-semibold hover:bg-gray-50 dark:hover:bg-slate-800 w-full sm:w-auto text-base h-14"
           >
             Về trang chủ
           </Button>

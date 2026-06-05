@@ -21,12 +21,12 @@ const getEventVenueText = (event: any) => {
 };
 
 const SkeletonLine = ({ className = '' }: { className?: string }) => (
-    <div className={`animate-pulse rounded-full bg-slate-200 ${className}`} />
+    <div className={`animate-pulse rounded-full bg-slate-200 dark:bg-slate-700/70 ${className}`} />
 );
 
 const EventCardSkeleton = () => (
-    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-        <div className="h-40 animate-pulse bg-slate-200" />
+    <div className="overflow-hidden rounded-2xl border border-slate-100 dark:border-white/10 bg-white dark:bg-slate-900/90 shadow-sm">
+        <div className="h-40 animate-pulse bg-slate-200 dark:bg-slate-700/70" />
         <div className="space-y-3 p-4">
             <SkeletonLine className="h-3 w-20" />
             <SkeletonLine className="h-4 w-4/5" />
@@ -37,7 +37,7 @@ const EventCardSkeleton = () => (
 );
 
 const GenreSkeleton = () => (
-    <div className="rounded-2xl border border-slate-100 bg-white px-5 py-6">
+    <div className="rounded-2xl border border-slate-100 dark:border-white/10 bg-white dark:bg-slate-900/90 px-5 py-6">
         <SkeletonLine className="h-3 w-20" />
         <SkeletonLine className="mt-3 h-6 w-28" />
     </div>
@@ -68,8 +68,8 @@ export default function HomePage() {
     };
 
     return (
-        <div className="bg-white font-sans text-slate-900">
-            <section className="relative overflow-hidden bg-[#F7F7FA]">
+        <div className="bg-white dark:bg-slate-900/90 font-sans text-slate-900 dark:text-slate-50">
+            <section className="relative overflow-hidden bg-[#F7F7FA] dark:bg-[#050510]">
                 <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-6 py-10 lg:grid-cols-2 lg:px-8 lg:py-8">
                     <div className="space-y-6 lg:pr-8">
                         <span className="inline-flex items-center gap-2 rounded-full bg-pink-50 px-4 py-2 text-xs font-bold text-[#FF0082]">
@@ -89,10 +89,10 @@ export default function HomePage() {
                                 </div>
                             ) : (
                                 <>
-                                    <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-slate-900 md:text-5xl">
+                                    <h1 className="max-w-xl text-4xl font-black leading-tight tracking-tight text-slate-900 dark:text-slate-50 md:text-5xl">
                                         {heroEvent?.name || 'Khám phá sự kiện bạn yêu thích'}
                                     </h1>
-                                    <p className="mt-4 max-w-lg text-sm leading-7 text-slate-500">
+                                    <p className="mt-4 max-w-lg text-sm leading-7 text-slate-500 dark:text-slate-400">
                                         {heroEvent?.description || 'Tìm kiếm sự kiện, xem lịch diễn, chọn show phù hợp và đặt vé nhanh chóng trên Tickify.'}
                                     </p>
                                 </>
@@ -101,20 +101,20 @@ export default function HomePage() {
 
                         {isPageLoading ? (
                             <div className="flex flex-wrap gap-3">
-                                <SkeletonLine className="h-10 w-36 bg-white" />
-                                <SkeletonLine className="h-10 w-44 bg-white" />
-                                <SkeletonLine className="h-10 w-28 bg-white" />
+                                <SkeletonLine className="h-10 w-36 bg-white dark:bg-slate-900/90" />
+                                <SkeletonLine className="h-10 w-44 bg-white dark:bg-slate-900/90" />
+                                <SkeletonLine className="h-10 w-28 bg-white dark:bg-slate-900/90" />
                             </div>
                         ) : heroEvent ? (
-                            <div className="flex flex-wrap gap-3 text-sm text-slate-600">
-                                <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold shadow-sm">
+                            <div className="flex flex-wrap gap-3 text-sm text-slate-600 dark:text-slate-300">
+                                <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900/90 px-4 py-2 font-semibold shadow-sm">
                                     <Calendar size={16} className="text-[#FF0082]" /> {formatDate(heroEvent.start_date)}
                                 </span>
-                                <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold shadow-sm">
+                                <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900/90 px-4 py-2 font-semibold shadow-sm">
                                     <MapPin size={16} className="text-[#4C4DCC]" /> {getEventVenueText(heroEvent)}
                                 </span>
                                 {heroEvent.genre && (
-                                    <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-semibold shadow-sm">
+                                    <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900/90 px-4 py-2 font-semibold shadow-sm">
                                         <Music2 size={16} className="text-[#FF0082]" /> {heroEvent.genre}
                                     </span>
                                 )}
@@ -132,14 +132,14 @@ export default function HomePage() {
                             <button
                                 onClick={() => navigate('/search')}
                                 disabled={isPageLoading}
-                                className="rounded-xl border border-slate-200 bg-white px-7 py-3 text-sm font-bold text-slate-700 transition hover:border-[#4C4DCC] hover:text-[#4C4DCC] disabled:cursor-not-allowed disabled:text-slate-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:text-pink-200"
+                                className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 px-7 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 transition hover:border-[#4C4DCC] hover:text-[#4C4DCC] disabled:cursor-not-allowed disabled:text-slate-300 dark:border-white/15 dark:bg-white/10 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:text-pink-200"
                             >
                                 Khám phá thêm
                             </button>
                         </div>
                     </div>
 
-                    <div className="relative h-[360px] overflow-hidden rounded-[28px] bg-slate-200 lg:h-[440px]">
+                    <div className="relative h-[360px] overflow-hidden rounded-[28px] bg-slate-200 dark:bg-slate-700/70 lg:h-[440px]">
                         {isPageLoading ? (
                             <div className="h-full w-full animate-pulse bg-slate-300" />
                         ) : (
@@ -190,8 +190,8 @@ export default function HomePage() {
 
             <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
                 <div className="mb-5 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-slate-900">Sự kiện sắp diễn ra</h2>
-                    <Link to="/search?sort=upcoming" className="text-sm font-semibold text-slate-600 hover:text-[#FF0082]">Xem tất cả</Link>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Sự kiện sắp diễn ra</h2>
+                    <Link to="/search?sort=upcoming" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FF0082]">Xem tất cả</Link>
                 </div>
 
                 {isPageLoading ? (
@@ -203,7 +203,7 @@ export default function HomePage() {
                         {visibleUpcomingEvents.slice(0, 4).map((event: any) => <PublicEventCard key={event._id} event={event} />)}
                     </div>
                 ) : (
-                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500">
+                    <div className="rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/80 px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                         Hiện chưa có sự kiện nào được hiển thị.
                     </div>
                 )}
@@ -212,8 +212,8 @@ export default function HomePage() {
             {(isPageLoading || genres.length > 0) && (
                 <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
                     <div className="mb-5 flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-slate-900">Khám phá theo thể loại</h2>
-                        <Link to="/search" className="text-sm font-semibold text-slate-600 hover:text-[#FF0082]">Xem thêm</Link>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Khám phá theo thể loại</h2>
+                        <Link to="/search" className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FF0082]">Xem thêm</Link>
                     </div>
 
                     {isPageLoading ? (
@@ -226,10 +226,10 @@ export default function HomePage() {
                                 <button
                                     key={genre}
                                     onClick={() => navigate(`/search?genre=${encodeURIComponent(genre)}`)}
-                                    className="rounded-2xl border border-slate-200 bg-white px-5 py-6 text-left transition hover:border-[#FF0082] hover:shadow-md dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:shadow-pink-500/10"
+                                    className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-900/90 px-5 py-6 text-left transition hover:border-[#FF0082] hover:shadow-md dark:border-white/10 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:border-pink-400 dark:hover:shadow-pink-500/10"
                                 >
                                     <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Thể loại</span>
-                                    <span className="mt-2 block text-lg font-black text-slate-900">{genre}</span>
+                                    <span className="mt-2 block text-lg font-black text-slate-900 dark:text-slate-50">{genre}</span>
                                 </button>
                             ))}
                         </div>
@@ -251,7 +251,7 @@ export default function HomePage() {
                         {isPageLoading ? (
                             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                                 {Array.from({ length: 3 }).map((_, index) => (
-                                    <article key={index} className="overflow-hidden rounded-2xl bg-white text-slate-900">
+                                    <article key={index} className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-50">
                                         <div className="h-40 animate-pulse bg-slate-300" />
                                         <div className="space-y-3 p-4">
                                             <SkeletonLine className="h-3 w-20" />
@@ -265,12 +265,12 @@ export default function HomePage() {
                         ) : (
                             <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                                 {newestEvents.slice(0, 3).map((event: any) => (
-                                    <article key={event._id} onClick={() => navigate(`/events/${event._id}`)} className="ticket-card cursor-pointer overflow-hidden rounded-2xl bg-white text-slate-900 dark:border dark:border-white/10 dark:bg-slate-900/85 dark:text-slate-100">
+                                    <article key={event._id} onClick={() => navigate(`/events/${event._id}`)} className="ticket-card cursor-pointer overflow-hidden rounded-2xl bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-50 dark:border dark:border-white/10 dark:bg-slate-900/85 dark:text-slate-100">
                                         <img src={event.banner_url || event.poster_url || heroImage} alt={event.name} className="h-40 w-full object-cover" />
                                         <div className="p-4">
                                             <p className="text-[11px] font-semibold text-slate-400">{event.genre || 'Sự kiện'}</p>
                                             <h3 className="mt-1 line-clamp-2 text-sm font-bold">{event.name}</h3>
-                                            <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">{event.description || 'Thông tin sự kiện sẽ được cập nhật trong thời gian tới.'}</p>
+                                            <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500 dark:text-slate-400">{event.description || 'Thông tin sự kiện sẽ được cập nhật trong thời gian tới.'}</p>
                                         </div>
                                     </article>
                                 ))}

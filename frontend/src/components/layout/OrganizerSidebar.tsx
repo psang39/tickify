@@ -24,11 +24,11 @@ export default function OrganizerSidebar() {
 
     return (
         <aside
-            className={`bg-white border-r border-slate-200 hidden md:flex flex-col shadow-sm z-10 transition-all duration-300 relative ${isCollapsed ? 'w-20' : 'w-64'
+            className={`bg-white dark:bg-slate-900/90 border-r border-slate-200 dark:border-white/10 hidden md:flex flex-col shadow-sm z-10 transition-all duration-300 relative ${isCollapsed ? 'w-20' : 'w-64'
                 }`}
         >
             {/* Header của Sidebar */}
-            <div className={`p-6 border-b border-slate-100 mb-4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+            <div className={`p-6 border-b border-slate-100 dark:border-white/10 mb-4 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
                 {!isCollapsed && (
                     <div>
                         <h2 className="text-2xl font-bold text-primary">Tickify</h2>
@@ -39,7 +39,7 @@ export default function OrganizerSidebar() {
                 {/* Nút Toggle Đóng/Mở */}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-200 transition-colors"
+                    className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-900/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 transition-colors"
                 >
                     {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
                 </button>
@@ -57,7 +57,7 @@ export default function OrganizerSidebar() {
                             className={`w-full flex items-center py-3 rounded-xl transition-all duration-200 ${isCollapsed ? 'justify-center px-0' : 'px-4 gap-3'
                                 } ${isActive
                                     ? 'bg-primary text-white shadow-md shadow-primary/20'
-                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900'
                                 }`}
                         >
                             <div className="flex items-center justify-center min-w-[20px]">

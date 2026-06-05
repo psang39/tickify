@@ -11,7 +11,7 @@ export const ErrorModal = ({ message, onClose }: ErrorModalProps) => {
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-neutral-dark/40 backdrop-blur-sm px-4">
-            <div className="w-full max-w-sm rounded-3xl border border-neutral-base/10 bg-white p-8 flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-200">
+            <div className="w-full max-w-sm rounded-3xl border border-neutral-base/10 bg-white dark:bg-slate-900/90 p-8 flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-200">
                 <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center text-error mb-2">
                     <AlertTriangle size={32} />
                 </div>

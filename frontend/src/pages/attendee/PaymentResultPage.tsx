@@ -58,12 +58,12 @@ export default function PaymentResultPage() {
 
     return (
         <div className="mx-auto max-w-xl p-6">
-            <div className="rounded-2xl border bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border bg-white dark:bg-slate-900/90 p-6 shadow-sm">
                 <h1 className="text-2xl font-semibold">
                     {isSuccess ? 'Thanh toán thành công' : 'Thanh toán chưa hoàn tất'}
                 </h1>
 
-                <p className="mt-3 text-sm text-gray-600">
+                <p className="mt-3 text-sm text-gray-600 dark:text-slate-300">
                     {isSuccess
                         ? 'Vé của bạn đang được hệ thống tạo và sẽ hiển thị trong tài khoản.'
                         : isFailedButRetryable

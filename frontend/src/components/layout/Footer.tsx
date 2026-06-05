@@ -17,7 +17,7 @@ export default function Footer() {
                             <input
                                 type="email"
                                 placeholder="Nhập email của bạn"
-                                className="w-full rounded-full px-5 py-3 pr-32 text-sm text-zinc-900 outline-none"
+                                className="w-full rounded-full px-5 py-3 pr-32 text-sm text-zinc-900 dark:text-slate-50 outline-none"
                             />
                             <button className="absolute bottom-1 right-1 top-1 rounded-full bg-primary px-5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-primary/90">
                                 Đăng ký
@@ -29,14 +29,14 @@ export default function Footer() {
                         </p>
 
                         <div className="flex flex-wrap gap-3 pt-1">
-                            <button className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-black transition-colors hover:bg-zinc-100">
+                            <button className="flex items-center gap-2 rounded-full bg-white dark:bg-slate-900/90 px-4 py-2 text-black transition-colors hover:bg-zinc-100">
                                 <Play size={18} className="text-primary" />
                                 <div className="flex flex-col text-left">
                                     <span className="text-[10px] leading-none text-zinc-600">Tải trên</span>
                                     <span className="text-xs font-bold leading-tight">Google Play</span>
                                 </div>
                             </button>
-                            <button className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-black transition-colors hover:bg-zinc-100">
+                            <button className="flex items-center gap-2 rounded-full bg-white dark:bg-slate-900/90 px-4 py-2 text-black transition-colors hover:bg-zinc-100">
                                 <Apple size={18} className="text-primary" />
                                 <div className="flex flex-col text-left">
                                     <span className="text-[10px] leading-none text-zinc-600">Tải trên</span>

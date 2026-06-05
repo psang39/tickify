@@ -198,7 +198,7 @@ export default function OrderDetailPage() {
                 <button
                     type="button"
                     onClick={() => navigate('/orders')}
-                    className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-primary transition-colors group"
+                    className="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-primary transition-colors group"
                 >
                     <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
                     <span>Quay lại lịch sử đặt vé</span>
@@ -206,27 +206,27 @@ export default function OrderDetailPage() {
             </div>
 
             <header className="mb-8">
-                <h1 className="text-2xl font-bold text-slate-800 mb-2">
+                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                     Chi tiết đơn hàng #{shortOrderId}
                 </h1>
-                <p className="text-slate-500 text-sm">
+                <p className="text-slate-500 dark:text-slate-400 text-sm">
                     Theo dõi trạng thái thanh toán, thông tin suất diễn và danh sách vé đã phát hành.
                 </p>
             </header>
 
             {!isLoading && !order ? (
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-8 text-center">
+                <div className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-8 text-center">
                     <AlertTriangle size={34} className="mx-auto text-amber-500 mb-3" />
-                    <h2 className="text-lg font-black text-slate-800">Không tìm thấy đơn hàng</h2>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <h2 className="text-lg font-black text-slate-800 dark:text-slate-100">Không tìm thấy đơn hàng</h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         Đơn hàng không tồn tại hoặc bạn không có quyền xem đơn này.
                     </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                     <div className="md:col-span-7 space-y-6">
-                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-none">
-                            <div className="flex items-start justify-between gap-4 border-b border-slate-200 pb-4 mb-5">
+                        <div className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-none">
+                            <div className="flex items-start justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-4 mb-5">
                                 <div className="min-w-0">
                                     <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider">
                                         Thông tin đơn hàng
@@ -239,8 +239,8 @@ export default function OrderDetailPage() {
                             </div>
 
                             <div className="mb-5">
-                                <h4 className="font-black text-xl text-slate-800 leading-snug">{eventName}</h4>
-                                <p className="text-sm text-slate-500 font-semibold mt-1">{showName}</p>
+                                <h4 className="font-black text-xl text-slate-800 dark:text-slate-100 leading-snug">{eventName}</h4>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 font-semibold mt-1">{showName}</p>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
@@ -266,28 +266,28 @@ export default function OrderDetailPage() {
                                 />
                             </div>
 
-                            <div className="space-y-2 border-b border-slate-200 pb-4 mb-4">
+                            <div className="space-y-2 border-b border-slate-200 dark:border-white/10 pb-4 mb-4">
                                 {hasTickets ? (
                                     tickets.map((ticket) => (
                                         <div
                                             key={ticket._id}
-                                            className="flex justify-between items-center gap-4 text-sm font-medium text-slate-600 bg-white border border-slate-100 rounded-xl px-3 py-2.5"
+                                            className="flex justify-between items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900/90 border border-slate-100 dark:border-white/10 rounded-xl px-3 py-2.5"
                                         >
                                             <span className="min-w-0">
-                                                <span className="font-bold text-slate-800">
+                                                <span className="font-bold text-slate-800 dark:text-slate-100">
                                                     {ticket.ticket_type_id?.name || 'Vé sự kiện'}
                                                 </span>
-                                                <span className="block text-xs text-slate-500 mt-0.5">
+                                                <span className="block text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                                     Khu {ticket.zone_id?.name || 'N/A'} — Hàng {ticket.seat_id?.row || 'N/A'}, Ghế {ticket.seat_id?.seat_number || 'N/A'}
                                                 </span>
                                             </span>
-                                            <span className="font-mono text-slate-700 shrink-0">
+                                            <span className="font-mono text-slate-700 dark:text-slate-200 shrink-0">
                                                 {formatCurrency(ticket.ticket_type_id?.price || 0)}
                                             </span>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="bg-white border border-dashed border-slate-200 rounded-xl p-4 text-sm text-slate-500">
+                                    <div className="bg-white dark:bg-slate-900/90 border border-dashed border-slate-200 dark:border-white/10 rounded-xl p-4 text-sm text-slate-500 dark:text-slate-400">
                                         {paymentStatus.kind === 'failed'
                                             ? 'Đơn hàng thanh toán thất bại nên hệ thống không phát hành vé.'
                                             : paymentStatus.kind === 'pending'
@@ -298,24 +298,24 @@ export default function OrderDetailPage() {
                             </div>
 
                             <div className="space-y-2 text-sm">
-                                <div className="flex justify-between text-slate-800 font-bold pt-2 border-t border-slate-100 text-base">
+                                <div className="flex justify-between text-slate-800 dark:text-slate-100 font-bold pt-2 border-t border-slate-100 dark:border-white/10 text-base">
                                     <span>Tổng cộng</span>
                                     <span className="font-mono text-primary">{formatCurrency(totalOrderAmount)}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-none">
-                            <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 border-b border-slate-200 pb-2">
+                        <div className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-none">
+                            <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 border-b border-slate-200 dark:border-white/10 pb-2">
                                 Thông tin khách hàng
                             </h3>
-                            <div className="text-sm font-medium text-slate-700 space-y-1">
-                                <p className="font-bold text-slate-800">{`${userData?.first_name || ''} ${userData?.last_name || ''}`}</p>
-                                <p className="text-slate-500">{userData?.email}</p>
+                            <div className="text-sm font-medium text-slate-700 dark:text-slate-200 space-y-1">
+                                <p className="font-bold text-slate-800 dark:text-slate-100">{`${userData?.first_name || ''} ${userData?.last_name || ''}`}</p>
+                                <p className="text-slate-500 dark:text-slate-400">{userData?.email}</p>
                             </div>
                         </div>
 
-                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex gap-3 items-start text-xs text-slate-500 shadow-none">
+                        <div className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-5 flex gap-3 items-start text-xs text-slate-500 dark:text-slate-400 shadow-none">
                             <Info size={16} className="text-slate-400 shrink-0 mt-0.5" />
                             <span>
                                 {paymentStatus.kind === 'success'
@@ -328,8 +328,8 @@ export default function OrderDetailPage() {
                     </div>
 
                     <div className="md:col-span-5 space-y-4">
-                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-none">
-                            <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">
+                        <div className="bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-none">
+                            <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-4 border-b border-slate-200 dark:border-white/10 pb-2">
                                 Trạng thái thanh toán
                             </h3>
 
@@ -386,12 +386,12 @@ export default function OrderDetailPage() {
 
 function InfoBox({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
     return (
-        <div className="bg-white border border-slate-100 rounded-xl p-3">
+        <div className="bg-white dark:bg-slate-900/90 border border-slate-100 dark:border-white/10 rounded-xl p-3">
             <div className="flex items-center gap-2 text-slate-400 mb-1">
                 {icon}
                 <span className="text-[11px] font-bold uppercase tracking-wider">{label}</span>
             </div>
-            <p className="text-sm font-bold text-slate-700 leading-snug">{value}</p>
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug">{value}</p>
         </div>
     );
 }
@@ -427,11 +427,11 @@ function getPaymentStatusMeta(status?: string) {
         return {
             kind: 'unknown',
             label: 'Chưa xác định',
-            icon: <AlertTriangle size={18} className="text-slate-500" />,
-            cardClassName: 'bg-slate-100 border border-slate-200',
-            textClassName: 'text-slate-700',
-            amountClassName: 'text-slate-700',
-            badgeClassName: 'bg-slate-100 text-slate-600 border-slate-200'
+            icon: <AlertTriangle size={18} className="text-slate-500 dark:text-slate-400" />,
+            cardClassName: 'bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-white/10',
+            textClassName: 'text-slate-700 dark:text-slate-200',
+            amountClassName: 'text-slate-700 dark:text-slate-200',
+            badgeClassName: 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10'
         };
     }
 

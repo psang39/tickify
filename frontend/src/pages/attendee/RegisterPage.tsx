@@ -98,7 +98,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="grid min-h-screen grid-cols-1 bg-white font-sans lg:grid-cols-2">
+        <div className="grid min-h-screen grid-cols-1 bg-white dark:bg-slate-900/90 font-sans lg:grid-cols-2">
             <LoadingOverlay isVisible={registerMutation.isPending} message="Đang tạo tài khoản..." />
 
             <section className="relative hidden overflow-hidden bg-slate-950 lg:block">
@@ -120,12 +120,12 @@ export default function RegisterPage() {
                 <div className="w-full max-w-md">
                     <Link to="/" className="mb-8 block text-2xl font-black tracking-wide text-[#FF0082] lg:hidden">Tickify</Link>
 
-                    <h2 className="text-3xl font-black tracking-tight text-slate-800">Tạo tài khoản</h2>
-                    <p className="mt-2 text-sm text-slate-500">
+                    <h2 className="text-3xl font-black tracking-tight text-slate-800 dark:text-slate-100">Tạo tài khoản</h2>
+                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                         Chọn loại tài khoản phù hợp với nhu cầu sử dụng của bạn.
                     </p>
 
-                    <div className="mt-6 grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+                    <div className="mt-6 grid grid-cols-2 rounded-2xl bg-slate-100 dark:bg-slate-800/80 p-1">
                         <button
                             type="button"
                             onClick={() => handleRoleChange('attendee')}
@@ -151,15 +151,15 @@ export default function RegisterPage() {
                     </div>
 
                     {registerRole === 'organizer' && (
-                        <div className="mt-4 rounded-2xl border border-pink-100 bg-pink-50 px-4 py-3 text-sm leading-6 text-slate-600">
-                            Tài khoản organizer sẽ được tạo với trạng thái <span className="font-bold text-slate-800">chưa xác minh</span>. Admin có thể duyệt sau trong hệ thống.
+                        <div className="mt-4 rounded-2xl border border-pink-100 bg-pink-50 px-4 py-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                            Tài khoản organizer sẽ được tạo với trạng thái <span className="font-bold text-slate-800 dark:text-slate-100">chưa xác minh</span>. Admin có thể duyệt sau trong hệ thống.
                         </div>
                     )}
 
                     <form className="mt-7 space-y-4" onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-slate-700">Họ</label>
+                                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Họ</label>
                                 <input
                                     value={formData.last_name}
                                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
@@ -169,7 +169,7 @@ export default function RegisterPage() {
                                 />
                             </div>
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-slate-700">Tên</label>
+                                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Tên</label>
                                 <input
                                     value={formData.first_name}
                                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
@@ -181,7 +181,7 @@ export default function RegisterPage() {
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Email</label>
                             <input
                                 type="email"
                                 value={formData.email}
@@ -194,7 +194,7 @@ export default function RegisterPage() {
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-slate-700">Tên hiển thị</label>
+                                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Tên hiển thị</label>
                                 <input
                                     value={formData.username}
                                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -203,7 +203,7 @@ export default function RegisterPage() {
                                 />
                             </div>
                             <div>
-                                <label className="mb-2 block text-sm font-semibold text-slate-700">Số điện thoại</label>
+                                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Số điện thoại</label>
                                 <input
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -215,26 +215,26 @@ export default function RegisterPage() {
                         </div>
 
                         {registerRole === 'organizer' && (
-                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                                <h3 className="mb-4 text-sm font-black uppercase tracking-wide text-slate-700">Thông tin organizer</h3>
+                            <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/80 p-4">
+                                <h3 className="mb-4 text-sm font-black uppercase tracking-wide text-slate-700 dark:text-slate-200">Thông tin organizer</h3>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="mb-2 block text-sm font-semibold text-slate-700">Tên công ty / đơn vị tổ chức</label>
+                                        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Tên công ty / đơn vị tổ chức</label>
                                         <input
                                             value={formData.company_name}
                                             onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                                             required={registerRole === 'organizer'}
-                                            className="h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100"
+                                            className="h-11 w-full rounded-xl border border-slate-300 bg-white dark:bg-slate-900/90 px-4 text-sm outline-none focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100"
                                             placeholder="Tickify Entertainment"
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-2 block text-sm font-semibold text-slate-700">Mã số thuế</label>
+                                        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Mã số thuế</label>
                                         <input
                                             value={formData.tax_id}
                                             onChange={(e) => setFormData({ ...formData, tax_id: e.target.value })}
                                             required={registerRole === 'organizer'}
-                                            className="h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100"
+                                            className="h-11 w-full rounded-xl border border-slate-300 bg-white dark:bg-slate-900/90 px-4 text-sm outline-none focus:border-[#FF0082] focus:ring-4 focus:ring-pink-100"
                                             placeholder="0312345678"
                                         />
                                     </div>
@@ -243,7 +243,7 @@ export default function RegisterPage() {
                         )}
 
                         <div>
-                            <label className="mb-2 block text-sm font-semibold text-slate-700">Mật khẩu</label>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Mật khẩu</label>
                             <input
                                 type="password"
                                 value={formData.password}
@@ -255,7 +255,7 @@ export default function RegisterPage() {
                         </div>
 
                         <div>
-                            <label className="mb-2 block text-sm font-semibold text-slate-700">Nhập lại mật khẩu</label>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">Nhập lại mật khẩu</label>
                             <input
                                 type="password"
                                 value={formData.confirmPassword}

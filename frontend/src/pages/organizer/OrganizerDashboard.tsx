@@ -21,14 +21,14 @@ const resultLabel: Record<string, string> = {
 
 function MetricCard({ title, value, icon, hint }: { title: string; value: string | number; icon: ReactNode; hint?: string }) {
     return (
-        <Card className="border-slate-200 rounded-2xl shadow-none">
+        <Card className="border-slate-200 dark:border-white/10 rounded-2xl shadow-none">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">{title}</CardTitle>
-                <div className="p-2 rounded-xl bg-slate-100 text-primary">{icon}</div>
+                <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{title}</CardTitle>
+                <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-primary">{icon}</div>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold text-slate-900">{value}</div>
-                {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-50">{value}</div>
+                {hint && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{hint}</p>}
             </CardContent>
         </Card>
     );
@@ -57,7 +57,7 @@ export default function OrganizerDashboard() {
         .map(([name, value]) => ({ name: resultLabel[name] || name, value })), [data]);
 
     if (isLoading) {
-        return <div className="min-h-[50vh] flex items-center justify-center font-medium text-slate-500 animate-pulse">Đang tải dashboard thống kê...</div>;
+        return <div className="min-h-[50vh] flex items-center justify-center font-medium text-slate-500 dark:text-slate-400 animate-pulse">Đang tải dashboard thống kê...</div>;
     }
 
     if (isError) {
@@ -73,8 +73,8 @@ export default function OrganizerDashboard() {
         <div className="max-w-7xl mx-auto space-y-6 p-4 md:p-8">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Dashboard thống kê event/show</h1>
-                    <p className="text-slate-500 mt-1 font-medium">
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">Dashboard thống kê event/show</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
                         Theo dõi doanh thu, số vé bán ra, tỷ lệ check-in và tình trạng vận hành theo từng show.
                     </p>
                 </div>
@@ -83,7 +83,7 @@ export default function OrganizerDashboard() {
                     <select
                         value={showId}
                         onChange={(e) => setShowId(e.target.value)}
-                        className="min-w-[260px] border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-primary"
+                        className="min-w-[260px] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm bg-white dark:bg-slate-900/90 focus:outline-primary"
                     >
                         <option value="">Tất cả show</option>
                         {showOptions.map((show: any) => (
@@ -102,9 +102,9 @@ export default function OrganizerDashboard() {
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <Card className="xl:col-span-2 border-slate-200 rounded-2xl shadow-none">
+                <Card className="xl:col-span-2 border-slate-200 dark:border-white/10 rounded-2xl shadow-none">
                     <CardHeader>
-                        <CardTitle className="text-base font-bold text-slate-800">Doanh thu theo show</CardTitle>
+                        <CardTitle className="text-base font-bold text-slate-800 dark:text-slate-100">Doanh thu theo show</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[340px]">
                         {revenueByShow.length === 0 ? (
@@ -123,9 +123,9 @@ export default function OrganizerDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-slate-200 rounded-2xl shadow-none">
+                <Card className="border-slate-200 dark:border-white/10 rounded-2xl shadow-none">
                     <CardHeader>
-                        <CardTitle className="text-base font-bold text-slate-800">Kết quả check-in</CardTitle>
+                        <CardTitle className="text-base font-bold text-slate-800 dark:text-slate-100">Kết quả check-in</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[340px]">
                         {checkInChartData.length === 0 ? (
@@ -143,9 +143,9 @@ export default function OrganizerDashboard() {
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <Card className="border-slate-200 rounded-2xl shadow-none">
+                <Card className="border-slate-200 dark:border-white/10 rounded-2xl shadow-none">
                     <CardHeader>
-                        <CardTitle className="text-base font-bold text-slate-800">Cơ cấu vé theo hạng vé</CardTitle>
+                        <CardTitle className="text-base font-bold text-slate-800 dark:text-slate-100">Cơ cấu vé theo hạng vé</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="overflow-x-auto">
@@ -157,12 +157,12 @@ export default function OrganizerDashboard() {
                                         <th className="text-right py-3">Doanh thu ước tính</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                <tbody className="divide-y divide-slate-100 dark:divide-white/10">
                                     {ticketTypeBreakdown.length === 0 ? (
                                         <tr><td colSpan={3} className="py-8 text-center text-slate-400">Chưa có dữ liệu vé.</td></tr>
                                     ) : ticketTypeBreakdown.map((item: any) => (
                                         <tr key={item.ticket_type}>
-                                            <td className="py-3 font-semibold text-slate-700">{item.ticket_type}</td>
+                                            <td className="py-3 font-semibold text-slate-700 dark:text-slate-200">{item.ticket_type}</td>
                                             <td className="py-3 text-right">{item.tickets}</td>
                                             <td className="py-3 text-right font-medium">{formatCurrency(item.revenue)}</td>
                                         </tr>
@@ -173,9 +173,9 @@ export default function OrganizerDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-slate-200 rounded-2xl shadow-none">
+                <Card className="border-slate-200 dark:border-white/10 rounded-2xl shadow-none">
                     <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="text-base font-bold text-slate-800">Lịch sử check-in gần đây</CardTitle>
+                        <CardTitle className="text-base font-bold text-slate-800 dark:text-slate-100">Lịch sử check-in gần đây</CardTitle>
                         <AlertTriangle size={18} className="text-slate-400" />
                     </CardHeader>
                     <CardContent>
@@ -183,15 +183,15 @@ export default function OrganizerDashboard() {
                             {recentCheckIns.length === 0 ? (
                                 <div className="py-8 text-center text-sm text-slate-400">Chưa có lịch sử check-in.</div>
                             ) : recentCheckIns.map((log: any) => (
-                                <div key={log._id} className="border border-slate-100 rounded-xl p-3 bg-slate-50/50">
+                                <div key={log._id} className="border border-slate-100 dark:border-white/10 rounded-xl p-3 bg-slate-50/50">
                                     <div className="flex justify-between gap-3">
                                         <div>
-                                            <div className="font-bold text-slate-800">{resultLabel[log.result] || log.result}</div>
-                                            <div className="text-xs text-slate-500 mt-0.5">{log.show_id?.name || 'Show'} • {formatDateTime(log.scanned_at)}</div>
+                                            <div className="font-bold text-slate-800 dark:text-slate-100">{resultLabel[log.result] || log.result}</div>
+                                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{log.show_id?.name || 'Show'} • {formatDateTime(log.scanned_at)}</div>
                                         </div>
-                                        <span className="text-[11px] px-2 py-1 rounded-full bg-white border border-slate-200 h-fit font-bold text-slate-600">{log.mode}</span>
+                                        <span className="text-[11px] px-2 py-1 rounded-full bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 h-fit font-bold text-slate-600 dark:text-slate-300">{log.mode}</span>
                                     </div>
-                                    <div className="mt-2 text-xs text-slate-500">
+                                    <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                                         Staff: {log.staff_id ? `${log.staff_id.first_name || ''} ${log.staff_id.last_name || ''}` : 'N/A'}
                                         {log.seat_id && <> • Ghế: {log.seat_id.seat_number || `${log.seat_id.row || ''}${log.seat_id.col_index || ''}`}</>}
                                     </div>

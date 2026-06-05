@@ -23,7 +23,7 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
         : '--:--';
 
     return (
-        <div className="flex w-full bg-white rounded-2xl border border-slate-200 overflow-hidden mt-8 mb-6">
+        <div className="flex w-full bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden mt-8 mb-6">
 
             <div className="bg-[#2d3092] text-white w-32 shrink-0 flex flex-col items-center justify-center py-8 gap-1">
                 <span className="text-4xl font-bold">{day}</span>
@@ -34,25 +34,25 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center p-6 lg:px-8 gap-6 bg-white">
+            <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center p-6 lg:px-8 gap-6 bg-white dark:bg-slate-900/90">
 
                 <div className="flex flex-col gap-4">
-                    <h1 className="text-2xl font-bold text-slate-800">
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                         {isLoadingShow ? "Đang tải sự kiện..." : showInfo?.name}
                     </h1>
 
                     <div className="flex flex-col gap-2.5">
-                        <div className="flex items-center gap-3 text-slate-600">
+                        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                             <Ticket size={20} className="text-slate-400" />
                             <span className="font-medium text-sm">
                                 Trạng thái: <span className="text-emerald-500 font-semibold">Đang mở bán</span>
                             </span>
                         </div>
-                        <div className="flex items-center gap-3 text-slate-600">
+                        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                             <Calendar size={20} className="text-slate-400" />
                             <span className="font-medium text-sm">{timeString}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-slate-600">
+                        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                             <MapPin size={20} className="text-slate-400" />
                             <span className="font-medium text-sm">{showInfo?.venue_id?.name || "Đang cập nhật địa điểm"}</span>
                         </div>
@@ -74,7 +74,7 @@ export const EventInfoHeader = ({ showInfo, isLoadingShow, currentStep, showId, 
                     {/* <Button
                         variant="outline"
                         onClick={onBack}
-                        className="px-6 py-5 rounded-xl border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors"
+                        className="px-6 py-5 rounded-xl border-slate-300 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                     >
                         Đổi ngày
                     </Button> */}

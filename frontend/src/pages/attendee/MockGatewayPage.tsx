@@ -52,10 +52,10 @@ export default function MockGatewayPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
+        <div className="min-h-screen bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center p-4 font-sans">
             <LoadingOverlay isVisible={isLoading} message="Đang xử lý thanh toán..." />
             <ErrorModal message={errorMessage} onClose={() => { setErrorMessage(null); navigate(`/`); }} />
-            <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div className="max-w-md w-full bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
                 <div className="bg-blue-600 p-6 text-center text-white">
                     <h1 className="text-2xl font-bold tracking-wider">MOCK GATEWAY</h1>
                     <p className="text-blue-100 mt-1 text-sm">Môi trường giả lập thanh toán</p>
@@ -64,20 +64,20 @@ export default function MockGatewayPage() {
                 {/* Thông tin đơn hàng */}
                 <div className="p-8">
                     <div className="text-center mb-8">
-                        <p className="text-slate-500 text-sm mb-2">Số tiền thanh toán</p>
-                        <p className="text-4xl font-bold text-slate-800 font-mono">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Số tiền thanh toán</p>
+                        <p className="text-4xl font-bold text-slate-800 dark:text-slate-100 font-mono">
                             {Number(amount).toLocaleString('vi-VN')} đ
                         </p>
                     </div>
 
-                    <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100 mb-8">
+                    <div className="space-y-3 bg-slate-50 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-100 dark:border-white/10 mb-8">
                         <div className="flex justify-between text-sm">
-                            <span className="text-slate-500">Mã đơn hàng:</span>
-                            <span className="font-bold text-slate-700 font-mono">{orderId}</span>
+                            <span className="text-slate-500 dark:text-slate-400">Mã đơn hàng:</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-200 font-mono">{orderId}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-slate-500">Nhà cung cấp:</span>
-                            <span className="font-bold text-slate-700">TICKIFY (DỀ DÊ)</span>
+                            <span className="text-slate-500 dark:text-slate-400">Nhà cung cấp:</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-200">TICKIFY (DỀ DÊ)</span>
                         </div>
                     </div>
 
@@ -93,7 +93,7 @@ export default function MockGatewayPage() {
                         <button
                             onClick={() => handlePayment('FAILED')}
                             disabled={isLoading}
-                            className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-4 rounded-xl transition-colors"
+                            className="w-full bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 text-slate-600 dark:text-slate-300 font-bold py-4 rounded-xl transition-colors"
                         >
                             Hủy giao dịch
                         </button>

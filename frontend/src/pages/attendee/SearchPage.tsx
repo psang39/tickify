@@ -52,10 +52,10 @@ export default function SearchPage() {
     return (
         <div className="w-full min-h-screen bg-[#F8F9FA] font-sans pb-20">
             {/* KHU VỰC TIÊU ĐỀ TRANG TÌM KIẾM */}
-            <div className="bg-white border-b border-gray-100 py-10 px-8">
+            <div className="bg-white dark:bg-slate-900/90 border-b border-gray-100 dark:border-white/10 py-10 px-8">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-black text-slate-800 tracking-tight">Kết quả tìm kiếm</h1>
+                        <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Kết quả tìm kiếm</h1>
                         <p className="text-xs font-medium text-slate-400 mt-1">
                             Tìm thấy {eventsList.length} sự kiện phù hợp cho từ khóa <span className="text-[#4C4DCC] font-bold">"{queryKeyword || 'Tất cả'}"</span>
                         </p>
@@ -69,7 +69,7 @@ export default function SearchPage() {
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-                            className="w-full bg-slate-50 border border-gray-200 rounded-full py-2.5 pl-4 pr-12 text-xs font-medium outline-none focus:border-primary focus:bg-white transition-all text-slate-700"
+                            className="w-full bg-slate-50 dark:bg-slate-900/80 border border-gray-200 dark:border-white/10 rounded-full py-2.5 pl-4 pr-12 text-xs font-medium outline-none focus:border-primary focus:bg-white transition-all text-slate-700 dark:text-slate-200"
                         />
                         <button onClick={applyFilters} className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-[#4C4DCC] text-white p-1.5 rounded-full border-none cursor-pointer hover:opacity-90">
                             <Search size={14} />
@@ -82,10 +82,10 @@ export default function SearchPage() {
             <div className="max-w-7xl mx-auto px-8 mt-10 grid grid-cols-1 lg:grid-cols-4 gap-8">
 
                 {/* 1. CỘT TRÁI: BỘ LỌC PHẲNG (FLAT SIDEBAR) */}
-                <aside className="lg:col-span-1 bg-white border border-gray-200 rounded-2xl p-5 h-fit space-y-6">
-                    <div className="flex items-center gap-2 border-b border-slate-50 pb-3">
-                        <SlidersHorizontal size={16} className="text-slate-500" />
-                        <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Bộ lọc tìm kiếm</h2>
+                <aside className="lg:col-span-1 bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-2xl p-5 h-fit space-y-6">
+                    <div className="flex items-center gap-2 border-b border-slate-50 dark:border-white/10 pb-3">
+                        <SlidersHorizontal size={16} className="text-slate-500 dark:text-slate-400" />
+                        <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Bộ lọc tìm kiếm</h2>
                     </div>
 
                     {/* Bộ lọc: Khu vực Thành phố */}
@@ -94,7 +94,7 @@ export default function SearchPage() {
                         <select
                             value={selectedCity}
                             onChange={(e) => { setSelectedCity(e.target.value); setTimeout(applyFilters, 0); }}
-                            className="w-full border border-gray-200 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 text-slate-700 outline-none focus:border-primary"
+                            className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 outline-none focus:border-primary"
                         >
                             <option value="">Tất cả thành phố</option>
                             <option value="Hồ Chí Minh">TP. Hồ Chí Minh</option>
@@ -109,7 +109,7 @@ export default function SearchPage() {
                         <select
                             value={selectedGenre}
                             onChange={(e) => { setSelectedGenre(e.target.value); setTimeout(applyFilters, 0); }}
-                            className="w-full border border-gray-200 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 text-slate-700 outline-none focus:border-primary"
+                            className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 outline-none focus:border-primary"
                         >
                             <option value="">Tất cả danh mục</option>
                             <option value="Pop / Concert">Pop / Concert</option>
@@ -125,7 +125,7 @@ export default function SearchPage() {
                         <select
                             value={sortBy}
                             onChange={(e) => { setSortBy(e.target.value); setTimeout(applyFilters, 0); }}
-                            className="w-full border border-gray-200 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 text-slate-700 outline-none focus:border-primary"
+                            className="w-full border border-gray-200 dark:border-white/10 rounded-xl p-2.5 text-xs font-semibold bg-slate-50 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 outline-none focus:border-primary"
                         >
                             <option value="newest">Mới nhất</option>
                             <option value="upcoming">Sắp diễn ra gần nhất</option>
@@ -145,11 +145,11 @@ export default function SearchPage() {
                     {isLoading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 animate-pulse">
                             {[1, 2, 3].map((n) => (
-                                <div key={n} className="bg-gray-200 h-80 rounded-2xl"></div>
+                                <div key={n} className="bg-gray-200 dark:bg-slate-700/70 h-80 rounded-2xl"></div>
                             ))}
                         </div>
                     ) : eventsList.length === 0 ? (
-                        <div className="w-full bg-white border border-gray-200 rounded-2xl p-12 text-center text-slate-400 font-medium italic text-sm">
+                        <div className="w-full bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-2xl p-12 text-center text-slate-400 font-medium italic text-sm">
                             Không tìm thấy sự kiện nào khớp với bộ lọc hiện tại. Vui lòng đổi từ khóa khác!
                         </div>
                     ) : (
@@ -158,10 +158,10 @@ export default function SearchPage() {
                                 <div
                                     key={event._id}
                                     onClick={() => navigate(`/events/${event._id}`)}
-                                    className="bg-white border border-gray-200 rounded-[24px] overflow-hidden hover:border-[#4C4DCC]/40 cursor-pointer transition-all flex flex-col group"
+                                    className="bg-white dark:bg-slate-900/90 border border-gray-200 dark:border-white/10 rounded-[24px] overflow-hidden hover:border-[#4C4DCC]/40 cursor-pointer transition-all flex flex-col group"
                                 >
                                     {/* KHU VỰC KHUNG ẢNH BANNER POSTER 3:4 NGHIÊM NGẶT */}
-                                    <div className="w-full aspect-[3/4] bg-slate-100 overflow-hidden relative">
+                                    <div className="w-full aspect-[3/4] bg-slate-100 dark:bg-slate-800/80 overflow-hidden relative">
                                         {event.poster_url ? (
                                             <img
                                                 src={event.poster_url}
@@ -172,7 +172,7 @@ export default function SearchPage() {
                                             <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon size={32} /></div>
                                         )}
                                         {/* Tag thể loại góc trên ảnh */}
-                                        <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-100">
+                                        <span className="absolute top-3 left-3 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm text-slate-800 dark:text-slate-100 text-[10px] font-bold px-2 py-0.5 rounded-full border border-slate-100 dark:border-white/10">
                                             {event.genre}
                                         </span>
                                     </div>
@@ -180,7 +180,7 @@ export default function SearchPage() {
                                     {/* NỘI DUNG CHỮ DƯỚI CHÂN CARD */}
                                     <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                                         <div className="space-y-1">
-                                            <h3 className="font-bold text-slate-800 text-sm leading-snug group-hover:text-[#4C4DCC] transition-colors line-clamp-2">
+                                            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug group-hover:text-[#4C4DCC] transition-colors line-clamp-2">
                                                 {event.name}
                                             </h3>
                                             {event.artists && (
@@ -191,7 +191,7 @@ export default function SearchPage() {
                                         </div>
 
                                         {/* Mốc thời gian và Vùng thành phố tổ chức */}
-                                        <div className="pt-2.5 border-t border-slate-50 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                                        <div className="pt-2.5 border-t border-slate-50 dark:border-white/10 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                                             <div className="flex items-center gap-1">
                                                 <Calendar size={13} className="text-slate-400" />
                                                 <span>{new Date(event.start_date).toLocaleDateString('vi-VN')}</span>

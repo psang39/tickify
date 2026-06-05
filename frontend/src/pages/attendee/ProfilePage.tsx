@@ -188,7 +188,7 @@ function PasswordField({
                 value={value}
                 onChange={onChange}
                 autoComplete="new-password"
-                className="border border-neutral-base/10 rounded-xl p-3.5 bg-white text-sm font-medium focus:outline-none focus:border-primary text-neutral-dark"
+                className="border border-neutral-base/10 rounded-xl p-3.5 bg-white dark:bg-slate-900/90 text-sm font-medium focus:outline-none focus:border-primary text-neutral-dark"
             />
         </div>
     );

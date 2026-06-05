@@ -132,23 +132,23 @@ export const WaitingRoomPage = () => {
         : 5;
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans">
-            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden p-8 text-center border border-slate-100">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900/80 flex flex-col items-center justify-center p-4 font-sans">
+            <div className="max-w-md w-full bg-white dark:bg-slate-900/90 rounded-2xl shadow-xl overflow-hidden p-8 text-center border border-slate-100 dark:border-white/10">
 
                 {phase === 'LOADING' && (
                     <div className="flex flex-col items-center animate-pulse">
-                        <div className="w-16 h-16 border-4 border-slate-200 border-t-pink-500 rounded-full animate-spin mb-4"></div>
-                        <h2 className="text-xl font-bold text-slate-800">Đang kết nối hệ thống...</h2>
+                        <div className="w-16 h-16 border-4 border-slate-200 dark:border-white/10 border-t-pink-500 rounded-full animate-spin mb-4"></div>
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Đang kết nối hệ thống...</h2>
                     </div>
                 )}
 
                 {phase === 'COUNTDOWN' && (
                     <div className="flex flex-col items-center">
-                        <div className="bg-slate-100 p-4 rounded-full mb-6">
+                        <div className="bg-slate-100 dark:bg-slate-800/80 p-4 rounded-full mb-6">
                             <span className="text-4xl">⏳</span>
                         </div>
-                        <h2 className="text-2xl font-black text-slate-800 mb-2">Phòng chờ sắp mở</h2>
-                        <p className="text-slate-500 mb-6">Hệ thống sẽ tự động đưa bạn vào hàng đợi khi đồng hồ điểm 0.</p>
+                        <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Phòng chờ sắp mở</h2>
+                        <p className="text-slate-500 dark:text-slate-400 mb-6">Hệ thống sẽ tự động đưa bạn vào hàng đợi khi đồng hồ điểm 0.</p>
                         <div className="text-5xl font-mono font-bold text-pink-600 bg-pink-50 py-4 px-8 rounded-xl border border-pink-100 shadow-inner">
                             {formatTime(timeLeftMs)}
                         </div>
@@ -157,12 +157,12 @@ export const WaitingRoomPage = () => {
 
                 {phase === 'IN_QUEUE' && (
                     <div className="flex flex-col items-center">
-                        <h2 className="text-2xl font-black text-slate-800 mb-2">Bạn đang trong hàng đợi</h2>
-                        <p className="text-sm text-slate-500 mb-8 px-4">
+                        <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Bạn đang trong hàng đợi</h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 px-4">
                             Vui lòng không tải lại trang. Hệ thống sẽ tự động chuyển hướng khi đến lượt bạn.
                         </p>
 
-                        <div className="w-full bg-slate-100 h-4 rounded-full mb-4 overflow-hidden shadow-inner">
+                        <div className="w-full bg-slate-100 dark:bg-slate-800/80 h-4 rounded-full mb-4 overflow-hidden shadow-inner">
                             <div
                                 className="h-full bg-emerald-500 transition-all duration-1000 ease-out rounded-full"
                                 style={{ width: `${progressPercent}%` }}
@@ -170,13 +170,13 @@ export const WaitingRoomPage = () => {
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 w-full mb-6">
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div className="bg-slate-50 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-100 dark:border-white/10">
                                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Số thứ tự của bạn</p>
-                                <p className="text-3xl font-black text-slate-800">{currentPosition}</p>
+                                <p className="text-3xl font-black text-slate-800 dark:text-slate-100">{currentPosition}</p>
                             </div>
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div className="bg-slate-50 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-100 dark:border-white/10">
                                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Thời gian chờ</p>
-                                <p className="text-lg font-bold text-slate-700 mt-2">{estimatedWait}</p>
+                                <p className="text-lg font-bold text-slate-700 dark:text-slate-200 mt-2">{estimatedWait}</p>
                             </div>
                         </div>
                     </div>
@@ -188,15 +188,15 @@ export const WaitingRoomPage = () => {
                             <span className="text-4xl"></span>
                         </div>
                         <h2 className="text-2xl font-black text-emerald-600 mb-2">Đã đến lượt bạn!</h2>
-                        <p className="text-slate-500">Đang đưa bạn đến sơ đồ ghế...</p>
+                        <p className="text-slate-500 dark:text-slate-400">Đang đưa bạn đến sơ đồ ghế...</p>
                     </div>
                 )}
 
                 {phase === 'ERROR' && (
                     <div className="flex flex-col items-center">
                         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6 text-red-500 text-3xl font-bold">!</div>
-                        <h2 className="text-xl font-bold text-slate-800 mb-2">Đã có lỗi xảy ra</h2>
-                        <p className="text-slate-500 mb-6">{errorMessage}</p>
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Đã có lỗi xảy ra</h2>
+                        <p className="text-slate-500 dark:text-slate-400 mb-6">{errorMessage}</p>
                         <button
                             onClick={() => joinMutation.mutate()}
                             className="bg-slate-800 text-white px-6 py-3 rounded-lg font-bold hover:bg-slate-700 transition-colors w-full"

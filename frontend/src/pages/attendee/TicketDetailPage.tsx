@@ -131,7 +131,7 @@ export default function TicketDetailPage() {
     const isTicketUsable = ticketStatus === 'VALID';
 
     return (
-        <div className="min-h-screen font-sans text-slate-900  flex flex-col items-center justify-center">
+        <div className="min-h-screen font-sans text-slate-900 dark:text-slate-50  flex flex-col items-center justify-center">
             <ErrorModal message={errorMessage} onClose={() => setErrorMessage(null)} />
 
             {/* THANH ĐIỀU HƯỚNG QUAY LẠI ĐƠN HÀNG */}
@@ -139,14 +139,14 @@ export default function TicketDetailPage() {
                 <Button
                     variant="ghost"
                     onClick={() => navigate(`/orders/detail?order_id=${ticketDetail.order_id}`)}
-                    className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-primary transition-colors group"
+                    className="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-primary transition-colors group"
                 >
                     <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" /> Quay lại chi tiết đơn hàng
                 </Button>
             </div>
 
             {/* TẤM VÉ HAI PHẦN ĐỈNH CAO (MÔ PHỎNG THEO IMAGE_26F1EA.JPG) */}
-            <div className="w-full max-w-4xl bg-white rounded-[24px] border border-slate-200 overflow-hidden flex flex-col md:flex-row relative shadow-none">
+            <div className="w-full max-w-4xl bg-white dark:bg-slate-900/90 rounded-[24px] border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col md:flex-row relative shadow-none">
 
                 {/* ------------------- PHẦN 1: MAIN STUB (THÂN VÉ CHÍNH - CHIẾM 2/3) ------------------- */}
                 <div className="flex-1 p-8 relative flex flex-col justify-between min-h-[340px] overflow-hidden bg-slate-900">
@@ -178,10 +178,10 @@ export default function TicketDetailPage() {
                         </div>
 
                         {/* KHU VỰC CỤM MÃ QR ĐỘNG XOAY VÒNG */}
-                        <div className="bg-white p-4 rounded-2xl flex flex-col items-center shrink-0 mx-auto md:mx-0 min-w-[190px]">
+                        <div className="bg-white dark:bg-slate-900/90 p-4 rounded-2xl flex flex-col items-center shrink-0 mx-auto md:mx-0 min-w-[190px]">
                             {isTicketUsable ? (
                                 <>
-                                    <div className="p-1 bg-white relative">
+                                    <div className="p-1 bg-white dark:bg-slate-900/90 relative">
                                         <QRCodeSVG value={qrPayload || ticketDetail._id} size={150} level="M" includeMargin={false} />
                                     </div>
 
@@ -193,7 +193,7 @@ export default function TicketDetailPage() {
                                                 {timeLeft} GIÂY
                                             </span>
                                         </div>
-                                        <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                                        <div className="w-full h-1 bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden">
                                             <div
                                                 className={`h-full transition-all duration-1000 ease-linear rounded-full ${timeLeft <= 5 ? 'bg-red-500' : 'bg-primary'}`}
                                                 style={{ width: progressWidth }}
@@ -202,10 +202,10 @@ export default function TicketDetailPage() {
                                     </div>
                                 </>
                             ) : (
-                                <div className="w-[150px] h-[150px] rounded-xl border border-slate-200 bg-slate-50 flex flex-col items-center justify-center text-center p-4">
-                                    <StatusIcon size={36} className={ticketStatus === 'USED' ? 'text-slate-500 mb-2' : 'text-red-500 mb-2'} />
-                                    <p className="text-sm font-black text-slate-800">{statusConfig.label}</p>
-                                    <p className="text-[11px] text-slate-500 mt-1 leading-snug">Không còn hiển thị QR</p>
+                                <div className="w-[150px] h-[150px] rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/80 flex flex-col items-center justify-center text-center p-4">
+                                    <StatusIcon size={36} className={ticketStatus === 'USED' ? 'text-slate-500 dark:text-slate-400 mb-2' : 'text-red-500 mb-2'} />
+                                    <p className="text-sm font-black text-slate-800 dark:text-slate-100">{statusConfig.label}</p>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">Không còn hiển thị QR</p>
                                 </div>
                             )}
                         </div>
@@ -220,7 +220,7 @@ export default function TicketDetailPage() {
                     </div>
 
                     {/* Hiệu ứng đục lỗ cắt góc vé răng cưa tại điểm nối */}
-                    <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-slate-200 hidden md:block z-20"></div>
+                    <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-slate-200 dark:border-white/10 hidden md:block z-20"></div>
                 </div>
 
                 {/* ĐƯỜNG RÃNH XÉ VÉ NÉT ĐỨT PHÂN TÁCH */}
@@ -230,7 +230,7 @@ export default function TicketDetailPage() {
                 <div className="w-full md:w-1/3 bg-gradient-to-br from-blue-700 to-indigo-900 p-8 text-white flex flex-col justify-between min-h-[300px] md:min-h-auto relative">
 
                     {/* Đục lỗ đối xứng cuống vé bên phải */}
-                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-slate-200 hidden md:block z-20"></div>
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#F8F9FA] rounded-full border border-slate-200 dark:border-white/10 hidden md:block z-20"></div>
 
                     <div className="space-y-4">
                         <div className="flex justify-between items-start">

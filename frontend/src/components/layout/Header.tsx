@@ -14,7 +14,7 @@ export default function Header() {
     };
 
     return (
-        <header className="w-full bg-white py-4 px-8 shadow-sm flex items-center justify-between sticky top-0 z-50 font-sans">
+        <header className="w-full bg-white dark:bg-slate-900/90 py-4 px-8 shadow-sm flex items-center justify-between sticky top-0 z-50 font-sans">
             <Link to="/" className="text-3xl font-black tracking-tight bg-gradient-to-r from-purple-700 via-pink-500 to-pink-400 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
                 Tickify
             </Link>
@@ -25,7 +25,7 @@ export default function Header() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    className="w-full bg-gray-100/80 text-gray-700 rounded-full py-2.5 px-5 pl-5 pr-12 outline-none focus:bg-gray-100 focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+                    className="w-full bg-gray-100/80 text-gray-700 dark:text-slate-200 rounded-full py-2.5 px-5 pl-5 pr-12 outline-none focus:bg-gray-100 focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
                 />
                 <Search
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-primary"
@@ -35,14 +35,14 @@ export default function Header() {
             </div>
             <div className="flex items-center gap-6">
                 {(!user || user.role === 'Attendee') && (
-                    <Link to="/orders" className="flex items-center gap-2 text-gray-600 hover:text-primary font-bold text-sm transition-colors">
+                    <Link to="/orders" className="flex items-center gap-2 text-gray-600 dark:text-slate-300 hover:text-primary font-bold text-sm transition-colors">
                         <Ticket size={18} />
                         <span>Lịch sử đặt vé</span>
                     </Link>
                 )}
 
                 {/* CHỌN NGÔN NGỮ GIỮ NGUYÊN */}
-                <button className="flex items-center gap-1 border border-gray-300 rounded-full px-3 py-1.5 text-gray-700 text-xs font-bold hover:border-gray-400 transition-colors bg-white">
+                <button className="flex items-center gap-1 border border-gray-300 rounded-full px-3 py-1.5 text-gray-700 dark:text-slate-200 text-xs font-bold hover:border-gray-400 transition-colors bg-white dark:bg-slate-900/90">
                     VN <ChevronDown size={14} />
                 </button>
 
@@ -59,7 +59,7 @@ export default function Header() {
                     <div className="flex items-center gap-3">
                         {user?.role === 'Attendee' ? (
                             <Link to="/profile">
-                                <button className="bg-gray-100 hover:bg-gray-200 text-gray-800 flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors border-none cursor-pointer">
+                                <button className="bg-gray-100 dark:bg-slate-800/80 hover:bg-gray-200 text-gray-800 dark:text-slate-100 flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors border-none cursor-pointer">
                                     <User size={16} />
                                     <span>Hồ sơ</span>
                                 </button>
