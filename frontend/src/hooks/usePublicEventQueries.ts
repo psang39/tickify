@@ -1,12 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient';
 
+const unwrapApiPayload = (payload: any) => {
+    const value = payload?.data || payload?.docs || payload;
+    if (typeof value === 'string') {
+        try {
+            return JSON.parse(value);
+        } catch (_error) {
+            return value;
+        }
+    }
+    return value;
+};
+
 export const usePublicEvents = (params: Record<string, any> = {}) => {
     return useQuery({
         queryKey: ['public-events', params],
         queryFn: async () => {
             const response = await api.get('/events/search', { params });
-            return response.data?.data || response.data?.docs || response.data || [];
+            return unwrapApiPayload(response.data) || [];
         }
     });
 };
@@ -17,7 +29,7 @@ export const usePublicEventDetail = (eventId?: string) => {
         enabled: Boolean(eventId),
         queryFn: async () => {
             const response = await api.get(`/events/${eventId}`);
-            return response.data?.data || response.data;
+            return unwrapApiPayload(response.data);
         }
     });
 };

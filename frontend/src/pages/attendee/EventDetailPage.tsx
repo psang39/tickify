@@ -1,5 +1,5 @@
 import { getShowAvailability } from '@/lib/showAvailability';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, ImageIcon, MapPin, Music2, Ticket } from 'lucide-react';
 import { usePublicEventDetail, usePublicEventShows, usePublicEvents } from '@/hooks/usePublicEventQueries';
@@ -38,6 +38,11 @@ export default function EventDetailPage() {
     const { data: event, isLoading } = usePublicEventDetail(eventId);
     const { data: showsResponse, isLoading: isShowsLoading } = usePublicEventShows(eventId, page, 4);
     const { data: suggestions = [] } = usePublicEvents({ limit: 4, sort: 'upcoming' });
+
+    useEffect(() => {
+        setPage(1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [eventId]);
 
     const shows = showsResponse?.docs || showsResponse?.data || [];
     const totalPages = showsResponse?.totalPages || showsResponse?.pagination?.totalPages || 1;
