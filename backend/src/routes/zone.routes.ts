@@ -9,7 +9,7 @@ const zoneRouter = express.Router({ mergeParams: true });
 
 zoneRouter.get('/:zone_id', verifyCheckoutToken, getZoneById);
 
-zoneRouter.put('/:zone_id', Verify, verifyRoles(['admin', 'organizer']), [
+zoneRouter.put('/:zone_id', Verify, verifyRoles(['Admin', 'admin', 'Organizer', 'organizer']), [
     body('name').optional().notEmpty().withMessage('Name cannot be empty'),
 ], Validate, updateZone);
 

@@ -31,15 +31,12 @@ export const handleMockPaymentWebhook = async (req: Request, res: Response): Pro
             return;
         }
 
-        // Không hủy đơn ngay khi thanh toán fail. Giữ pending để user retry trong thời gian giữ chỗ.
         if (status !== 'SUCCESS') {
             if (new Date() > new Date(order.cancellation_deadline)) {
                 order.status = 'cancelled';
                 await order.save();
             }
 
-            // Không tạo Payment confirmed/failed ở đây để tránh conflict nếu Payment.order_id đang unique.
-            // Nếu muốn lưu lịch sử từng lần thử, nên tạo model riêng PaymentAttempt.
 
             res.status(200).json({
                 message: 'Payment failed, order is still retryable if not expired',

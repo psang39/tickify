@@ -99,9 +99,6 @@ export const startAdminDashboardThrottler = (event_id: string, show_id: string) 
 
       const dashboardData = {
         timestamp: new Date().toISOString(),
-        // Backward compatible field. Old frontend reads holdingCount.
-        // It now means number of distinct users who are actively holding seats,
-        // not raw size of the Redis holding_seats set.
         holdingCount: holdingUserCount,
         holdingUserCount,
         holdingSeatCount,

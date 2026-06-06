@@ -15,6 +15,7 @@ import waitingRoomRouter from './waiting-room.routes';
 import webhookRouter from './webhook.routes';
 import zoneRouter from './zone.routes';
 import staffRouter from './staff.routes';
+import seatRouter from './seat.routes';
 import { Verify, verifyRoles } from '../middleware/auth.middleware';
 
 const router = Express.Router();
@@ -39,6 +40,7 @@ router.use('/waiting-room', waitingRoomRouter);
 router.use('/admin', Verify, verifyRoles(['admin', 'Admin']), adminRoutes);
 router.use('/venues', venueRoutes);
 router.use('/zones', zoneRouter);
+router.use('/seats', seatRouter);
 router.use('/payments', paymentRouter);
 router.use('/webhooks', webhookRouter);
 router.use('/staff', staffRouter);

@@ -24,7 +24,7 @@ const holdSeatsLuaScript = `
     local userId = ARGV[2]
 
     -- 1. KIỂM TRA GIỚI HẠN VÉ CỦA USER (Tối đa 4 vé)
-    local numSeats = #KEYS - 2 -- Số lượng ghế đang muốn giữ ở request này
+    local numSeats = #KEYS - 2 
     local currentHeldCount = tonumber(redis.call('GET', userCountKey) or 0)
 
     if currentHeldCount + numSeats > 4 then
@@ -126,10 +126,6 @@ const rollbackLuaScript = `
     local userId = ARGV[1]
     local numSeats = tonumber(ARGV[2]) or 0
 
-    -- KEYS layout:
-    -- KEYS[1] = user held_count key
-    -- KEYS[2..numSeats+1] = seat lock keys
-    -- KEYS[numSeats+2..end] = row keys cần restore
 
     -- 1. Giải phóng lock ghế, chỉ xóa nếu lock đúng là của user này.
     for i = 1, numSeats do
@@ -283,23 +279,23 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
     }
 
     const targetShow = await Show.findById(show_id)
-      .select('event_id status sale_start sale_end start_time end_time')
-      .lean();
+        .select('event_id status sale_start sale_end start_time end_time')
+        .lean();
 
     if (!targetShow) {
-      res.status(404).json({ message: 'Show diễn không tồn tại.' });
-      return;
+        res.status(404).json({ message: 'Show diễn không tồn tại.' });
+        return;
     }
 
     if (String((targetShow as any).event_id) !== String(event_id)) {
-      res.status(400).json({ message: 'Checkout token không khớp với show hiện tại.' });
-      return;
+        res.status(400).json({ message: 'Checkout token không khớp với show hiện tại.' });
+        return;
     }
 
     const availability = computeShowAvailability(targetShow);
     if (!availability.is_bookable) {
-      res.status(403).json({ message: availability.booking_message, availability });
-      return;
+        res.status(403).json({ message: availability.booking_message, availability });
+        return;
     }
 
     const seat_ids = items.map(item => item.seat_id);

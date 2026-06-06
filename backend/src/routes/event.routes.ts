@@ -9,7 +9,7 @@ const eventRouter = express.Router();
 
 eventRouter.get('/search', searchEventsPublic);
 eventRouter.get('/', getEvents);
-eventRouter.post('/', Verify, verifyRoles(['admin', 'organizer']), [
+eventRouter.post('/', Verify, verifyRoles(['Admin', 'admin', 'Organizer', 'organizer']), [
     body('name').notEmpty().withMessage('Name is required'),
     body('description').notEmpty().withMessage('Description is required'),
 ], Validate, createEvent);

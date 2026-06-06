@@ -7,8 +7,8 @@ const TicketTypeSchema: Mongoose.Schema = new Mongoose.Schema<ITicketType>({
     target_tier: { type: String, required: true },
     description: { type: String },
     price: { type: Number, required: true },
-    is_limited_promo: { type: Boolean, default: false }, // Đánh dấu đây có phải vé giới hạn không
-    total_quantity: { type: Number, default: null },     // Khuyến khích để null nếu phụ thuộc vào ghế
+    is_limited_promo: { type: Boolean, default: false },
+    total_quantity: { type: Number, default: null },
     sold_quantity: { type: Number, default: 0 },
     sale_start: { type: Date, required: true },
     sale_end: { type: Date, required: true },

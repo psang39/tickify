@@ -14,7 +14,6 @@ const redisClient = createClient({
 redisClient.on('error', err => console.log('Redis Client Error:', err.message));
 redisClient.on('ready', () => console.log('Redis Labs đã sẵn sàng!'));
 
-// Hàm này sẽ được gọi ở server.ts
 export const connectRedis = async () => {
     try {
         if (!redisClient.isOpen) {

@@ -15,7 +15,7 @@ export default function PaymentResultPage() {
     const { data: result, isLoading } = useQuery({
         queryKey: ['payment-result', orderId],
         queryFn: async () => {
-            const response = await api.get(`/payments/result/${orderId}`);
+            const response = await api.get(`/orders/${orderId}/payment-result`);
             return response.data?.data || response.data;
         },
         enabled: !!orderId,

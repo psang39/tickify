@@ -5,7 +5,7 @@ const OrderItemSchema = new Mongoose.Schema<IOrderItem>({
     seat_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Seat', required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
-    ticket_type: { type: String, required: true }, // e.g., 'adult', 'child', 'vip'
+    ticket_type: { type: String, required: true },
 });
 
 const OrderItem = Mongoose.model('OrderItem', OrderItemSchema);

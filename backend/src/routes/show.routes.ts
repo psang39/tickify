@@ -13,7 +13,7 @@ const showRouter = express.Router({ mergeParams: true });
 showRouter.get('/:show_id', getShowById);
 showRouter.get('/:show_id/zones', verifyCheckoutToken, getZonesByEvent);
 
-showRouter.post('/:show_id/zones', Verify, verifyRoles(['admin', 'organizer']), [
+showRouter.post('/:show_id/zones', Verify, verifyRoles(['Admin', 'admin', 'Organizer', 'organizer']), [
     body('name').notEmpty().withMessage('Name is required'),
     body('event_id').notEmpty().withMessage('Event ID is required'),
     body('show_id').notEmpty().withMessage('Show ID is required'),

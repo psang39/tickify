@@ -87,11 +87,9 @@ export const checkZoneAvailability = async (req: Request, res: Response) => {
         const { showId } = req.query;
         const requestedQty = parseInt(req.query.qty as string) || 1;
 
-        // 1. Chỉ mất 0.001s để lấy con số này từ Redis
         const availableCountStr = await redisClient.get(`event:${event_id}:show:${show_id}:zone:${zone_id}:available`);
         const availableCount = typeof availableCountStr === "string" ? parseInt(availableCountStr, 10) : 0;
 
-        // 2. Trả kết quả về cho Frontend
         if (availableCount >= requestedQty) {
             res.status(200).json({ isAvailable: true, availableCount });
         } else {

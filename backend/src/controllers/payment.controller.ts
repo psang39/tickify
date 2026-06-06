@@ -156,6 +156,9 @@ export const getPaymentResult = async (req: Request, res: Response): Promise<voi
                 eventId: order.event_id,
                 status: order.status,
                 email: order.purchaser_email,
+                purchaserName: order.purchaser_name,
+                purchaserPhone: order.purchaser_phone,
+                purchaserEmail: order.purchaser_email,
                 totalPrice: order.total_price,
                 cancellationDeadline: order.cancellation_deadline,
                 canRetry: order.status === 'pending' && new Date() <= new Date(order.cancellation_deadline)

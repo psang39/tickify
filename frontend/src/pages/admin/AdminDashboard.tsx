@@ -154,8 +154,8 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Tổng Tài khoản" value={statsData?.totalUsers?.toLocaleString() || 0} icon={<Users size={24} className="text-blue-500" />} bg="bg-blue-50" />
-                <StatCard title="Sự kiện Active" value={statsData?.totalActiveEvents?.toLocaleString() || 0} icon={<Ticket size={24} className="text-emerald-500" />} bg="bg-emerald-50" />
-                <StatCard title="Sự kiện chờ duyệt" value={statsData?.totalPendingEvents?.toLocaleString() || 0} icon={<CalendarClock size={24} className="text-amber-500" />} bg="bg-amber-50" />
+                <StatCard title="Sự kiện công khai" value={statsData?.totalActiveEvents?.toLocaleString() || 0} icon={<Ticket size={24} className="text-emerald-500" />} bg="bg-emerald-50" />
+                <StatCard title="Sự kiện bản nháp" value={statsData?.totalPendingEvents?.toLocaleString() || 0} icon={<CalendarClock size={24} className="text-amber-500" />} bg="bg-amber-50" />
                 <StatCard title="Tổng Doanh thu" value={new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(statsData?.totalSystemRevenue || 0)} icon={<DollarSign size={24} className="text-primary" />} bg="bg-pink-50" />
             </div>
 

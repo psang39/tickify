@@ -16,9 +16,6 @@ const allowedOrigins = Array.from(new Set([
     // Production domain
     'https://tickify.tech',
     'https://www.tickify.tech',
-
-    // Keep HTTP while the domain is not fully switched to SSL yet.
-    // After HTTPS works, you can remove these two lines.
     'http://tickify.tech',
     'http://www.tickify.tech',
 
@@ -42,7 +39,6 @@ const allowedOrigins = Array.from(new Set([
 
 const corsOptions: cors.CorsOptions = {
     origin: (origin, callback) => {
-        // Allow requests without Origin, e.g. mobile app, Postman, curl, server-to-server webhook.
         if (!origin) {
             return callback(null, true);
         }

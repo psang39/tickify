@@ -4,5 +4,7 @@ import { Verify, verifyRoles, verifyCheckoutToken } from '../middleware/auth.mid
 const seatRouter = express.Router();
 
 seatRouter.get('/:seat_id', verifyCheckoutToken, getSeatById);
-seatRouter.put('/:seat_id/block', Verify, verifyRoles(['admin', 'organizer']), blockSeat);
-seatRouter.put('/:seat_id/unblock', Verify, verifyRoles(['admin', 'organizer']), unblockSeat);
+seatRouter.put('/:seat_id/block', Verify, verifyRoles(['Admin', 'admin', 'Organizer', 'organizer']), blockSeat);
+seatRouter.put('/:seat_id/unblock', Verify, verifyRoles(['Admin', 'admin', 'Organizer', 'organizer']), unblockSeat);
+
+export default seatRouter;

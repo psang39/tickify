@@ -3,7 +3,7 @@ import crypto from "crypto";
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 const DEFAULT_TOTP_PERIOD_SECONDS = 30;
 const DEFAULT_TOTP_DIGITS = 6;
-const DEFAULT_TOTP_WINDOW = 2; // Cho phép lệch tối đa khoảng ±60s giữa web/server/app scanner.
+const DEFAULT_TOTP_WINDOW = 2;
 
 export const generateTicketSecret = (length: number = 20): string => {
     let secret = '';

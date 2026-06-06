@@ -74,10 +74,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         isAuthenticated &&
         user?.role === 'Organizer';
 
-    /**
-     * Backend nên trả is_verified vào user khi login/getMe/refresh profile.
-     * Với organizer mới đăng ký, is_verified mặc định false.
-     */
+
     const isOrganizerNotVerified =
         shouldCheckOrganizerVerification && user?.is_verified === false;
 

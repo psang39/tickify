@@ -14,7 +14,7 @@ const connection = new IORedis(REDIS_URL || 'redis://127.0.0.1:6379', {
 
 const releaseSeatsLuaScript = `
     local rowKey = KEYS[1]
-    local userCountKey = KEYS[2] -- Thêm Key đếm vé của user
+    local userCountKey = KEYS[2] 
     
     -- Lấy chuỗi hiện tại
     local rowStr = redis.call('GET', rowKey)
@@ -27,7 +27,6 @@ const releaseSeatsLuaScript = `
     end
 
     -- Đổi chữ 'H' thành 'O' ở ĐÚNG VỊ TRÍ col_index
-    -- Độ dài của ARGV chính là số ghế cần nhả trong hàng này!
     local numSeatsToRelease = #ARGV
     for i = 1, numSeatsToRelease do
         local colIndex = tonumber(ARGV[i])
@@ -43,7 +42,6 @@ const releaseSeatsLuaScript = `
     redis.call('SET', rowKey, newRowStr)
 
     -- Xóa các Key khóa ghế (Lock)
-    -- Chú ý: Bắt đầu vòng lặp từ 3 vì KEYS[1] là row, KEYS[2] là userCount
     for i = 3, #KEYS do
         redis.call('DEL', KEYS[i])
     end
@@ -64,7 +62,7 @@ const releaseSeatsLuaScript = `
     return newRowStr
 `;
 
-// 1. Khởi tạo hàng đợi
+
 export const orderExpirationQueue = new Queue('order-expiration', {
     connection,
     defaultJobOptions: {
@@ -77,7 +75,6 @@ export const orderExpirationQueue = new Queue('order-expiration', {
     }
 });
 
-// 2. Định nghĩa Worker
 const worker = new Worker('order-expiration', async (job: Job) => {
     const { order_id, event_id, zone_id, show_id, seat_ids } = job.data;
     console.log(`[BullMQ] Bắt đầu kiểm tra đơn hàng quá hạn: ${order_id}`);
@@ -150,7 +147,6 @@ const worker = new Worker('order-expiration', async (job: Job) => {
                 }));
             }
 
-            // Bắn SSE update toàn bộ Zone Summary
             const updatedHash = await redisClient.hGetAll(summaryKey);
             await redisClient.publish('ZONE_SUMMARY_UPDATES', JSON.stringify({
                 zone_id: zone_id,

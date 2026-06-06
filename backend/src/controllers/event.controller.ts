@@ -197,38 +197,54 @@ export const unpublishEvent = async (req: Request, res: Response) => {
     try {
         const { event_id } = req.params;
         const organizer_id = req.user!.id;
-        const event = await Event.findOne({ _id: event_id, organizer_id });
-        if (!event) return res.status(404).json({ message: "Sự kiện không tồn tại" });
+        const event = await Event.findOne({ _id: event_id, organizer_id }).session(session);
+
+        if (!event) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ message: "Sự kiện không tồn tại" });
+        }
+
         if (event.status !== 'published') {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({ message: "Chỉ có thể tạm dừng khi sự kiện đang hiển thị Công khai." });
         }
-        const hasSoldTickets = await Order.exists({
+
+        const hasPaidOrHoldingOrder = await Order.exists({
             event_id,
-            status: { $in: ['completed', 'reserved'] }
-        });
-        if (hasSoldTickets) {
+            status: { $in: ['pending', 'confirmed'] }
+        }).session(session);
+
+        if (hasPaidOrHoldingOrder) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({
-                message: "Không thể hạ trạng thái Sự kiện! Một hoặc nhiều đêm diễn bên trong đã phát sinh giao dịch đặt vé thực tế."
+                message: "Không thể hạ trạng thái Sự kiện! Một hoặc nhiều đêm diễn bên trong đã phát sinh đơn giữ chỗ hoặc giao dịch vé."
             });
         }
+
         event.status = 'draft';
         await event.save({ session });
-        const publishedShows = await Show.find({ event_id, status: 'published' }).select('_id');
+
+        const publishedShows = await Show.find({ event_id, status: 'published' }).select('_id').session(session);
         if (publishedShows.length > 0) {
             const showIds = publishedShows.map(s => s._id);
             await Show.updateMany({ _id: { $in: showIds } }, { status: 'draft' }, { session });
             const pipeline = redisClient.multi();
             for (const showId of showIds) {
-                const zones = await Zone.find({ show_id: showId }).select('_id');
+                const zones = await Zone.find({ show_id: showId }).select('_id').session(session);
                 zones.forEach(zone => {
                     const summaryKey = `event:${event_id}:show:${showId}:zone:${zone._id}:summary`;
                     pipeline.del(summaryKey);
                 });
                 pipeline.del(`show:${showId}:ticket_types`);
                 pipeline.del(`show:${showId}:seats_static_layout`);
+                pipeline.del(`show:${showId}:seat_status`);
             }
             await pipeline.exec();
         }
+
         await session.commitTransaction();
         session.endSession();
         res.status(200).json({ message: "Đã tạm dừng sự kiện và hạ toàn bộ các đêm diễn liên quan về dạng bản nháp." });
