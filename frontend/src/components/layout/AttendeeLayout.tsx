@@ -5,6 +5,7 @@ import { api } from '@/lib/axiosClient';
 import { User, ShoppingBag, Gift, Settings, HelpCircle, LogOut } from 'lucide-react';
 import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 import { ErrorModal } from '@/components/shared/ErrorModal';
+import { LogoutConfirmDialog } from '@/components/shared/LogoutConfirmDialog';
 
 export default function AttendeeLayout() {
     const navigate = useNavigate();
@@ -73,10 +74,10 @@ export default function AttendeeLayout() {
                     </div>
 
                     {/* Nút đăng xuất tài khoản */}
-                    <button className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-red-500 transition-colors font-semibold text-sm">
+                    <LogoutConfirmDialog className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-red-500 transition-colors font-semibold text-sm">
                         <LogOut size={18} />
                         <span>Đăng xuất</span>
-                    </button>
+                    </LogoutConfirmDialog>
                 </aside>
 
                 {/* KHU VỰC CHỨA NỘI DUNG TRANG CON BÊN PHẢI */}

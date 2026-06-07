@@ -21,7 +21,7 @@ export const BookingStepper = ({ currentStep = 2 }) => {
               {index !== 0 && (
                 <div
                   className={`absolute right-1/2 top-4 h-[2px] w-full -translate-y-1/2 z-0 ${
-                    step.id <= currentStep ? "bg-pink-500" : "bg-slate-300"
+                    step.id <= currentStep ? "bg-pink-500" : "bg-slate-300 dark:bg-slate-700"
                   }`}
                 />
               )}
@@ -31,8 +31,8 @@ export const BookingStepper = ({ currentStep = 2 }) => {
                   isDone
                     ? "bg-emerald-500 text-white"
                     : isActive
-                      ? "bg-pink-600 text-white ring-4 ring-pink-100"
-                      : "bg-slate-300 text-slate-600"
+                      ? "bg-pink-600 text-white ring-4 ring-pink-100 dark:ring-pink-500/20"
+                      : "border border-slate-300 bg-white text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
                 }`}
               >
                 {isDone ? <Check size={16} strokeWidth={3} /> : step.id}
@@ -40,7 +40,7 @@ export const BookingStepper = ({ currentStep = 2 }) => {
 
               <span
                 className={`mt-3 text-center text-xs font-medium sm:text-sm ${
-                  isActive ? "font-bold text-pink-600" : "text-slate-500"
+                  isActive ? "font-bold text-pink-600 dark:text-pink-300" : "text-slate-500 dark:text-slate-400"
                 }`}
               >
                 {step.label}

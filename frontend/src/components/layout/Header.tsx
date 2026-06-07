@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Ticket, ChevronDown, User, LayoutDashboard, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore'; // Import Store của bạn
+import { LogoutConfirmDialog } from '@/components/shared/LogoutConfirmDialog';
 
 export default function Header() {
     const navigate = useNavigate();
-    const { user, isAuthenticated, logout } = useAuthStore();
+    const { user, isAuthenticated } = useAuthStore();
     const [searchQuery, setSearchQuery] = useState('');
     const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchQuery.trim()) {
@@ -66,7 +67,7 @@ export default function Header() {
                             </Link>
                         ) : (
                             /* 2B. ADMIN / ORGANIZER: Hiện Trang quản trị điều hướng thẳng về hệ thống */
-                            <Link to={user?.role === 'Admin' ? '/admin/dashboard' : '/organizer/dashboard'}>
+                            <Link to={user?.role === 'Admin' ? '/admin' : '/organizer/dashboard'}>
                                 <button className="bg-[#4C4DCC] hover:bg-[#3b3ca3] text-white flex items-center gap-2 rounded-full px-5 py-2 text-sm font-bold transition-colors shadow-sm border-none cursor-pointer">
                                     <LayoutDashboard size={16} />
                                     <span>Trang quản trị</span>
@@ -75,13 +76,12 @@ export default function Header() {
                         )}
 
                         {/* Nút đăng xuất nhanh bên cạnh */}
-                        <button
-                            onClick={() => { if (window.confirm("Xác nhận đăng xuất khỏi hệ thống?")) logout(); }}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors border-none bg-transparent cursor-pointer"
+                        <LogoutConfirmDialog
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-full transition-colors border-none bg-transparent cursor-pointer"
                             title="Đăng xuất"
                         >
                             <LogOut size={16} />
-                        </button>
+                        </LogoutConfirmDialog>
                     </div>
                 )}
             </div>

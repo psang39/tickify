@@ -236,7 +236,7 @@ export default function TicketDetailPage() {
                         <div className="flex justify-between items-start">
                             <span className="text-[10px] font-black tracking-widest text-blue-200 uppercase">CUỐNG VÉ SOÁT RE-CHECK</span>
                             {/* Huy hiệu Badge Giá tiền hiển thị sang xịn mịn y mẫu */}
-                            <span className="bg-white dark:bg-white/10 text-white font-bold text-xs px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 font-mono">
+                            <span className="bg-white/95 text-indigo-900 dark:bg-white/10 dark:text-white font-bold text-xs px-2.5 py-1 rounded-md border border-white/60 dark:border-white/10 font-mono">
                                 {formatCurrency(ticketDetail.ticket_type_id?.price)}
                             </span>
                         </div>

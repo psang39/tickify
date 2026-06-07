@@ -1,13 +1,15 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { DollarSign, QrCode, Ticket, Users, AlertTriangle } from 'lucide-react';
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart } from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Pie, PieChart, Cell } from 'recharts';
 import { api } from '@/lib/axiosClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 const formatCurrency = (amount: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
 const formatDateTime = (value?: string) => value ? new Date(value).toLocaleString('vi-VN') : '-';
+
+const CHART_COLORS = ['#ec4899', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
 
 const resultLabel: Record<string, string> = {
     SUCCESS: 'Thành công',
@@ -112,11 +114,18 @@ export default function OrganizerDashboard() {
                         ) : (
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={revenueByShow} margin={{ top: 10, right: 20, bottom: 60, left: 10 }}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="show_name" angle={-20} textAnchor="end" interval={0} height={80} tick={{ fontSize: 12 }} />
-                                    <YAxis tickFormatter={(v) => `${Math.round(Number(v) / 1000000)}tr`} tick={{ fontSize: 12 }} />
-                                    <Tooltip formatter={(value: any) => formatCurrency(Number(value))} />
-                                    <Bar dataKey="revenue" radius={[8, 8, 0, 0]} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.22)" />
+                                    <XAxis dataKey="show_name" angle={-20} textAnchor="end" interval={0} height={80} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                                    <YAxis tickFormatter={(v) => `${Math.round(Number(v) / 1000000)}tr`} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                                    <Tooltip
+                                        formatter={(value: any) => formatCurrency(Number(value))}
+                                        contentStyle={{ borderRadius: 12, borderColor: 'rgba(148, 163, 184, 0.25)' }}
+                                    />
+                                    <Bar dataKey="revenue" radius={[8, 8, 0, 0]}>
+                                        {revenueByShow.map((item: any, index: number) => (
+                                            <Cell key={`revenue-${item.show_id || item.show_name || index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                        ))}
+                                    </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
                         )}
@@ -133,8 +142,12 @@ export default function OrganizerDashboard() {
                         ) : (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
-                                    <Pie dataKey="value" nameKey="name" data={checkInChartData} outerRadius={105} label />
-                                    <Tooltip />
+                                    <Pie dataKey="value" nameKey="name" data={checkInChartData} outerRadius={105} label>
+                                        {checkInChartData.map((item, index) => (
+                                            <Cell key={`checkin-${item.name}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip contentStyle={{ borderRadius: 12, borderColor: 'rgba(148, 163, 184, 0.25)' }} />
                                 </PieChart>
                             </ResponsiveContainer>
                         )}

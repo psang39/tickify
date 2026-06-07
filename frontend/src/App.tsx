@@ -32,6 +32,7 @@ import PaymentResultPage from '@/pages/attendee/PaymentResultPage';
 import SearchPage from '@/pages/attendee/SearchPage';
 import { useAuthStore } from '@/store/useAuthStore';
 import { FeedbackModalHost } from '@/components/shared/FeedbackModalHost';
+import { ScrollToTop } from '@/components/shared/ScrollToTop';
 
 import './App.css';
 
@@ -58,6 +59,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ScrollToTop />
         <FeedbackModalHost />
         <ThemeToggle variant="floating" />
         <Routes>

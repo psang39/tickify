@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/useAuthStore';
+import { LogoutConfirmDialog } from '@/components/shared/LogoutConfirmDialog';
 import {
     AlertTriangle,
     Building2,
@@ -14,7 +14,6 @@ import {
 export default function AdminLayout() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { logout } = useAuthStore();
     const currentPath = location.pathname;
 
     return (
@@ -66,11 +65,10 @@ export default function AdminLayout() {
                         </div>
 
                         <div className="border-t border-slate-100 dark:border-white/10 p-5">
-                            <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
-                                onClick={() => { if (window.confirm("Xác nhận đăng xuất khỏi hệ thống?")) logout(); }}>
+                            <LogoutConfirmDialog className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10">
                                 <LogOut size={18} />
                                 <span>Đăng xuất</span>
-                            </button>
+                            </LogoutConfirmDialog>
                         </div>
                     </div>
                 </aside>
