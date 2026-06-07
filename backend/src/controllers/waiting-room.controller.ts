@@ -104,14 +104,15 @@ export const joinWaitingRoom = async (req: Request, res: Response) => {
         }
 
         const saleStartTimeMs = times.saleStartMs!;
-        const position = await WaitingRoomService.joinQueue(show_id, user_id, saleStartTimeMs);
+        const result = await WaitingRoomService.joinWaitingRoom(show_id, user_id, saleStartTimeMs);
 
         res.status(200).json({
-            message: nowMs < saleStartTimeMs
-                ? 'Đã vào phòng chờ. Hệ thống sẽ xếp lượt ngẫu nhiên khi mở bán.'
+            message: result.status === 'WAITING_ROOM'
+                ? 'Đã vào phòng chờ. Số thứ tự sẽ được random khi bắt đầu mở bán.'
                 : 'Đã tham gia hàng đợi đặt vé.',
-            position,
-            sale_started: nowMs >= saleStartTimeMs,
+            status: result.status,
+            position: result.position,
+            sale_started: result.saleStarted,
             sale_start_in_ms: Math.max(0, saleStartTimeMs - nowMs),
             sale_start_at: new Date(saleStartTimeMs).toISOString(),
         });
@@ -173,10 +174,10 @@ export const checkMyTurn = async (req: Request, res: Response) => {
         }
 
         res.status(200).json({
-            message: nowMs < times.saleStartMs!
-                ? 'Bạn đang ở trong phòng chờ. Hệ thống sẽ mở lượt khi đến giờ bán vé.'
+            message: result.status === 'WAITING_ROOM'
+                ? 'Bạn đang ở trong phòng chờ. Khi mở bán, hệ thống sẽ random số thứ tự và chuyển bạn sang hàng đợi.'
                 : 'Vui lòng đợi...',
-            status: 'WAITING',
+            status: result.status,
             position: result.position,
             estimatedWaitTime: result.estimatedWaitTime,
             sale_start_in_ms: Math.max(0, times.saleStartMs! - nowMs),

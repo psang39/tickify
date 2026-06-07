@@ -116,7 +116,7 @@ export const getShowAvailability = (show: any, now: Date = new Date()): Frontend
     label: isWaitingRoomOpen && bookingStatus === 'coming_soon' ? 'Phòng chờ đã mở' : labelMap[bookingStatus] || 'Chưa thể đặt vé',
     buttonLabel: buttonMap[bookingStatus] || 'Chưa thể đặt vé',
     message: isWaitingRoomOpen && bookingStatus === 'coming_soon'
-      ? 'Phòng chờ đã mở. Bạn có thể vào trước giờ bán vé để được xếp lượt ngẫu nhiên.'
+      ? 'Phòng chờ đã mở. Bạn có thể vào trước giờ bán vé; số thứ tự sẽ chỉ được random khi bắt đầu mở bán.'
       : messageMap[bookingStatus] || 'Show hiện chưa thể đặt vé.',
   };
 };
