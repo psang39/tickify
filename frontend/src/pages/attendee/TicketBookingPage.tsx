@@ -45,6 +45,7 @@ export default function TicketBookingPage() {
   >("combo");
   const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false);
   const [activeStandingZoneId, setActiveStandingZoneId] = useState<string | null>(null);
+  const [hasCheckoutToken, setHasCheckoutToken] = useState(false);
 
   const [purchaserInfo, setPurchaserInfo] = useState({
     fullName: "",
@@ -75,12 +76,14 @@ export default function TicketBookingPage() {
   }, [orderData, currentStep, showId, clearCart, navigate]);
 
   useEffect(() => {
-    if (!showId || isBookingClosed) return;
+    if (!showId) return;
 
     const checkoutToken = localStorage.getItem(`checkoutToken_${showId}`);
+    setHasCheckoutToken(Boolean(checkoutToken));
+
     if (!checkoutToken) {
       console.warn(
-        "Bạn chưa xếp hàng hoặc Token hết hạn. Đang điều hướng về phòng chờ...",
+        "Bạn chưa xếp hàng hoặc token hết hạn. Đang điều hướng về phòng chờ...",
       );
       navigate(`/queue/${showId}`, { replace: true });
     }
@@ -193,7 +196,9 @@ export default function TicketBookingPage() {
 
   const showInfo = showDataPayload?.show_info;
   const showAvailability = getShowAvailability(showInfo);
-  const isBookingClosed = Boolean(showInfo) && !showAvailability.isBookable;
+  // Nếu backend đã cấp checkoutToken từ hàng đợi thì cho phép vào sơ đồ ghế,
+  // kể cả snapshot sale_start trong show_info phía frontend còn lệch vài giây/phút.
+  const isBookingClosed = Boolean(showInfo) && !showAvailability.isBookable && !hasCheckoutToken;
   const zonesData = showDataPayload?.zones || [];
   useEffect(() => {
     if (showDataPayload?.zone_summaries) {

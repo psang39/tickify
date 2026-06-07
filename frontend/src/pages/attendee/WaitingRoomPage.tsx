@@ -39,6 +39,19 @@ export const WaitingRoomPage = () => {
     const [estimatedWait, setEstimatedWait] = useState<string>('Đang tính toán...');
 
     const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const redirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const redirectToBooking = (checkoutToken?: string) => {
+        setPhase('REDIRECTING');
+        if (checkoutToken) {
+            localStorage.setItem(`checkoutToken_${showId}`, checkoutToken);
+        }
+
+        if (redirectTimeoutRef.current) clearTimeout(redirectTimeoutRef.current);
+        redirectTimeoutRef.current = setTimeout(() => {
+            navigate(`/shows/${showId}/booking`, { replace: true });
+        }, 800);
+    };
 
     const statusQuery = useQuery<WaitingRoomResponse>({
         queryKey: ['waitingRoomStatus', showId],
@@ -60,6 +73,11 @@ export const WaitingRoomPage = () => {
         },
         onSuccess: (data) => {
             setErrorMessage('');
+
+            if (data.status === 'YOUR_TURN') {
+                redirectToBooking(data.checkoutToken);
+                return;
+            }
 
             if (data.status === 'WAITING_ROOM' || data.sale_started === false) {
                 setTimeLeftMs(data.sale_start_in_ms || 0);
@@ -93,6 +111,7 @@ export const WaitingRoomPage = () => {
         joinMutation.mutate();
         return () => {
             if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+            if (redirectTimeoutRef.current) clearTimeout(redirectTimeoutRef.current);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showId]);
@@ -102,22 +121,26 @@ export const WaitingRoomPage = () => {
         if (!statusData) return;
 
         if (statusData.status === 'YOUR_TURN') {
-            setPhase('REDIRECTING');
-            if (statusData.checkoutToken) {
-                localStorage.setItem(`checkoutToken_${showId}`, statusData.checkoutToken);
-            }
-            setTimeout(() => {
-                navigate(`/shows/${showId}/booking`);
-            }, 1500);
+            redirectToBooking(statusData.checkoutToken);
             return;
         }
 
         if (statusData.status === 'WAITING_ROOM') {
+            const nextTimeLeft = statusData.sale_start_in_ms || 0;
+
+            // Khi countdown vừa về 0, có thể request đầu tiên vẫn nhận snapshot WAITING_ROOM.
+            // Không đứng yên ở màn hình phòng chờ; refetch lại để backend finalize/random sang queue.
+            if (nextTimeLeft <= 0) {
+                setPhase('LOADING');
+                setTimeout(() => statusQuery.refetch(), 700);
+                return;
+            }
+
             setPhase('WAITING_ROOM');
             setCurrentPosition(0);
             setInitialPosition(0);
-            setTimeLeftMs(statusData.sale_start_in_ms || 0);
-            setEstimatedWait(statusData.sale_start_in_ms ? `Mở bán sau ${formatTime(statusData.sale_start_in_ms)}` : 'Đang chờ mở bán');
+            setTimeLeftMs(nextTimeLeft);
+            setEstimatedWait(`Mở bán sau ${formatTime(nextTimeLeft)}`);
             return;
         }
 
@@ -134,7 +157,7 @@ export const WaitingRoomPage = () => {
                 setEstimatedWait('Đang tính toán...');
             }
         }
-    }, [statusQuery.data, navigate, showId]);
+    }, [statusQuery.data, showId]);
 
     useEffect(() => {
         if (!['COUNTDOWN', 'WAITING_ROOM'].includes(phase) || timeLeftMs <= 0) return;
@@ -180,7 +203,7 @@ export const WaitingRoomPage = () => {
                 {phase === 'COUNTDOWN' && (
                     <div className="flex flex-col items-center">
                         <div className="bg-slate-100 dark:bg-slate-800/80 p-4 rounded-full mb-6">
-                            <span className="text-4xl">⏳</span>
+                            <span className="text-4xl"></span>
                         </div>
                         <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Phòng chờ sắp mở</h2>
                         <p className="text-slate-500 dark:text-slate-400 mb-6">Hệ thống sẽ tự động đưa bạn vào phòng chờ khi đồng hồ điểm 0.</p>
@@ -193,7 +216,7 @@ export const WaitingRoomPage = () => {
                 {phase === 'WAITING_ROOM' && (
                     <div className="flex flex-col items-center">
                         <div className="bg-pink-50 dark:bg-pink-950/30 p-4 rounded-full mb-6">
-                            <span className="text-4xl">🎟️</span>
+                            <span className="text-4xl"></span>
                         </div>
                         <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Bạn đang ở phòng chờ</h2>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 px-4">
@@ -237,7 +260,7 @@ export const WaitingRoomPage = () => {
                 {phase === 'REDIRECTING' && (
                     <div className="flex flex-col items-center">
                         <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-950/40 rounded-full flex items-center justify-center mb-6">
-                            <span className="text-4xl">✅</span>
+                            <span className="text-4xl"></span>
                         </div>
                         <h2 className="text-2xl font-black text-emerald-600 dark:text-emerald-300 mb-2">Đã đến lượt bạn!</h2>
                         <p className="text-slate-500 dark:text-slate-400">Đang đưa bạn đến sơ đồ ghế...</p>
