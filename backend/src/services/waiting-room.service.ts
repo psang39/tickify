@@ -94,6 +94,23 @@ export class WaitingRoomService {
         }
     }
 
+
+    private static async ensureUserInQueue(show_id: string, user_id: string): Promise<number | null> {
+        const userId = String(user_id);
+        const waitingRoomKey = this.getWaitingRoomKey(show_id);
+        const queueKey = this.getQueueKey(show_id);
+
+        const currentRank = await redisClient.zRank(queueKey, userId);
+        if (currentRank !== null) return currentRank;
+
+        // Recovery cho trường hợp user vừa ở waiting room nhưng request finalize bị race.
+        // Sau giờ mở bán, /status cũng nên có khả năng đưa user vào queue thay vì báo lỗi.
+        await redisClient.zRem(waitingRoomKey, userId);
+        await redisClient.zAdd(queueKey, [{ score: Date.now() + Math.random(), value: userId }], { NX: true });
+
+        return redisClient.zRank(queueKey, userId);
+    }
+
     static async joinWaitingRoom(show_id: string, user_id: string, saleStartTime: number): Promise<JoinResult> {
         const currentTime = Date.now();
         const userId = String(user_id);
@@ -143,11 +160,10 @@ export class WaitingRoomService {
 
         await this.finalizeQueueIfNeeded(show_id, saleStartTime);
 
-        const queueKey = this.getQueueKey(show_id);
-        const rank = await redisClient.zRank(queueKey, userId);
+        const rank = await this.ensureUserInQueue(show_id, userId);
 
         if (rank === null) {
-            throw new Error('Bạn không có mặt trong hàng đợi.');
+            throw new Error('Không thể khôi phục vị trí hàng đợi. Vui lòng vào lại phòng chờ.');
         }
 
         const position = rank + 1;

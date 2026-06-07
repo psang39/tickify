@@ -48,6 +48,21 @@ const buildGateError = (message: string, statusCode = 403, extra: Record<string,
     payload: { error: message, message, ...extra },
 });
 
+const getCheckoutTokenKey = (eventId: string, showId: string, userId: string) => (
+    `event:${eventId}:show:${showId}:user:${userId}:checkoutToken`
+);
+
+const createCheckoutToken = (eventId: string, showId: string, userId: string) => jwt.sign(
+    {
+        user_id: userId,
+        event_id: eventId,
+        show_id: showId,
+        purpose: 'checkout',
+    },
+    JWT_SECRET as string,
+    { expiresIn: '15m' }
+);
+
 const validateWaitingRoomGate = (show: any, times: Awaited<ReturnType<typeof getShowSaleTimes>>, nowMs: number) => {
     if (show.status !== 'published') {
         return buildGateError('Show diễn này chưa được công khai mở bán.');
@@ -145,22 +160,27 @@ export const checkMyTurn = async (req: Request, res: Response) => {
             return res.status(gateError.statusCode).json(gateError.payload);
         }
 
+        const eventId = event._id.toString();
+        const checkoutTokenKey = getCheckoutTokenKey(eventId, show_id, user_id);
+        const hasActiveCheckoutToken = await redisClient.get(checkoutTokenKey);
+
+        // Idempotency: sau khi đã tới lượt, frontend có thể gọi /status thêm 1 lần
+        // trong lúc đang redirect. Không báo lỗi "không có mặt trong hàng đợi" nữa.
+        if (hasActiveCheckoutToken) {
+            return res.status(200).json({
+                message: 'Đã đến lượt của bạn!',
+                status: 'YOUR_TURN',
+                checkoutToken: createCheckoutToken(eventId, show_id, user_id),
+            });
+        }
+
         const result = await WaitingRoomService.checkStatus(show_id, user_id, times.saleStartMs!);
 
         if (result.status === 'YOUR_TURN') {
-            const checkoutToken = jwt.sign(
-                {
-                    user_id,
-                    event_id: event._id.toString(),
-                    show_id,
-                    purpose: 'checkout',
-                },
-                JWT_SECRET as string,
-                { expiresIn: '15m' }
-            );
+            const checkoutToken = createCheckoutToken(eventId, show_id, user_id);
 
             await redisClient.setEx(
-                `event:${event._id}:show:${show_id}:user:${user_id}:checkoutToken`,
+                checkoutTokenKey,
                 15 * 60,
                 'active'
             );
