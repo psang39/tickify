@@ -6,6 +6,7 @@ import { api, API_BASE_URL } from '@/lib/axiosClient';
 import { ErrorModal } from '@/components/shared/ErrorModal';
 import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 import { useFeedbackStore } from '@/store/useFeedbackStore';
+import { localDateTimeInputToIso, toLocalDateTimeInputValue } from '@/lib/dateTime';
 import {
     ArrowLeft, Save, X, MapPin, Calendar, CheckCircle2,
     UploadCloud, EyeOff, Globe, Ban, Info, Clock, Ticket,
@@ -165,10 +166,7 @@ export default function ShowDetail() {
     const assignedStaff = staffList.filter((s: any) => s.assigned_show_ids?.includes(showId));
     const availableStaff = staffList.filter((s: any) => !s.assigned_show_ids?.includes(showId));
 
-    const formatDateTimeLocal = (isoString?: string) => {
-        if (!isoString) return '';
-        return new Date(isoString).toISOString().slice(0, 16);
-    };
+    const formatDateTimeLocal = toLocalDateTimeInputValue;
 
     useEffect(() => {
         if (showData && showData.show_info) {
@@ -264,8 +262,8 @@ export default function ShowDetail() {
         target_tier: ticketTypeForm.target_tier.trim() || undefined,
         total_quantity: ticketTypeForm.total_quantity === '' ? null : Number(ticketTypeForm.total_quantity),
         is_limited_promo: ticketTypeForm.is_limited_promo,
-        sale_start: ticketTypeForm.sale_start || undefined,
-        sale_end: ticketTypeForm.sale_end || undefined
+        sale_start: localDateTimeInputToIso(ticketTypeForm.sale_start),
+        sale_end: localDateTimeInputToIso(ticketTypeForm.sale_end)
     });
 
     const { mutateAsync: updateTicketTypeMutation, isPending: isUpdatingTicketType } = useMutation({
@@ -319,7 +317,13 @@ export default function ShowDetail() {
             setErrorMessage("Vui lòng điền đầy đủ thông tin và địa điểm.");
             return;
         }
-        await updateShowMutation(formData);
+        await updateShowMutation({
+            ...formData,
+            start_time: localDateTimeInputToIso(formData.start_time),
+            end_time: localDateTimeInputToIso(formData.end_time),
+            sale_start: localDateTimeInputToIso(formData.sale_start),
+            sale_end: localDateTimeInputToIso(formData.sale_end),
+        });
     };
 
     const handleSVGUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

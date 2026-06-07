@@ -11,6 +11,7 @@ import * as cheerio from 'cheerio';
 import { Request, Response } from 'express';
 import redisClient from '../utils/redisClient';
 import { calculateValidQuantities } from '../utils/validQuantities';
+import { parseClientDate } from '../utils/dateParser';
 import mongoose from 'mongoose';
 import { formatHashToJSON } from '../utils/hashToJson';
 import { generateRSAKeyPair, encryptPrivateKey } from '../utils/cryptoUtils';
@@ -40,13 +41,24 @@ export const createShow = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
-        if (new Date(start_time) > new Date(end_time)) {
+        const parsedStartTime = parseClientDate(start_time);
+        const parsedEndTime = parseClientDate(end_time);
+        const parsedSaleStart = parseClientDate(sale_start);
+        const parsedSaleEnd = parseClientDate(sale_end);
+
+        if (!parsedStartTime || !parsedEndTime || !parsedSaleStart || !parsedSaleEnd) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ message: "Thời gian show hoặc thời gian mở bán không hợp lệ." });
+        }
+
+        if (parsedStartTime > parsedEndTime) {
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ message: "End time must be later than start time" });
         }
 
-        if (new Date(sale_start) > new Date(sale_end)) {
+        if (parsedSaleStart > parsedSaleEnd) {
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ message: "Sale end time must be later than sale start time" });
@@ -59,13 +71,13 @@ export const createShow = async (req: Request, res: Response) => {
             return res.status(403).json({ message: "Bạn không có quyền tạo show cho sự kiện này" });
         }
 
-        if (new Date(start_time) < new Date(event.start_date)) {
+        if (parsedStartTime < new Date(event.start_date)) {
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ message: "Show start time must be within event duration" });
         }
 
-        if (new Date(end_time) > new Date(event.end_date)) {
+        if (parsedEndTime > new Date(event.end_date)) {
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ message: "Show end time must be within event duration" });
@@ -79,10 +91,10 @@ export const createShow = async (req: Request, res: Response) => {
             event_id,
             name,
             description,
-            sale_start: new Date(sale_start),
-            sale_end: new Date(sale_end),
-            start_time: new Date(start_time),
-            end_time: new Date(end_time),
+            sale_start: parsedSaleStart,
+            sale_end: parsedSaleEnd,
+            start_time: parsedStartTime,
+            end_time: parsedEndTime,
             venue_id,
             organizer_id,
             stadium_map_svg,
@@ -112,6 +124,8 @@ export const createShow = async (req: Request, res: Response) => {
                     total_quantity: ticketType.total_quantity === '' || ticketType.total_quantity === undefined
                         ? null
                         : ticketType.total_quantity,
+                    sale_start: parseClientDate(ticketType.sale_start) || parsedSaleStart,
+                    sale_end: parseClientDate(ticketType.sale_end) || parsedSaleEnd,
                     event_id,
                     show_id: savedShow._id
                 })),
@@ -376,10 +390,10 @@ export const updateShow = async (req: Request, res: Response) => {
 
         show.name = name ?? show.name;
         show.description = description ?? show.description;
-        show.start_time = start_time ? new Date(start_time) : show.start_time;
-        show.end_time = end_time ? new Date(end_time) : show.end_time;
-        show.sale_start = sale_start ? new Date(sale_start) : show.sale_start;
-        show.sale_end = sale_end ? new Date(sale_end) : show.sale_end;
+        show.start_time = start_time ? (parseClientDate(start_time) || show.start_time) : show.start_time;
+        show.end_time = end_time ? (parseClientDate(end_time) || show.end_time) : show.end_time;
+        show.sale_start = sale_start ? (parseClientDate(sale_start) || show.sale_start) : show.sale_start;
+        show.sale_end = sale_end ? (parseClientDate(sale_end) || show.sale_end) : show.sale_end;
         show.venue_id = venue_id ?? show.venue_id;
 
         if (stadium_map_svg) {

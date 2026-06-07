@@ -6,6 +6,7 @@ import { api } from '@/lib/axiosClient';
 import { ErrorModal } from '@/components/shared/ErrorModal';
 import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 import { useFeedbackStore } from '@/store/useFeedbackStore';
+import { localDateTimeInputToIso } from '@/lib/dateTime';
 import {
     UploadCloud, Search, CheckCircle2, Plus, Trash2, Ticket,
     CalendarClock, Tag, Settings, ListVideo, Save, ArrowLeft,
@@ -298,8 +299,21 @@ export default function EventDetail() {
         setIsSubmittingShow(true);
         try {
             const finalPayload = {
-                name: showData.name, description: showData.description, start_time: showData.start_time, end_time: showData.end_time, venue_id: showData.venue_id, sale_start: showData.sale_start, sale_end: showData.sale_end, stadium_map_svg: showData.stadium_map_svg,
-                ticket_types: ticketTypes.map(tt => ({ ...tt, price: Number(tt.price), total_quantity: tt.total_quantity !== '' ? Number(tt.total_quantity) : null }))
+                name: showData.name,
+                description: showData.description,
+                start_time: localDateTimeInputToIso(showData.start_time),
+                end_time: localDateTimeInputToIso(showData.end_time),
+                venue_id: showData.venue_id,
+                sale_start: localDateTimeInputToIso(showData.sale_start),
+                sale_end: localDateTimeInputToIso(showData.sale_end),
+                stadium_map_svg: showData.stadium_map_svg,
+                ticket_types: ticketTypes.map(tt => ({
+                    ...tt,
+                    price: Number(tt.price),
+                    total_quantity: tt.total_quantity !== '' ? Number(tt.total_quantity) : null,
+                    sale_start: localDateTimeInputToIso(tt.sale_start),
+                    sale_end: localDateTimeInputToIso(tt.sale_end)
+                }))
             };
             const result = await createShow(finalPayload);
             showSuccess(

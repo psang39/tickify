@@ -3,11 +3,12 @@ import TicketType from "../models/ticket-type.model";
 import Show from "../models/show.model";
 import redisClient from "../utils/redisClient";
 import { hasBlockingOrdersForShow, rebuildShowRedisCache } from "../services/seatmap-cache.service";
+import { parseClientDate } from "../utils/dateParser";
 
 const normalizeOptionalDate = (value: unknown) => {
     if (value === undefined) return undefined;
     if (value === null || value === "") return null;
-    return new Date(value as string);
+    return parseClientDate(value);
 };
 
 const clearTicketTypeCache = async (showId: string) => {

@@ -17,13 +17,14 @@ const formatTime = (value?: string) => {
     return new Date(value).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
-const getEventStatusLabel = (status?: string, shows: any[] = [], isShowsLoading = false) => {
+const getEventStatusLabel = (status?: string, shows: any[] = [], isShowsLoading = false, now: Date = new Date()) => {
   if (status === 'cancelled') return 'Đã hủy';
   if (status !== 'published') return 'Sắp công bố';
   if (isShowsLoading) return 'Đang kiểm tra lịch show';
   if (!shows.length) return 'Chưa có show mở bán';
-  const availabilityList = shows.map((show) => getShowAvailability(show));
+  const availabilityList = shows.map((show) => getShowAvailability(show, now));
   if (availabilityList.some((item) => item.isBookable)) return 'Đang mở bán vé';
+  if (availabilityList.some((item) => item.isWaitingRoomOpen)) return 'Phòng chờ đã mở';
   if (availabilityList.some((item) => item.timeState === 'ongoing')) return 'Đang diễn ra';
   if (availabilityList.every((item) => item.timeState === 'past')) return 'Đã kết thúc';
   if (availabilityList.some((item) => item.saleState === 'coming_soon')) return 'Sắp mở bán';
@@ -35,6 +36,7 @@ export default function EventDetailPage() {
     const { eventId } = useParams();
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
+    const [now, setNow] = useState(() => new Date());
     const { data: event, isLoading } = usePublicEventDetail(eventId);
     const { data: showsResponse, isLoading: isShowsLoading } = usePublicEventShows(eventId, page, 4);
     const { data: suggestions = [] } = usePublicEvents({ limit: 4, sort: 'upcoming' });
@@ -43,6 +45,11 @@ export default function EventDetailPage() {
         setPage(1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [eventId]);
+
+    useEffect(() => {
+        const timer = window.setInterval(() => setNow(new Date()), 10_000);
+        return () => window.clearInterval(timer);
+    }, []);
 
     const shows = showsResponse?.docs || showsResponse?.data || [];
     const totalPages = showsResponse?.totalPages || showsResponse?.pagination?.totalPages || 1;
@@ -69,18 +76,25 @@ export default function EventDetailPage() {
                     <ChevronLeft size={18} /> Quay lại
                 </button>
 
-                <div className="relative overflow-hidden rounded-[28px] bg-slate-900">
-                    <img src={banner} alt={event.name} className="h-[260px] w-full object-cover md:h-[360px]" style={{ objectPosition: `center ${event.banner_offset_y || 50}%` }} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
-                    <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
-                        <div className="max-w-3xl rounded-3xl border border-white/15 bg-black/45 p-5 text-white shadow-2xl backdrop-blur-md md:p-7">
-                            <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-xs font-bold text-white backdrop-blur">
-                                <Music2 size={14} /> {event.genre || 'Sự kiện'}
-                            </span>
-                            <h1 className="mt-4 text-3xl font-black leading-tight text-white drop-shadow md:text-5xl">{event.name}</h1>
-                            <p className="mt-3 line-clamp-2 text-sm leading-6 text-white/85">{event.description}</p>
-                        </div>
-                    </div>
+                <div className="overflow-hidden rounded-[28px] bg-slate-900 shadow-sm">
+                    <img
+                        src={banner}
+                        alt={event.name}
+                        className="h-[260px] w-full object-cover md:h-[380px]"
+                        style={{ objectPosition: `center ${event.banner_offset_y || 50}%` }}
+                    />
+                </div>
+
+                <div className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900/90 md:p-7">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-[#262880]/10 px-4 py-1.5 text-xs font-bold text-[#262880] dark:bg-white/10 dark:text-slate-100">
+                        <Music2 size={14} /> {event.genre || 'Sự kiện'}
+                    </span>
+                    <h1 className="mt-4 text-3xl font-black leading-tight text-slate-950 dark:text-white md:text-5xl">
+                        {event.name}
+                    </h1>
+                    <p className="mt-4 max-w-4xl whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-slate-300 md:text-base">
+                        {event.description || 'Thông tin chi tiết sự kiện sẽ được cập nhật trong thời gian tới.'}
+                    </p>
                 </div>
             </section>
 
@@ -95,7 +109,7 @@ export default function EventDetailPage() {
                             </div>
                             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 p-4">
                                 <p className="text-xs font-bold uppercase text-slate-400">Trạng thái</p>
-                                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#00A878]"><Ticket size={16} />{getEventStatusLabel(event.status, shows, isShowsLoading)}</p>
+                                <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-[#00A878]"><Ticket size={16} />{getEventStatusLabel(event.status, shows, isShowsLoading, now)}</p>
                             </div>
                             <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 p-4 sm:col-span-2">
                                 <p className="text-xs font-bold uppercase text-slate-400">Nghệ sĩ</p>
@@ -103,10 +117,6 @@ export default function EventDetailPage() {
                                     {Array.isArray(event.artists) && event.artists.length > 0 ? event.artists.join(', ') : 'Đang cập nhật'}
                                 </p>
                             </div>
-                        </div>
-                        <div className="mt-6 border-t border-slate-100 dark:border-white/10 pt-6">
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-50">Mô tả</h3>
-                            <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600 dark:text-slate-300">{event.description || 'Thông tin chi tiết sự kiện sẽ được cập nhật trong thời gian tới.'}</p>
                         </div>
                     </div>
 
@@ -132,7 +142,7 @@ export default function EventDetailPage() {
                                 <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/70 dark:bg-slate-900/80 p-8 text-center text-sm font-medium text-slate-400 md:col-span-2">Hiện chưa có show nào đang mở bán công khai.</div>
                             ) : shows.map((show: any) => {
                                 const venue = show.venue_id || show.venue_info;
-                                const availability = getShowAvailability(show);
+                                const availability = getShowAvailability(show, now);
                                 const canEnterQueue = availability.canEnterWaitingRoom || availability.isBookable;
                                 return (
                                     <article key={show._id} className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90">

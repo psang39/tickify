@@ -161,7 +161,7 @@ export default function SearchPage() {
                                 <option key={city} value={city}>{city}</option>
                             ))}
                         </select>
-                        <p className="text-[11px] leading-5 text-slate-400">Danh sách lấy từ city của venue có show đang công khai.</p>
+
                     </div>
 
                     <div className="space-y-2">

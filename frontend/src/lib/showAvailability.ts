@@ -29,9 +29,9 @@ const computeTimeState = (show: any, now: Date) => {
   return 'past' as const;
 };
 
-const computeSaleState = (show: any, now: Date) => {
-  const timeState = show?.time_state || computeTimeState(show, now);
-  if (show?.status === 'cancelled' || timeState === 'past' || timeState === 'ongoing') return 'closed' as const;
+const computeSaleState = (show: any, now: Date, timeState?: FrontendShowAvailability['timeState']) => {
+  const normalizedTimeState = timeState || computeTimeState(show, now);
+  if (show?.status === 'cancelled' || normalizedTimeState === 'past' || normalizedTimeState === 'ongoing') return 'closed' as const;
   const saleStart = toDate(show?.sale_start);
   const saleEnd = toDate(show?.sale_end);
   if (saleStart && now < saleStart) return 'coming_soon' as const;
@@ -40,16 +40,29 @@ const computeSaleState = (show: any, now: Date) => {
   return 'closed' as const;
 };
 
-export const getShowAvailability = (show: any): FrontendShowAvailability => {
-  const now = new Date();
-  const timeState = show?.time_state || computeTimeState(show, now);
-  let saleState = show?.sale_state || computeSaleState(show, now);
+const computeBookingStatus = (
+  show: any,
+  timeState: FrontendShowAvailability['timeState'],
+  saleState: FrontendShowAvailability['saleState']
+) => {
+  if (show?.status !== 'published') return show?.status === 'cancelled' ? 'cancelled' : 'draft';
+  if (timeState === 'past') return 'past';
+  if (timeState === 'ongoing') return 'ongoing';
+  if (saleState === 'coming_soon') return 'coming_soon';
+  if (saleState === 'closed') return 'closed';
+  return 'on_sale';
+};
+
+export const getShowAvailability = (show: any, now: Date = new Date()): FrontendShowAvailability => {
+  // Không dùng trực tiếp time_state/sale_state/booking_status từ API vì các field này là snapshot
+  // tại thời điểm fetch. Trang EventDetail cần tự đổi trạng thái khi đến giờ mở phòng chờ/mở bán.
+  const timeState = computeTimeState(show, now);
+  const saleState = computeSaleState(show, now, timeState);
   const saleStart = toDate(show?.sale_start);
   const saleEnd = toDate(show?.sale_end);
   const waitingRoomOpenTime = saleStart ? new Date(saleStart.getTime() - WAITING_ROOM_OPEN_BEFORE_MS) : null;
-  if (timeState === 'past' || timeState === 'ongoing' || timeState === 'cancelled') saleState = 'closed';
-  const backendBookable = typeof show?.is_bookable === 'boolean' ? show.is_bookable : undefined;
-  const isBookable = backendBookable ?? (show?.status === 'published' && timeState === 'upcoming' && saleState === 'on_sale');
+
+  const isBookable = show?.status === 'published' && timeState === 'upcoming' && saleState === 'on_sale';
   const isWaitingRoomOpen = Boolean(
     show?.status === 'published' &&
     timeState === 'upcoming' &&
@@ -59,14 +72,7 @@ export const getShowAvailability = (show: any): FrontendShowAvailability => {
     (!saleEnd || now <= saleEnd)
   );
   const canEnterWaitingRoom = isWaitingRoomOpen || isBookable;
-  const bookingStatus = show?.booking_status || (() => {
-    if (show?.status !== 'published') return show?.status === 'cancelled' ? 'cancelled' : 'draft';
-    if (timeState === 'past') return 'past';
-    if (timeState === 'ongoing') return 'ongoing';
-    if (saleState === 'coming_soon') return 'coming_soon';
-    if (saleState === 'closed') return 'closed';
-    return 'on_sale';
-  })();
+  const bookingStatus = computeBookingStatus(show, timeState, saleState);
 
   const messageMap: Record<string, string> = {
     draft: 'Show diễn này chưa được công khai mở bán.',
@@ -111,6 +117,6 @@ export const getShowAvailability = (show: any): FrontendShowAvailability => {
     buttonLabel: buttonMap[bookingStatus] || 'Chưa thể đặt vé',
     message: isWaitingRoomOpen && bookingStatus === 'coming_soon'
       ? 'Phòng chờ đã mở. Bạn có thể vào trước giờ bán vé để được xếp lượt ngẫu nhiên.'
-      : show?.booking_message || messageMap[bookingStatus] || 'Show hiện chưa thể đặt vé.',
+      : messageMap[bookingStatus] || 'Show hiện chưa thể đặt vé.',
   };
 };
