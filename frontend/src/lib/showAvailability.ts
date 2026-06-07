@@ -3,10 +3,16 @@ export type FrontendShowAvailability = {
   saleState: 'coming_soon' | 'on_sale' | 'closed';
   bookingStatus: string;
   isBookable: boolean;
+  canEnterWaitingRoom: boolean;
+  isWaitingRoomOpen: boolean;
+  waitingRoomOpensAt?: string;
+  secondsUntilWaitingRoomOpen?: number | null;
   label: string;
   buttonLabel: string;
   message: string;
 };
+
+const WAITING_ROOM_OPEN_BEFORE_MS = 30 * 60 * 1000;
 
 const toDate = (value: unknown): Date | null => {
   if (!value) return null;
@@ -38,9 +44,21 @@ export const getShowAvailability = (show: any): FrontendShowAvailability => {
   const now = new Date();
   const timeState = show?.time_state || computeTimeState(show, now);
   let saleState = show?.sale_state || computeSaleState(show, now);
+  const saleStart = toDate(show?.sale_start);
+  const saleEnd = toDate(show?.sale_end);
+  const waitingRoomOpenTime = saleStart ? new Date(saleStart.getTime() - WAITING_ROOM_OPEN_BEFORE_MS) : null;
   if (timeState === 'past' || timeState === 'ongoing' || timeState === 'cancelled') saleState = 'closed';
   const backendBookable = typeof show?.is_bookable === 'boolean' ? show.is_bookable : undefined;
   const isBookable = backendBookable ?? (show?.status === 'published' && timeState === 'upcoming' && saleState === 'on_sale');
+  const isWaitingRoomOpen = Boolean(
+    show?.status === 'published' &&
+    timeState === 'upcoming' &&
+    saleStart &&
+    waitingRoomOpenTime &&
+    now >= waitingRoomOpenTime &&
+    (!saleEnd || now <= saleEnd)
+  );
+  const canEnterWaitingRoom = isWaitingRoomOpen || isBookable;
   const bookingStatus = show?.booking_status || (() => {
     if (show?.status !== 'published') return show?.status === 'cancelled' ? 'cancelled' : 'draft';
     if (timeState === 'past') return 'past';
@@ -75,9 +93,9 @@ export const getShowAvailability = (show: any): FrontendShowAvailability => {
     cancelled: 'Đã hủy',
     past: 'Đã kết thúc',
     ongoing: 'Đã đóng đặt vé',
-    coming_soon: 'Sắp mở bán',
+    coming_soon: isWaitingRoomOpen ? 'Vào phòng chờ' : 'Sắp mở phòng chờ',
     closed: 'Hết giờ bán vé',
-    on_sale: 'Xem vé',
+    on_sale: 'Đặt vé',
   };
 
   return {
@@ -85,8 +103,14 @@ export const getShowAvailability = (show: any): FrontendShowAvailability => {
     saleState,
     bookingStatus,
     isBookable,
-    label: labelMap[bookingStatus] || 'Chưa thể đặt vé',
+    canEnterWaitingRoom,
+    isWaitingRoomOpen,
+    waitingRoomOpensAt: waitingRoomOpenTime?.toISOString(),
+    secondsUntilWaitingRoomOpen: waitingRoomOpenTime ? Math.max(0, Math.ceil((waitingRoomOpenTime.getTime() - now.getTime()) / 1000)) : null,
+    label: isWaitingRoomOpen && bookingStatus === 'coming_soon' ? 'Phòng chờ đã mở' : labelMap[bookingStatus] || 'Chưa thể đặt vé',
     buttonLabel: buttonMap[bookingStatus] || 'Chưa thể đặt vé',
-    message: show?.booking_message || messageMap[bookingStatus] || 'Show hiện chưa thể đặt vé.',
+    message: isWaitingRoomOpen && bookingStatus === 'coming_soon'
+      ? 'Phòng chờ đã mở. Bạn có thể vào trước giờ bán vé để được xếp lượt ngẫu nhiên.'
+      : show?.booking_message || messageMap[bookingStatus] || 'Show hiện chưa thể đặt vé.',
   };
 };

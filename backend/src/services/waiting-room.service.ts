@@ -30,7 +30,7 @@ export class WaitingRoomService {
     }
 
 
-    static async checkStatus(show_id: string, user_id: string): Promise<{
+    static async checkStatus(show_id: string, user_id: string, saleStartTime: number): Promise<{
         status: 'WAITING' | 'YOUR_TURN',
         position?: number,
         estimatedWaitTime?: number
@@ -45,6 +45,16 @@ export class WaitingRoomService {
             throw new Error("Bạn không có mặt trong phòng chờ.");
         }
 
+        const position = rank + 1;
+        const currentTime = Date.now();
+
+        if (currentTime < saleStartTime) {
+            return {
+                status: 'WAITING',
+                position,
+                estimatedWaitTime: Math.max(1, Math.ceil((saleStartTime - currentTime) / 60000))
+            };
+        }
 
         if (rank < ALLOWED_CONCURRENT_USERS) {
             return { status: 'YOUR_TURN' };
@@ -52,7 +62,6 @@ export class WaitingRoomService {
 
 
 
-        const position = rank + 1;
         const usersAhead = position - ALLOWED_CONCURRENT_USERS;
         const estimatedWaitTime = Math.ceil(usersAhead / 100);
 

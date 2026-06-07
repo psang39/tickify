@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { createEvent, getEvents, getEventById, searchEventsPublic } from '../controllers/event.controller';
+import { createEvent, getEvents, getEventById, getPublicEventFilters, searchEventsPublic } from '../controllers/event.controller';
 import { body } from 'express-validator';
 import { Validate } from '../middleware/validation.middleware';
 import { cachedMiddleware } from '../middleware/cache.middleware';
@@ -8,6 +8,7 @@ import { createShow, getShowsByEvent } from "../controllers/show.controller";
 const eventRouter = express.Router();
 
 eventRouter.get('/search', searchEventsPublic);
+eventRouter.get('/filters', getPublicEventFilters);
 eventRouter.get('/', getEvents);
 eventRouter.post('/', Verify, verifyRoles(['Admin', 'admin', 'Organizer', 'organizer']), [
     body('name').notEmpty().withMessage('Name is required'),

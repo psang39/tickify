@@ -11,8 +11,33 @@ const formatDate = (value?: string) => {
     return new Date(value).toLocaleDateString('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' });
 };
 
+const toDateInputValue = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const getCurrentWeekRange = () => {
+    const now = new Date();
+    const mondayOffset = (now.getDay() + 6) % 7;
+    const start = new Date(now);
+    start.setDate(now.getDate() - mondayOffset);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    return { dateFrom: toDateInputValue(start), dateTo: toDateInputValue(end) };
+};
+
+const getCurrentMonthRange = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return { dateFrom: toDateInputValue(start), dateTo: toDateInputValue(end) };
+};
+
+
 const getEventVenueText = (event: any) => {
-    const venue = event?.venue_id || event?.venue;
+    const venue = event?.venue_info || event?.venue_id || event?.venue;
     if (!venue) return 'Địa điểm đang cập nhật';
 
     if (typeof venue === 'string') return venue;
@@ -46,8 +71,12 @@ const GenreSkeleton = () => (
 export default function HomePage() {
     const navigate = useNavigate();
     const [keyword, setKeyword] = useState('');
+    const weekRange = useMemo(() => getCurrentWeekRange(), []);
+    const monthRange = useMemo(() => getCurrentMonthRange(), []);
     const { data: newestEvents = [], isLoading: isNewestLoading } = usePublicEvents({ limit: 8, sort: 'newest' });
     const { data: upcomingEvents = [], isLoading: isUpcomingLoading } = usePublicEvents({ limit: 8, sort: 'upcoming' });
+    const { data: thisWeekEvents = [], isLoading: isThisWeekLoading } = usePublicEvents({ limit: 4, sort: 'upcoming', ...weekRange });
+    const { data: thisMonthEvents = [], isLoading: isThisMonthLoading } = usePublicEvents({ limit: 4, sort: 'upcoming', ...monthRange });
 
     const isPageLoading = isNewestLoading || isUpcomingLoading;
     const visibleUpcomingEvents = upcomingEvents;
@@ -208,6 +237,50 @@ export default function HomePage() {
                     </div>
                 )}
             </section>
+
+            {(isThisWeekLoading || thisWeekEvents.length > 0) && (
+                <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
+                    <div className="mb-5 flex items-center justify-between">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Sự kiện diễn ra trong tuần này</h2>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Từ {weekRange.dateFrom} đến {weekRange.dateTo}</p>
+                        </div>
+                        <Link to={`/search?sort=upcoming&dateFrom=${weekRange.dateFrom}&dateTo=${weekRange.dateTo}`} className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FF0082]">Xem tất cả</Link>
+                    </div>
+
+                    {isThisWeekLoading ? (
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                            {Array.from({ length: 4 }).map((_, index) => <EventCardSkeleton key={index} />)}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                            {thisWeekEvents.slice(0, 4).map((event: any) => <PublicEventCard key={event._id} event={event} />)}
+                        </div>
+                    )}
+                </section>
+            )}
+
+            {(isThisMonthLoading || thisMonthEvents.length > 0) && (
+                <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
+                    <div className="mb-5 flex items-center justify-between">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Sự kiện diễn ra trong tháng này</h2>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Từ {monthRange.dateFrom} đến {monthRange.dateTo}</p>
+                        </div>
+                        <Link to={`/search?sort=upcoming&dateFrom=${monthRange.dateFrom}&dateTo=${monthRange.dateTo}`} className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#FF0082]">Xem tất cả</Link>
+                    </div>
+
+                    {isThisMonthLoading ? (
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                            {Array.from({ length: 4 }).map((_, index) => <EventCardSkeleton key={index} />)}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                            {thisMonthEvents.slice(0, 4).map((event: any) => <PublicEventCard key={event._id} event={event} />)}
+                        </div>
+                    )}
+                </section>
+            )}
 
             {(isPageLoading || genres.length > 0) && (
                 <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">

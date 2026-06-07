@@ -379,69 +379,169 @@ export const getOrganizerEventById = async (req: Request, res: Response) => {
     }
 };
 
+const normalizeQueryText = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
+const isEmptyFilterValue = (value: string) => !value || ['undefined', 'null', 'all'].includes(value.toLowerCase());
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const parseVietnamDateBoundary = (value: unknown, endOfDay = false) => {
+  const text = normalizeQueryText(value);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return null;
+
+  const timePart = endOfDay ? 'T23:59:59.999+07:00' : 'T00:00:00.000+07:00';
+  const parsedDate = new Date(`${text}${timePart}`);
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+};
+
+const buildSearchDateRange = (query: Request['query']) => {
+  const exactDate = query.date || query.showDate || query.occursOn;
+  if (exactDate) {
+    const from = parseVietnamDateBoundary(exactDate, false);
+    const to = parseVietnamDateBoundary(exactDate, true);
+    return { from, to, hasDateFilter: Boolean(from || to) };
+  }
+
+  const from = parseVietnamDateBoundary(query.dateFrom || query.startDate || query.from, false);
+  const to = parseVietnamDateBoundary(query.dateTo || query.endDate || query.to, true);
+  return { from, to, hasDateFilter: Boolean(from || to) };
+};
+
+const buildSearchPagination = (totalElements: number, currentPage: number, limit: number) => {
+  const totalPages = totalElements > 0 ? Math.ceil(totalElements / limit) : 0;
+  return {
+    totalElements,
+    totalPages,
+    currentPage,
+    limit,
+    hasNextPage: totalPages > 0 && currentPage < totalPages,
+    hasPrevPage: totalPages > 0 && currentPage > 1,
+  };
+};
+
+export const getPublicEventFilters = async (_req: Request, res: Response) => {
+  try {
+    const now = new Date();
+    const activeShows = await Show.find({
+      status: 'published',
+      end_time: { $gte: now },
+    })
+      .select('event_id venue_id')
+      .populate({ path: 'venue_id', select: 'city' })
+      .lean();
+
+    const activeEventIds = Array.from(new Set(
+      activeShows.map((show: any) => String(show.event_id || show.event)).filter(Boolean)
+    ));
+
+    const cities = Array.from(new Set<string>(
+      activeShows
+        .map((show: any) => show?.venue_id?.city)
+        .filter((city: any): city is string => typeof city === 'string' && city.trim().length > 0)
+        .map((city: string) => city.trim())
+    )).sort((a: string, b: string) => a.localeCompare(b, 'vi'));
+
+    const genres = activeEventIds.length > 0
+      ? (await Event.distinct('genre', { _id: { $in: activeEventIds }, status: 'published' }))
+        .filter((genre: any): genre is string => typeof genre === 'string' && genre.trim().length > 0)
+        .map((genre: string) => genre.trim())
+        .sort((a: string, b: string) => a.localeCompare(b, 'vi'))
+      : [];
+
+    return res.status(200).json({ success: true, data: { cities, genres } });
+  } catch (error) {
+    console.error('[Public Event Filters Error]', error);
+    return res.status(500).json({ message: 'Lỗi hệ thống khi tải bộ lọc sự kiện.' });
+  }
+};
+
 export const searchEventsPublic = async (req: Request, res: Response) => {
   try {
-    const keyword = (req.query.q || req.query.keyword || req.query.search || req.query.name) as string;
-    const city = (req.query.city || req.query.location) as string;
-    const genre = req.query.genre as string;
-    const sort = ((req.query.sort as string) || 'newest').trim();
+    const keyword = normalizeQueryText(req.query.q || req.query.keyword || req.query.search || req.query.name);
+    const city = normalizeQueryText(req.query.city || req.query.location);
+    const genre = normalizeQueryText(req.query.genre);
+    const sort = normalizeQueryText(req.query.sort) || 'newest';
     const limit = parseInt(req.query.limit as string) || 20;
+    const page = parseInt(req.query.page as string) || 1;
     const safeLimit = Math.min(Math.max(limit, 1), 50);
+    const safePage = Math.max(page, 1);
     const now = new Date();
+    const { from: dateFrom, to: dateTo, hasDateFilter } = buildSearchDateRange(req.query);
+
+    const emptyResponse = () => res.status(200).json({
+      success: true,
+      data: [],
+      pagination: buildSearchPagination(0, safePage, safeLimit),
+    });
 
     const findQuery: any = { status: 'published' };
+    let keywordVenueIds = new Set<string>();
 
-    if (keyword && keyword.trim() !== '' && keyword !== 'undefined' && keyword !== 'null') {
-      const cleanKeyword = keyword.trim();
+    if (!isEmptyFilterValue(keyword)) {
+      const keywordRegex = { $regex: escapeRegex(keyword), $options: 'i' };
       findQuery.$or = [
-        { name: { $regex: cleanKeyword, $options: 'i' } },
-        { description: { $regex: cleanKeyword, $options: 'i' } },
-        { artists: { $regex: cleanKeyword, $options: 'i' } },
+        { name: keywordRegex },
+        { description: keywordRegex },
+        { artists: keywordRegex },
+        { genre: keywordRegex },
       ];
+
+      const venuesMatchedByKeyword = await Venue.find({
+        $or: [
+          { name: keywordRegex },
+          { address: keywordRegex },
+          { city: keywordRegex },
+        ],
+      }).select('_id').lean();
+      keywordVenueIds = new Set(venuesMatchedByKeyword.map((venue: any) => String(venue._id)));
     }
 
-    if (genre && genre.trim() !== '' && genre !== 'undefined' && genre !== 'all') {
-      findQuery.genre = genre.trim();
+    if (!isEmptyFilterValue(genre)) {
+      findQuery.genre = genre;
     }
 
     let venueIds: any[] | null = null;
-    if (city && city.trim() !== '' && city !== 'undefined' && city !== 'all') {
-      const matchingVenues = await Venue.find({ city: { $regex: '^' + city.trim() + '$', $options: 'i' } }).select('_id').lean();
+    if (!isEmptyFilterValue(city)) {
+      const cityRegex = { $regex: `^${escapeRegex(city)}$`, $options: 'i' };
+      const matchingVenues = await Venue.find({ city: cityRegex }).select('_id').lean();
       venueIds = matchingVenues.map((v: any) => v._id);
-      if (venueIds.length === 0) {
-        return res.status(200).json({ success: true, data: [] });
-      }
+      if (venueIds.length === 0) return emptyResponse();
     }
 
-    const activeShowFilter: any = {
-      status: 'published',
-      end_time: { $gte: now },
-    };
+    const activeShowFilter: any = { status: 'published' };
     if (venueIds) activeShowFilter.venue_id = { $in: venueIds };
+    if (hasDateFilter) {
+      activeShowFilter.end_time = { $gte: now };
+      activeShowFilter.start_time = {};
+      if (dateFrom) activeShowFilter.start_time.$gte = dateFrom;
+      if (dateTo) activeShowFilter.start_time.$lte = dateTo;
+    } else {
+      activeShowFilter.end_time = { $gte: now };
+    }
 
     const activeShows = await Show.find(activeShowFilter)
       .select('event_id venue_id start_time end_time sale_start sale_end status')
-      .populate({ path: 'venue_id', select: 'name city' })
+      .populate({ path: 'venue_id', select: 'name city address' })
       .sort({ start_time: 1 })
       .lean();
 
     const activeEventIds = Array.from(new Set(activeShows.map((show: any) => String(show.event_id || show.event)).filter(Boolean)));
-    if (activeEventIds.length === 0) {
-      return res.status(200).json({ success: true, data: [] });
+    if (activeEventIds.length === 0) return emptyResponse();
+
+    if (!isEmptyFilterValue(keyword) && keywordVenueIds.size > 0) {
+      const keywordVenueEventIds = activeShows
+        .filter((show: any) => keywordVenueIds.has(String((show.venue_id as any)?._id || show.venue_id)))
+        .map((show: any) => String(show.event_id || show.event));
+
+      if (keywordVenueEventIds.length > 0) {
+        findQuery.$or = [...(findQuery.$or || []), { _id: { $in: Array.from(new Set(keywordVenueEventIds)) } }];
+      }
     }
 
-    if (findQuery._id && findQuery._id.$in) {
-      const existingIds = new Set((findQuery._id.$in as any[]).map((id: any) => String(id)));
-      findQuery._id = { $in: activeEventIds.filter((id) => existingIds.has(String(id))) };
-    } else {
-      findQuery._id = { $in: activeEventIds };
-    }
+    findQuery._id = { $in: activeEventIds };
 
     const sortOption: any = sort === 'upcoming' ? { start_date: 1 } : { created_at: -1 };
     const events = await Event.find(findQuery)
       .select('_id name description genre artists poster_url banner_url start_date end_date created_at status')
       .sort(sortOption)
-      .limit(safeLimit * 3)
       .lean();
 
     const showByEventId = new Map<string, any>();
@@ -475,19 +575,32 @@ export const searchEventsPublic = async (req: Request, res: Response) => {
           banner_url: toSafeListImage(event.banner_url),
           start_date: event.start_date,
           end_date: event.end_date,
+          created_at: event.created_at,
           next_show_start_time: matchShow.start_time,
           next_show_end_time: matchShow.end_time,
           booking_label: getBookingLabel(matchShow),
-          venue_info: venueInfo ? { name: venueInfo.name, city: venueInfo.city } : null,
+          venue_info: venueInfo ? { name: venueInfo.name, city: venueInfo.city, address: venueInfo.address } : null,
         };
       })
       .filter(Boolean) as any[];
 
-    if (sort === 'upcoming') {
+    if (sort === 'upcoming' || hasDateFilter) {
       formattedEvents.sort((a, b) => new Date(a.next_show_start_time || a.start_date).getTime() - new Date(b.next_show_start_time || b.start_date).getTime());
+    } else {
+      formattedEvents.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
 
-    return res.status(200).json({ success: true, data: formattedEvents.slice(0, safeLimit) });
+    const totalElements = formattedEvents.length;
+    const totalPages = totalElements > 0 ? Math.ceil(totalElements / safeLimit) : 0;
+    const currentPage = totalPages > 0 ? Math.min(safePage, totalPages) : 1;
+    const startIndex = (currentPage - 1) * safeLimit;
+    const data = formattedEvents.slice(startIndex, startIndex + safeLimit);
+
+    return res.status(200).json({
+      success: true,
+      data,
+      pagination: buildSearchPagination(totalElements, currentPage, safeLimit),
+    });
   } catch (error) {
     console.error('[Search Events Backend Error]', error);
     return res.status(500).json({ message: 'Lỗi hệ thống khi truy vấn tìm kiếm sự kiện.' });

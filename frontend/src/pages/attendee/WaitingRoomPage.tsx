@@ -93,7 +93,11 @@ export const WaitingRoomPage = () => {
             }, 1500);
         } else if (statusData.status === 'WAITING') {
             setCurrentPosition(statusData.position);
-            if (statusData.estimatedWaitTime) setEstimatedWait(statusData.estimatedWaitTime);
+            if (statusData.sale_start_in_ms && statusData.sale_start_in_ms > 0) {
+                setEstimatedWait(`Mở bán sau ${formatTime(statusData.sale_start_in_ms)}`);
+            } else if (statusData.estimatedWaitTime) {
+                setEstimatedWait(`Khoảng ${statusData.estimatedWaitTime} phút`);
+            }
         }
     }, [statusData, navigate, showId]);
 

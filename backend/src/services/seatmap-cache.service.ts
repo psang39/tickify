@@ -173,8 +173,8 @@ export const rebuildShowRedisCache = async (showId: string) => {
     const eventId = normalizeId(show.event_id);
     const pipeline = redisClient.multi();
 
-    pipeline.set(`event:${eventId}:show:${showId}:sale_start`, new Date(show.sale_start).toISOString());
-    pipeline.set(`event:${eventId}:show:${showId}:sale_end`, new Date(show.sale_end).toISOString());
+    pipeline.set(`event:${eventId}:show:${showId}:sale_start`, String(new Date(show.sale_start).getTime()));
+    pipeline.set(`event:${eventId}:show:${showId}:sale_end`, String(new Date(show.sale_end).getTime()));
 
     pipeline.set(
         `show:${showId}:ticket_types`,

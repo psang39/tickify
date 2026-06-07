@@ -71,13 +71,15 @@ export default function EventDetailPage() {
 
                 <div className="relative overflow-hidden rounded-[28px] bg-slate-900">
                     <img src={banner} alt={event.name} className="h-[260px] w-full object-cover md:h-[360px]" style={{ objectPosition: `center ${event.banner_offset_y || 50}%` }} />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent" />
-                    <div className="absolute bottom-0 left-0 max-w-3xl p-7 text-white md:p-10">
-                        <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold backdrop-blur">
-                            <Music2 size={14} /> {event.genre || 'Concert'}
-                        </span>
-                        <h1 className="mt-4 text-3xl font-black leading-tight md:text-5xl">{event.name}</h1>
-                        <p className="mt-3 line-clamp-2 text-sm leading-6 text-white/80">{event.description}</p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
+                    <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
+                        <div className="max-w-3xl rounded-3xl border border-white/15 bg-black/45 p-5 text-white shadow-2xl backdrop-blur-md md:p-7">
+                            <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-xs font-bold text-white backdrop-blur">
+                                <Music2 size={14} /> {event.genre || 'Sự kiện'}
+                            </span>
+                            <h1 className="mt-4 text-3xl font-black leading-tight text-white drop-shadow md:text-5xl">{event.name}</h1>
+                            <p className="mt-3 line-clamp-2 text-sm leading-6 text-white/85">{event.description}</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -131,11 +133,11 @@ export default function EventDetailPage() {
                             ) : shows.map((show: any) => {
                                 const venue = show.venue_id || show.venue_info;
                                 const availability = getShowAvailability(show);
-  const isBookable = availability.isBookable;
+                                const canEnterQueue = availability.canEnterWaitingRoom || availability.isBookable;
                                 return (
                                     <article key={show._id} className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90">
                                         <div className="flex">
-                                            <div className={`flex w-24 shrink-0 flex-col items-center justify-center ${isBookable ? 'bg-[#262880] text-white' : 'bg-slate-200 text-slate-500'}`}>
+                                            <div className={`flex w-24 shrink-0 flex-col items-center justify-center ${canEnterQueue ? 'bg-[#262880] text-white' : 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-300'}`}>
                                                 <span className="text-2xl font-black">{new Date(show.start_time).toLocaleDateString('vi-VN', { day: '2-digit' })}</span>
                                                 <span className="text-xs font-bold">Tháng {new Date(show.start_time).getMonth() + 1}</span>
                                             </div>
@@ -144,8 +146,8 @@ export default function EventDetailPage() {
                                                 <p className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400"><Clock size={14} />{formatTime(show.start_time)}</p>
                                                 <p className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400"><MapPin size={14} />{venue?.name || 'Địa điểm đang cập nhật'}{venue?.city ? `, ${venue.city}` : ''}</p>
                                                 <button
-                                                    disabled={!isBookable}
-                                                    onClick={() => isBookable && navigate(`/shows/${show._id}/booking`)} title={availability.message}
+                                                    disabled={!canEnterQueue}
+                                                    onClick={() => canEnterQueue && navigate(`/queue/${show._id}`)} title={availability.message}
                                                     className="mt-2 self-end rounded-xl bg-[#FF0082] px-5 py-2 text-xs font-bold text-white transition hover:bg-pink-700 disabled:bg-slate-200 disabled:text-slate-400"
                                                 >
                                                     {availability.buttonLabel}
