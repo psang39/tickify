@@ -59,6 +59,31 @@ const releaseSeatsLuaScript = `
 
     return newRowStr
 `;
+let orderExpirationWorker: Worker<OrderExpirationJobData> | null = null;
+
+export const startOrderExpirationWorker = (): Worker<OrderExpirationJobData> => {
+    if (orderExpirationWorker) {
+        return orderExpirationWorker;
+    }
+
+    orderExpirationWorker = new Worker<OrderExpirationJobData>(
+        'order-expiration',
+        processOrderExpiration,
+        {
+            connection,
+            concurrency: 5,
+        },
+    );
+
+    orderExpirationWorker.on('failed', (job, error) => {
+        console.error(
+            `[BullMQ] Job ${job?.id} thất bại. Cần can thiệp tay! Lỗi:`,
+            error,
+        );
+    });
+
+    return orderExpirationWorker;
+};
 
 export const orderExpirationQueue = new Queue<OrderExpirationJobData>('order-expiration', {
     connection,
@@ -166,20 +191,19 @@ export const processOrderExpiration = async (
     }
 };
 
-export const orderExpirationWorker = new Worker<OrderExpirationJobData>(
-    'order-expiration',
-    processOrderExpiration,
-    { connection, concurrency: 5 },
-);
 
-orderExpirationWorker.on('failed', (job, err) => {
-    console.error(`[BullMQ] Job ${job?.id} thất bại. Cần can thiệp tay! Lỗi:`, err);
-});
+export const closeOrderExpirationInfrastructure =
+    async (): Promise<void> => {
+        const worker = orderExpirationWorker;
+        orderExpirationWorker = null;
 
-export const closeOrderExpirationInfrastructure = async (): Promise<void> => {
-    await Promise.allSettled([
-        orderExpirationWorker.close(),
-        orderExpirationQueue.close(),
-    ]);
-    if (connection.status !== 'end') await connection.quit();
-};
+        if (worker) {
+            await worker.close();
+        }
+
+        await orderExpirationQueue.close();
+
+        if (connection.status !== 'end') {
+            await connection.quit();
+        }
+    };

@@ -4,8 +4,9 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { PORT } from "./config/index";
 import connectDB from './config/db.js';
-import './queues/orderExpiration.queue';
+import { startOrderExpirationWorker } from './queues/orderExpiration.queue';
 import { connectRedis } from "./utils/redisClient";
+
 import app from './app';
 
 // import methodOverride from 'method-override';
@@ -29,7 +30,7 @@ mongoose.set("strictQuery", false);
 //     .then(console.log("Connected to database"))
 //     .catch((err) => console.log(err));
 
-connectDB();
+
 // === 4 - CONFIGURE ROUTES ===
 // Connect Route handler to server
 // Router(app);
@@ -37,7 +38,10 @@ connectDB();
 // === 5 - START UP SERVER ===
 async function bootstrap() {
     try {
+        await connectDB();
         await connectRedis();
+
+        startOrderExpirationWorker();
         app.listen(PORT, () =>
             console.log(`Server running on http://localhost:${PORT}`)
         )
