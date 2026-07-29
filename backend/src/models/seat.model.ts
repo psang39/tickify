@@ -13,4 +13,8 @@ const SeatSchema = new Mongoose.Schema<ISeat>({
     tier: { type: String },
     ticket_type_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'TicketType' }
 });
-export default Mongoose.model('Seat', SeatSchema);
+const Seat = (
+    Mongoose.models.Seat as Mongoose.Model<ISeat> | undefined
+) ?? Mongoose.model<ISeat>('Seat', SeatSchema);
+
+export default Seat;

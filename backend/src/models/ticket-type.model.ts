@@ -19,4 +19,8 @@ const TicketTypeSchema: Mongoose.Schema = new Mongoose.Schema<ITicketType>({
     }
 }, { timestamps: true });
 
-export default Mongoose.model('TicketType', TicketTypeSchema);
+const TicketType = (
+    Mongoose.models.TicketType as Mongoose.Model<ITicketType> | undefined
+) ?? Mongoose.model<ITicketType>('TicketType', TicketTypeSchema);
+
+export default TicketType;

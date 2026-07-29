@@ -14,4 +14,8 @@ const ZoneSchema = new Mongoose.Schema<IZone>({
     path_data: { type: String }
 });
 
-export default Mongoose.model('Zone', ZoneSchema);
+const Zone = (
+    Mongoose.models.Zone as Mongoose.Model<IZone> | undefined
+) ?? Mongoose.model<IZone>('Zone', ZoneSchema);
+
+export default Zone;

@@ -8,7 +8,7 @@ const OrderSchema = new Mongoose.Schema<IOrder>({
     show_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Show', required: true },
     zone_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Zone', required: true },
     items: [{
-        seat_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Seat', required: true },
+        Order_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
         ticket_type_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'TicketType', required: true },
         price: { type: Number, required: true }
     }],
@@ -23,6 +23,8 @@ const OrderSchema = new Mongoose.Schema<IOrder>({
     promo_code: { type: String }
 });
 
-const Order = Mongoose.model('Order', OrderSchema);
-export default Order;
+const Order = (
+    Mongoose.models.Order as Mongoose.Model<IOrder> | undefined
+) ?? Mongoose.model<IOrder>('Order', OrderSchema);
 
+export default Order;

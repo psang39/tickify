@@ -42,6 +42,11 @@ EventSchema.index({ organizer_id: 1, created_at: -1 });
 EventSchema.plugin(paginate);
 EventSchema.set('toJSON', { virtuals: true });
 EventSchema.set('toObject', { virtuals: true });
-const Event = Mongoose.model<IEvent, mongoose.PaginateModel<IEvent>>('Event', EventSchema);
+const Event = (
+    Mongoose.models.Event as Mongoose.PaginateModel<IEvent> | undefined
+) ?? Mongoose.model<IEvent, Mongoose.PaginateModel<IEvent>>(
+    'Event',
+    EventSchema,
+);
 
 export default Event;

@@ -18,4 +18,8 @@ const PaymentSchema = new mongoose.Schema<IPayment>({
 PaymentSchema.index({ order_id: 1 }, { unique: true });
 PaymentSchema.index({ transaction_id: 1 }, { unique: true, sparse: true });
 
-export default mongoose.model<IPayment>('Payment', PaymentSchema);
+const Payment = (
+    mongoose.models.Seat as mongoose.Model<IPayment> | undefined
+) ?? mongoose.model<IPayment>('Seat', PaymentSchema);
+
+export default Payment;
