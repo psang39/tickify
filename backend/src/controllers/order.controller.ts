@@ -13,6 +13,8 @@ import { calculateValidQuantities } from '../utils/validQuantities';
 import { formatHashToJSON } from '../utils/hashToJson';
 import { updateZoneSummaryAfterHold, updateZoneSummaryAfterRelease } from '../services/zone-summary.service';
 import Attendee from '../models/attendee.model';
+import { calculateReservationExpiry } from '../domain/reservation';
+import { isRedisUnavailableError } from '../utils/redisErrors';
 
 
 const HOLD_DURATION_SECONDS = 600;
@@ -372,7 +374,7 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
                     res.status(400).json({ message: 'Bạn chỉ có thể giữ tối đa 4 vé cho một suất chiếu.' }); return;
                 }
                 console.error("Lỗi giữ ghế:", error);
-                res.status(500).json({ message: 'Lỗi hệ thống khi giữ ghế.' }); return;
+                res.status(503).json({ message: 'Dịch vụ giữ chỗ tạm thời không khả dụng.' }); return;
             }
         }
 
@@ -427,7 +429,7 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
             });
         }
 
-        const cancellation_deadline = new Date(Date.now() + HOLD_DURATION_SECONDS * 1000);
+        const cancellation_deadline = calculateReservationExpiry(new Date(), HOLD_DURATION_SECONDS);
         const newOrder = await Order.create({
             order_number: `TKF-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`,
             user_id: user_id,
@@ -477,7 +479,12 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
         if (createdOrderId) {
             await Order.findByIdAndUpdate(createdOrderId, { status: 'cancelled' });
         }
-        res.status(400).json({ message: error.message || 'Lỗi hệ thống nội bộ.' });
+        const redisUnavailable = isRedisUnavailableError(error);
+        res.status(redisUnavailable ? 503 : 400).json({
+            message: redisUnavailable
+                ? 'Dịch vụ giữ chỗ tạm thời không khả dụng.'
+                : error.message || 'Lỗi hệ thống nội bộ.'
+        });
     }
 };
 export const releaseSeats = async (req: Request, res: Response): Promise<void> => {

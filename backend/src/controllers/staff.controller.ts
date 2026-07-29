@@ -5,17 +5,7 @@ import CheckInLog from '../models/check-in-log.model';
 import { verifyTicketToken } from '../config/totp.util';
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
-
-const parseQrData = (qrData: string) => {
-    const parts = String(qrData || '').split('|').map(part => part.trim());
-    if (parts.length < 4) return null;
-    return {
-        ticketId: parts[0],
-        ticketSecret: parts[1],
-        currentTotpCode: parts[2],
-        signature: parts[3],
-    };
-};
+import { parseTicketQrPayload, verifyTicketQrSignature } from '../domain/qr-payload';
 
 const getDocId = (value: any) => value?._id || value;
 
@@ -143,9 +133,15 @@ export const onlineCheckIn = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
-        const parsed = parseQrData(qrData);
+        const parsed = parseTicketQrPayload(qrData);
         if (!parsed) {
             res.status(400).json({ message: 'Định dạng mã QR không hợp lệ' });
+            return;
+        }
+
+        const show = await Show.findById(show_id).select('public_key').lean();
+        if (!show) {
+            res.status(404).json({ message: 'Show không tồn tại' });
             return;
         }
 
@@ -156,6 +152,13 @@ export const onlineCheckIn = async (req: Request, res: Response): Promise<void> 
 
         if (!ticket) {
             res.status(404).json({ message: 'Vé không thuộc show này hoặc không tồn tại' });
+            return;
+        }
+
+        const hasValidIdentity = parsed.ticketSecret === ticket.ticket_secret
+            && verifyTicketQrSignature(parsed, show.public_key);
+        if (!hasValidIdentity) {
+            res.status(401).json({ message: 'QR payload hoặc chữ ký vé không hợp lệ' });
             return;
         }
 

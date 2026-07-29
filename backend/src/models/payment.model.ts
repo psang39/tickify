@@ -15,4 +15,7 @@ const PaymentSchema = new mongoose.Schema<IPayment>({
     }
 }, { timestamps: true });
 
+PaymentSchema.index({ order_id: 1 }, { unique: true });
+PaymentSchema.index({ transaction_id: 1 }, { unique: true, sparse: true });
+
 export default mongoose.model<IPayment>('Payment', PaymentSchema);

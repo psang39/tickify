@@ -2,8 +2,8 @@ import User from "../models/user.model";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { SECRET_ACCESS_TOKEN, JWT_SECRET } from "../config/index";
+import { hasAnyRole } from '../domain/permissions';
 
-// Helper để xác thực JWT dạng Promise cho sạch code
 const verifyJwt = (token: string, secret: string) => {
     return new Promise((resolve, reject) => {
         jwt.verify(token, secret, (err, decoded) => {
@@ -48,7 +48,6 @@ const Verify = async (req: Request, res: Response, next: NextFunction) => {
         }
 
         const decoded: any = await verifyJwt(token, SECRET_ACCESS_TOKEN as string);
-
         const user = await User.findById(decoded.id);
         if (!user) {
             return res.status(404).json({ error: "User not found." });
@@ -69,7 +68,7 @@ const Verify = async (req: Request, res: Response, next: NextFunction) => {
 const verifyRoles = (allowedRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const user = (req as any).user;
-        if (!user || !allowedRoles.includes(user.role as string)) {
+        if (!user || !hasAnyRole(user.role, allowedRoles)) {
             return res.status(403).json({ error: "You don't have permission to perform this action" });
         }
         next();
@@ -95,7 +94,6 @@ const verifyCheckoutToken = async (req: Request, res: Response, next: NextFuncti
         }
 
         (req as any).checkoutData = decoded;
-
         next();
     } catch (error: any) {
         console.error("Lỗi Checkout Token:", error.message);
