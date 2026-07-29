@@ -27,4 +27,11 @@ CheckInLogSchema.index({ organizer_id: 1, scanned_at: -1 });
 CheckInLogSchema.index({ show_id: 1, ticket_id: 1, result: 1 });
 CheckInLogSchema.plugin(mongoosePaginate);
 
-export default mongoose.model<ICheckInLog, mongoose.PaginateModel<ICheckInLog>>('CheckInLog', CheckInLogSchema);
+const CheckInLog = (
+    mongoose.models.CheckInLog as mongoose.PaginateModel<ICheckInLog> | undefined
+) ?? mongoose.model<ICheckInLog, mongoose.PaginateModel<ICheckInLog>>(
+    'CheckInLog',
+    CheckInLogSchema,
+);
+
+export default CheckInLog;

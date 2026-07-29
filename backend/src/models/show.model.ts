@@ -50,5 +50,11 @@ ShowSchema.virtual('sale_state').get(function () {
 ShowSchema.set('toJSON', { virtuals: true });
 ShowSchema.set('toObject', { virtuals: true });
 
-const Show = mongoose.model<IShow, mongoose.PaginateModel<IShow>>('Show', ShowSchema);
+const Show = (
+    mongoose.models.Show as mongoose.PaginateModel<IShow> | undefined
+) ?? mongoose.model<IShow, mongoose.PaginateModel<IShow>>(
+    'Show',
+    ShowSchema,
+);
+
 export default Show;

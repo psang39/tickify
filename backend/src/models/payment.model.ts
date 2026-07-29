@@ -19,7 +19,7 @@ PaymentSchema.index({ order_id: 1 }, { unique: true });
 PaymentSchema.index({ transaction_id: 1 }, { unique: true, sparse: true });
 
 const Payment = (
-    mongoose.models.Seat as mongoose.Model<IPayment> | undefined
-) ?? mongoose.model<IPayment>('Seat', PaymentSchema);
+    mongoose.models.Payment as mongoose.Model<IPayment> | undefined
+) ?? mongoose.model<IPayment>('Payment', PaymentSchema);
 
 export default Payment;
