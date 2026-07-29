@@ -8,7 +8,7 @@ const OrderSchema = new Mongoose.Schema<IOrder>({
     show_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Show', required: true },
     zone_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Zone', required: true },
     items: [{
-        Order_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
+        seat_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'Seat', required: true },
         ticket_type_id: { type: Mongoose.Schema.Types.ObjectId, ref: 'TicketType', required: true },
         price: { type: Number, required: true }
     }],
