@@ -20,7 +20,7 @@ const TicketSchema = new mongoose.Schema<ITicket>({
 
 TicketSchema.index({ event_id: 1, seat_id: 1 }, { unique: true });
 const Ticket = (
-    mongoose.models.Seat as mongoose.Model<ITicket> | undefined
+    mongoose.models.Ticket as mongoose.Model<ITicket> | undefined
 ) ?? mongoose.model<ITicket>('Ticket', TicketSchema);
 
 export default Ticket;
