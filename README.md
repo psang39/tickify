@@ -1,7 +1,12 @@
 # Tickify
 
 Tickify is a full-stack event ticketing platform for browsing events, booking tickets, issuing QR tickets, and checking attendees in with a mobile scanner app.
-Deployed site: https://tickify.tech
+
+Deployed site: https://tickify.tech. 
+For testing, please use the sample accounts and passwords listed below:
+- User: user@gmail.com, password: 123456a
+- Organizer: company@gmail.com, password: 123456
+
 The project is built as a small monorepo with three apps:
 
 ```txt
