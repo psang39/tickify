@@ -35,6 +35,11 @@ UserSchema.pre("save", async function () {
     this.password = await bcrypt.hash(this.password as string, salt);
 });
 
-const User = Mongoose.model<IUser, Mongoose.PaginateModel<IUser>>('User', UserSchema);
+const User = (
+    Mongoose.models.User as Mongoose.PaginateModel<IUser> | undefined
+) ?? Mongoose.model<IUser, Mongoose.PaginateModel<IUser>>(
+    'User',
+    UserSchema,
+);
 
 export default User;

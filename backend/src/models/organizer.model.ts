@@ -1,12 +1,26 @@
 import Mongoose from 'mongoose';
 import User from './user.model';
 import { IOrganizer } from '../types/organizer.types';
+
 const OrganizerSchema = new Mongoose.Schema<IOrganizer>({
-    company_name: { type: String, required: true },
-    tax_id: { type: String, required: true, unique: true },
-    is_verified: { type: Boolean, default: false }
+    company_name: {
+        type: String,
+        required: true,
+    },
+    tax_id: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    is_verified: {
+        type: Boolean,
+        default: false,
+    },
 });
 
-const Organizer = User.discriminator('Organizer', OrganizerSchema);
+const Organizer = (
+    User.discriminators?.Organizer
+    ?? User.discriminator<IOrganizer>('Organizer', OrganizerSchema)
+);
 
 export default Organizer;

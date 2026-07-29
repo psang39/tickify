@@ -1,5 +1,9 @@
 import User from './user.model';
-import Mongoose, { Schema } from 'mongoose';
+import Mongoose from 'mongoose';
 
-export const Admin = User.discriminator('Admin', new Mongoose.Schema({
-}));
+const AdminSchema = new Mongoose.Schema({});
+
+export const Admin = (
+    User.discriminators?.Admin
+    ?? User.discriminator('Admin', AdminSchema)
+);
