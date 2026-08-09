@@ -4,6 +4,9 @@
 
 🔗 **Live demo:** [tickify.tech](https://tickify.tech/)
 
+For live demo, please use provided accounts below to gain access to the website:
+- Organizer: company@gmail.com - password: 123456
+- User: user@gmail.com - password: 123456a
 <p align="center">
   <a href="#overview">Overview</a> ·
   <a href="#frontend-engineering">Frontend</a> ·
@@ -34,18 +37,13 @@ The project has three main parts:
 
 | Attendee booking | Organizer dashboard |
 | --- | --- |
-| ![Interactive seat selection]<img width="1280" height="720" alt="booking" src="https://github.com/user-attachments/assets/c1f6d4bc-fa6c-450f-9d90-d53821afb92a" />
- | ![Organizer dashboard]<img width="1821" height="1131" alt="Screenshot 2026-08-09 143542" src="https://github.com/user-attachments/assets/4b1aab25-3f68-43e9-8242-2026290fc0c6" />
-|
+| ![Interactive seat selection](docs/assets/booking-seats.gif) | ![Organizer dashboard](docs/assets/organizer-dashboard.png) |
 | Interactive seat selection with filters, booking summary, and live availability. | Revenue, ticket, check-in, event, show, and staff workflows. |
 
 | Electronic ticket | Waiting room |
 | --- | --- |
-| ![Electronic ticket]<img width="1822" height="1137" alt="Screenshot 2026-08-09 143453" src="https://github.com/user-attachments/assets/c52ff968-4765-4754-a101-0c23c9da6e74" />
-| ![Waiting room]<img width="631" height="302" alt="Waiting room" src="https://github.com/user-attachments/assets/faef5b8a-c3f3-4aa7-8ece-bd7bdd10b092" />
- <img width="631" height="305" alt="Queue" src="https://github.com/user-attachments/assets/7d7eac80-02e7-47ef-85ab-4fc4747a84d5" />
-|
-| Ticket details and QR presentation for check-in. | Queue/admission flow before entering booking. |
+| ![Electronic ticket](docs/assets/ticket-qr.png) | ![Waiting room](docs/assets/waiting-room.png) |
+| Electronic ticket details with QR code for event check-in. | Queue and admission flow before users enter the booking process. |
 
 ---
 
@@ -203,6 +201,13 @@ The workflow includes:
 6. Persisting temporary offline scan state and synchronizing it when connectivity returns.
 
 The offline path is treated as a prototype. Production offline ticketing would require stronger local cryptographic verification, pre-event synchronization, and conflict handling across multiple offline devices.
+
+A few screenshots for the Mobile Scanner app:
+
+<img width=30% alt="videoframe_0" src="https://github.com/user-attachments/assets/0c6b797c-001c-45cc-bd7f-fba3171fd4c8" />
+<img width=30% alt="videoframe_91442" src="https://github.com/user-attachments/assets/30ae54d3-dcd0-4af4-93a9-2ef09a6e9ab7" />
+<img width=30% alt="videoframe_47252" src="https://github.com/user-attachments/assets/89ed867a-1999-49fd-86c6-9ba1e5164df0" />
+
 
 ---
 
