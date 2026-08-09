@@ -34,12 +34,17 @@ The project has three main parts:
 
 | Attendee booking | Organizer dashboard |
 | --- | --- |
-| ![Interactive seat selection](docs/assets/booking-seats.png) | ![Organizer dashboard](docs/assets/organizer-dashboard.png) |
+| ![Interactive seat selection]<img width="1280" height="720" alt="booking" src="https://github.com/user-attachments/assets/c1f6d4bc-fa6c-450f-9d90-d53821afb92a" />
+ | ![Organizer dashboard]<img width="1821" height="1131" alt="Screenshot 2026-08-09 143542" src="https://github.com/user-attachments/assets/4b1aab25-3f68-43e9-8242-2026290fc0c6" />
+|
 | Interactive seat selection with filters, booking summary, and live availability. | Revenue, ticket, check-in, event, show, and staff workflows. |
 
 | Electronic ticket | Waiting room |
 | --- | --- |
-| ![Electronic ticket](docs/assets/ticket-qr.png) | ![Waiting room](docs/assets/waiting-room.png) |
+| ![Electronic ticket]<img width="1822" height="1137" alt="Screenshot 2026-08-09 143453" src="https://github.com/user-attachments/assets/c52ff968-4765-4754-a101-0c23c9da6e74" />
+| ![Waiting room]<img width="631" height="302" alt="Waiting room" src="https://github.com/user-attachments/assets/faef5b8a-c3f3-4aa7-8ece-bd7bdd10b092" />
+ <img width="631" height="305" alt="Queue" src="https://github.com/user-attachments/assets/7d7eac80-02e7-47ef-85ab-4fc4747a84d5" />
+|
 | Ticket details and QR presentation for check-in. | Queue/admission flow before entering booking. |
 
 ---
