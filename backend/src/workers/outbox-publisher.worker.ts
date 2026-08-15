@@ -1,4 +1,4 @@
-import type { Producer } from 'kafkajs';
+import { Partitioners, type Producer } from 'kafkajs';
 import OutboxEvent from '../models/outbox-event.model';
 import { kafka } from '../kafka/kafka.client';
 import { PAYMENT_EVENTS_TOPIC } from '../kafka/payment-events';
@@ -36,7 +36,7 @@ const claimNextEvent = async () => {
         },
         {
             sort: { createdAt: 1 },
-            new: true,
+            returnDocument: 'after',
         },
     );
 };
@@ -120,8 +120,12 @@ export const runOutboxPublisher = async (
 ): Promise<void> => {
     const producer = kafka.producer({
         allowAutoTopicCreation: false,
+        createPartitioner: Partitioners.DefaultPartitioner,
         idempotent: true,
         maxInFlightRequests: 1,
+        retry: {
+            retries: Number.MAX_SAFE_INTEGER,
+        },
     });
 
     await producer.connect();

@@ -8,6 +8,7 @@ import { applyPaymentConfirmedProjection } from '../services/payment-projection.
 
 export const runPaymentEventsConsumer = async (
     signal: AbortSignal,
+    onReady?: () => void,
 ): Promise<void> => {
     const consumer = kafka.consumer({
         groupId: PAYMENT_PROJECTION_GROUP,
@@ -18,14 +19,6 @@ export const runPaymentEventsConsumer = async (
         topic: PAYMENT_EVENTS_TOPIC,
         fromBeginning: false,
     });
-
-    signal.addEventListener(
-        'abort',
-        () => {
-            void consumer.disconnect();
-        },
-        { once: true },
-    );
 
     console.log('[Kafka Consumer] Payment projection consumer connected');
 
@@ -56,6 +49,16 @@ export const runPaymentEventsConsumer = async (
 
                 await applyPaymentConfirmedProjection(parsed);
             },
+        });
+        onReady?.();
+
+        await new Promise<void>((resolve) => {
+            if (signal.aborted) {
+                resolve();
+                return;
+            }
+
+            signal.addEventListener('abort', () => resolve(), { once: true });
         });
     } finally {
         await consumer.disconnect();

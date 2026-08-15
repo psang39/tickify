@@ -13,3 +13,5 @@ process.env.RSA_PRIVATE_KEY = process.env.RSA_PRIVATE_KEY || 'test-only-placehol
 process.env.FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 process.env.BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
 process.env.PORT = process.env.PORT || '3000';
+process.env.KAFKA_BROKERS = process.env.TEST_KAFKA_BROKERS || '127.0.0.1:9092';
+process.env.KAFKA_CLIENT_ID = process.env.KAFKA_CLIENT_ID || 'tickify-test';

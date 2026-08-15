@@ -7,7 +7,7 @@ export interface ITicketType extends Document {
     is_limited_promo: boolean,
     total_quantity: number,
     sold_quantity: number,
-    description: { type: String },
+    description?: string,
     status: 'active' | 'inactive' | 'sold_out',
     event_id: Types.ObjectId,
     show_id: Types.ObjectId,

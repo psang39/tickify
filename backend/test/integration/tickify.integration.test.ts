@@ -157,7 +157,7 @@ test('an expired reservation is cancelled and its Redis seat state is released',
     );
 });
 
-test('replayed payment webhooks create one payment, one ticket and one revenue increment', async () => {
+test('replayed payment webhooks create one payment, one ticket and one outbox event', async () => {
     const fixture = await seedBookingFixture();
     const order = await createPendingOrderForFixture(fixture);
     await markFixtureSeatAsHeld(fixture);
@@ -172,20 +172,22 @@ test('replayed payment webhooks create one payment, one ticket and one revenue i
         { default: Order },
         { default: Payment },
         { default: Ticket },
-        { default: redisClient },
+        { default: OutboxEvent },
     ] = await Promise.all([
         import('../../src/models/order.model'),
         import('../../src/models/payment.model'),
         import('../../src/models/ticket.model'),
-        import('../../src/utils/redisClient'),
+        import('../../src/models/outbox-event.model'),
     ]);
 
     assert.deepEqual(responses.map(response => response.status), [200, 200]);
     assert.equal((await Order.findById(order._id).lean())?.status, 'confirmed');
     assert.equal(await Payment.countDocuments({ order_id: order._id }), 1);
     assert.equal(await Ticket.countDocuments({ order_id: order._id }), 1);
-    assert.equal(Number(await redisClient.get(`event:${fixture.eventId}:show:${fixture.showId}:total_revenue`)), fixture.price);
-    assert.equal(Number(await redisClient.get(`event:${fixture.eventId}:show:${fixture.showId}:sold_count`)), 1);
+    assert.equal(await OutboxEvent.countDocuments({
+        aggregate_id: order._id.toString(),
+        event_type: 'payment.confirmed',
+    }), 1);
 });
 
 test('an attendee cannot call staff-only endpoints', async () => {

@@ -25,17 +25,20 @@ export const ensureKafkaTopics = async (): Promise<void> => {
 
     try {
         await admin.connect();
+        const existingTopics = await admin.listTopics();
 
-        await admin.createTopics({
-            waitForLeaders: true,
-            topics: [
-                {
-                    topic: PAYMENT_EVENTS_TOPIC,
-                    numPartitions: 3,
-                    replicationFactor: 1,
-                },
-            ],
-        });
+        if (!existingTopics.includes(PAYMENT_EVENTS_TOPIC)) {
+            await admin.createTopics({
+                waitForLeaders: true,
+                topics: [
+                    {
+                        topic: PAYMENT_EVENTS_TOPIC,
+                        numPartitions: 3,
+                        replicationFactor: 1,
+                    },
+                ],
+            });
+        }
     } finally {
         await admin.disconnect();
     }

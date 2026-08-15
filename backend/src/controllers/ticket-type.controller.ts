@@ -76,7 +76,7 @@ export const getTicketTypeById = async (req: Request, res: Response) => {
 export const updateTicketType = async (req: Request, res: Response) => {
     try {
         const show_id = req.params.show_id as string;
-        const ticketTypeId = req.params.ticketTypeId as String;
+        const ticketTypeId = req.params.ticketTypeId as string;
         const organizer_id = req.user!.id;
 
         const show = await Show.findOne({ _id: show_id, organizer_id });
