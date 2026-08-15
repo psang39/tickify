@@ -139,7 +139,7 @@ const rollbackLuaScript = `
     local numRows = #KEYS - (numSeats + 1)
     for i = 1, numRows do
         local rowKey = KEYS[numSeats + 1 + i]
-        local prevString = ARGV[2 + i]
+        local prevString = ARGV[3 + i]
         if rowKey and prevString then
             redis.call("SET", rowKey, prevString)
         end
