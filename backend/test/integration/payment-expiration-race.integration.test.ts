@@ -159,6 +159,7 @@ test('payment confirmation racing a stale expiration attempt leaves a converged 
         result => ({ kind: 'resolved' as const, result }),
         error => ({ kind: 'rejected' as const, error: String(error) }),
     );
+    (globalThis as any).Date = RealDate;
 
     const state = await captureBookingState(fixture, [order._id.toString()]);
     assert.equal(

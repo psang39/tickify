@@ -17,9 +17,44 @@ export interface OrderExpirationJobData {
     seat_ids: string[];
 }
 
-const connection = new IORedis(REDIS_URL || 'redis://127.0.0.1:6379', {
-    maxRetriesPerRequest: null,
-});
+interface OrderExpirationInfrastructure {
+    connection: IORedis;
+    queue: Queue<OrderExpirationJobData>;
+    worker: Worker<OrderExpirationJobData> | null;
+}
+
+const infrastructureKey = Symbol.for('tickify.orderExpirationInfrastructure');
+const globalInfrastructure = globalThis as typeof globalThis & {
+    [infrastructureKey]?: OrderExpirationInfrastructure;
+};
+
+const infrastructure = globalInfrastructure[infrastructureKey] ?? (() => {
+    const sharedConnection = new IORedis(
+        REDIS_URL || 'redis://127.0.0.1:6379',
+        { maxRetriesPerRequest: null },
+    );
+    const sharedQueue = new Queue<OrderExpirationJobData>('order-expiration', {
+        connection: sharedConnection,
+        defaultJobOptions: {
+            attempts: 3,
+            backoff: {
+                type: 'fixed',
+                delay: 5000,
+            },
+            removeOnComplete: true,
+        },
+    });
+
+    const created = {
+        connection: sharedConnection,
+        queue: sharedQueue,
+        worker: null,
+    };
+    globalInfrastructure[infrastructureKey] = created;
+    return created;
+})();
+
+const { connection } = infrastructure;
 
 const releaseSeatsLuaScript = `
     local rowKey = KEYS[1]
@@ -87,14 +122,13 @@ const releaseSeatsLuaScript = `
 
     return newRowStr
 `;
-let orderExpirationWorker: Worker<OrderExpirationJobData> | null = null;
 
 export const startOrderExpirationWorker = (): Worker<OrderExpirationJobData> => {
-    if (orderExpirationWorker) {
-        return orderExpirationWorker;
+    if (infrastructure.worker) {
+        return infrastructure.worker;
     }
 
-    orderExpirationWorker = new Worker<OrderExpirationJobData>(
+    infrastructure.worker = new Worker<OrderExpirationJobData>(
         'order-expiration',
         processOrderExpiration,
         {
@@ -103,27 +137,17 @@ export const startOrderExpirationWorker = (): Worker<OrderExpirationJobData> => 
         },
     );
 
-    orderExpirationWorker.on('failed', (job, error) => {
+    infrastructure.worker.on('failed', (job, error) => {
         console.error(
             `[BullMQ] Job ${job?.id} thất bại. Cần can thiệp tay! Lỗi:`,
             error,
         );
     });
 
-    return orderExpirationWorker;
+    return infrastructure.worker;
 };
 
-export const orderExpirationQueue = new Queue<OrderExpirationJobData>('order-expiration', {
-    connection,
-    defaultJobOptions: {
-        attempts: 3,
-        backoff: {
-            type: 'fixed',
-            delay: 5000,
-        },
-        removeOnComplete: true,
-    }
-});
+export const orderExpirationQueue = infrastructure.queue;
 
 export const processOrderExpiration = async (
     job: Pick<Job<OrderExpirationJobData>, 'data' | 'id'>,
@@ -210,8 +234,8 @@ export const processOrderExpiration = async (
 
 export const closeOrderExpirationInfrastructure =
     async (): Promise<void> => {
-        const worker = orderExpirationWorker;
-        orderExpirationWorker = null;
+        const worker = infrastructure.worker;
+        infrastructure.worker = null;
 
         if (worker) {
             await worker.close();
