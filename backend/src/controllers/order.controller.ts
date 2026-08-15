@@ -9,9 +9,7 @@ import TicketType from '../models/ticket-type.model';
 import Show from '../models/show.model';
 import Ticket from '../models/ticket.model';
 import { orderExpirationQueue } from '../queues/orderExpiration.queue';
-import { calculateValidQuantities } from '../utils/validQuantities';
-import { formatHashToJSON } from '../utils/hashToJson';
-import { updateZoneSummaryAfterHold, updateZoneSummaryAfterRelease } from '../services/zone-summary.service';
+import { finalizeReleasedSeatMetadata, updateZoneSummaryAfterHold } from '../services/zone-summary.service';
 import Attendee from '../models/attendee.model';
 import { calculateReservationExpiry } from '../domain/reservation';
 import { isRedisUnavailableError } from '../utils/redisErrors';
@@ -170,6 +168,7 @@ const rollbackLuaScript = `
 const releaseSeatsLuaScript = `
     local rowKey = KEYS[1]
     local userCountKey = KEYS[2]
+    local lockCount = tonumber(ARGV[1]) or 0
     local rowStr = redis.call('GET', rowKey)
     if not rowStr then return nil end
 
@@ -178,26 +177,54 @@ const releaseSeatsLuaScript = `
         chars[i] = rowStr:sub(i, i)
     end
 
-    local numSeatsToRelease = #ARGV
-    for i = 1, numSeatsToRelease do
-        local colIndex = tonumber(ARGV[i])
+    for i = 1, lockCount do
+        local colIndex = tonumber(ARGV[1 + i])
         chars[colIndex] = 'O'
     end
 
     local newRowStr = table.concat(chars)
     redis.call('SET', rowKey, newRowStr)
 
-    for i = 3, #KEYS do
-        redis.call('DEL', KEYS[i])
+    for i = 1, lockCount do
+        redis.call('DEL', KEYS[2 + i])
     end
 
-    if numSeatsToRelease > 0 then
+    if lockCount > 0 then
         local currentCount = tonumber(redis.call('GET', userCountKey) or 0)
-        if currentCount >= numSeatsToRelease then
-            redis.call('DECRBY', userCountKey, numSeatsToRelease)
+        if currentCount >= lockCount then
+            redis.call('DECRBY', userCountKey, lockCount)
         else
             redis.call('SET', userCountKey, 0)
         end
+    end
+
+    local summaryKey = KEYS[3 + lockCount]
+    local releasedByTier = {}
+    for i = 1, lockCount do
+        local ticketTypeId = ARGV[1 + lockCount + i]
+        if ticketTypeId and ticketTypeId ~= '' then
+            releasedByTier[ticketTypeId] = (releasedByTier[ticketTypeId] or 0) + 1
+        end
+    end
+    for ticketTypeId, count in pairs(releasedByTier) do
+        redis.call('HINCRBY', summaryKey, 'tier:' .. ticketTypeId .. ':count', count)
+    end
+
+    local validSet = {}
+    for chunk in string.gmatch(newRowStr, 'O+') do
+        local maxQuantity = math.min(#chunk, 4)
+        for quantity = 1, maxQuantity do
+            if #chunk - quantity ~= 1 then validSet[quantity] = true end
+        end
+    end
+    local validQuantities = {}
+    for quantity = 1, 4 do
+        if validSet[quantity] then table.insert(validQuantities, quantity) end
+    end
+    if #validQuantities == 0 then
+        redis.call('HSET', summaryKey, 'valid_quantities', '[]')
+    else
+        redis.call('HSET', summaryKey, 'valid_quantities', cjson.encode(validQuantities))
     end
 
     return newRowStr
@@ -528,53 +555,46 @@ export const releaseSeats = async (req: Request, res: Response): Promise<void> =
 
         const seatsToRelease = await Seat.find({ _id: { $in: seatIds } });
         const seatsByRow: Record<string, typeof seatsToRelease> = {};
-        const releaseByTier: Record<string, number> = {};
 
         seatsToRelease.forEach(seat => {
             if (!seatsByRow[seat.row]) seatsByRow[seat.row] = [];
             seatsByRow[seat.row].push(seat);
-            const ticketTypeId = seat.ticket_type_id?.toString();
-            if (ticketTypeId) {
-                releaseByTier[ticketTypeId] = (releaseByTier[ticketTypeId] || 0) + 1;
-            }
         });
-
-        const updatedRowStrings: string[] = [];
 
         for (const rowLabel in seatsByRow) {
             const seatsInRow = seatsByRow[rowLabel];
             const rowKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:row:${rowLabel}`;
             const keys = [rowKey, `event:${event_id}:show:${show_id}:user:${user_id}:held_count`];
-            const args: string[] = [];
+            const args: string[] = [String(seatsInRow.length)];
 
             seatsInRow.forEach(seat => {
                 keys.push(`event:${event_id}:show:${show_id}:seat:${seat._id}:lock`);
                 args.push(String(seat.col_index));
             });
+            keys.push(`event:${event_id}:show:${show_id}:zone:${zone_id}:summary`);
+            seatsInRow.forEach(seat => {
+                args.push(seat.ticket_type_id?.toString?.() || '');
+            });
 
-            const newString = await redisClient.eval(releaseSeatsLuaScript, {
+            await redisClient.eval(releaseSeatsLuaScript, {
                 keys: keys,
                 arguments: args
-            }) as string;
-
-            if (newString) updatedRowStrings.push(newString);
+            });
         }
 
-
-        const statusHashKey = `show:${show_id}:seat_status`;
-        await redisClient.hDel(statusHashKey, seatIds);
-
-        await updateZoneSummaryAfterRelease({
+        const { releasedSeatIds } = await finalizeReleasedSeatMetadata({
             eventId: strEventId,
             showId: strShowId,
             zoneId: strZoneId,
-            updatedRowStrings,
-            releasedByTicketType: releaseByTier,
-            seatIds
+            seats: seatsToRelease.map(seat => ({
+                id: seat._id.toString(),
+                row: seat.row,
+                colIndex: Number(seat.col_index),
+                ticketTypeId: seat.ticket_type_id?.toString?.() || null,
+            })),
         });
 
-
-        for (const seatId of seatIds) {
+        for (const seatId of releasedSeatIds) {
             await redisClient.publish('SEAT_UPDATES', JSON.stringify({
                 show_id: strShowId,
                 seat_id: seatId,
