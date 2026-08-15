@@ -498,8 +498,17 @@ export const releaseSeats = async (req: Request, res: Response): Promise<void> =
 
     try {
 
-        const order = await Order.findOne({ _id: order_id, user_id: user_id });
+        const order = await Order.findOneAndUpdate(
+            { _id: order_id, user_id, status: 'pending' },
+            { $set: { status: 'cancelled' } },
+            { returnDocument: 'before' },
+        );
         if (!order) {
+            const existingOrder = await Order.exists({ _id: order_id, user_id });
+            if (existingOrder) {
+                res.status(400).json({ message: 'Order is no longer pending.' });
+                return;
+            }
             res.status(404).json({ message: 'Không tìm thấy đơn hàng của bạn.' });
             return;
         }
@@ -515,10 +524,6 @@ export const releaseSeats = async (req: Request, res: Response): Promise<void> =
         const strEventId = event_id.toString();
         const strShowId = show_id.toString();
         const strZoneId = zone_id.toString();
-
-
-        order.status = 'cancelled';
-        await order.save();
 
 
         const seatsToRelease = await Seat.find({ _id: { $in: seatIds } });
