@@ -1,0 +1,3388 @@
+{
+  "startedAt": "2026-08-18T09:29:44.201Z",
+  "durationMs": 12000,
+  "intervalMs": 100,
+  "samples": [
+    {
+      "at": "2026-08-18T09:29:44.138Z",
+      "stats": {
+        "total_commands_processed": "3939",
+        "instantaneous_ops_per_sec": "0",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5135,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.232100",
+        "used_cpu_user": "0.800215",
+        "used_cpu_sys_main_thread": "0.226800",
+        "used_cpu_user_main_thread": "0.791661"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=387,usec=149,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:44.251Z",
+      "stats": {
+        "total_commands_processed": "3945",
+        "instantaneous_ops_per_sec": "6",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5224,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.234104",
+        "used_cpu_user": "0.800215",
+        "used_cpu_sys_main_thread": "0.227246",
+        "used_cpu_user_main_thread": "0.793219"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=387,usec=149,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:44.371Z",
+      "stats": {
+        "total_commands_processed": "3951",
+        "instantaneous_ops_per_sec": "9",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5225,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.236552",
+        "used_cpu_user": "0.800215",
+        "used_cpu_sys_main_thread": "0.229695",
+        "used_cpu_user_main_thread": "0.793219"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=387,usec=149,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:44.476Z",
+      "stats": {
+        "total_commands_processed": "3957",
+        "instantaneous_ops_per_sec": "13",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5227,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.237719",
+        "used_cpu_user": "0.800215",
+        "used_cpu_sys_main_thread": "0.230418",
+        "used_cpu_user_main_thread": "0.793662"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=387,usec=149,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:44.586Z",
+      "stats": {
+        "total_commands_processed": "3963",
+        "instantaneous_ops_per_sec": "17",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5227,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.239758",
+        "used_cpu_user": "0.800620",
+        "used_cpu_sys_main_thread": "0.230418",
+        "used_cpu_user_main_thread": "0.796106"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=387,usec=149,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:44.707Z",
+      "stats": {
+        "total_commands_processed": "3969",
+        "instantaneous_ops_per_sec": "20",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5229,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.240362",
+        "used_cpu_user": "0.802640",
+        "used_cpu_sys_main_thread": "0.230597",
+        "used_cpu_user_main_thread": "0.798551"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=387,usec=149,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:44.824Z",
+      "stats": {
+        "total_commands_processed": "3976",
+        "instantaneous_ops_per_sec": "24",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5228,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.240478",
+        "used_cpu_user": "0.805781",
+        "used_cpu_sys_main_thread": "0.230597",
+        "used_cpu_user_main_thread": "0.801808"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:44.932Z",
+      "stats": {
+        "total_commands_processed": "3982",
+        "instantaneous_ops_per_sec": "28",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5228,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.240524",
+        "used_cpu_user": "0.807475",
+        "used_cpu_sys_main_thread": "0.230759",
+        "used_cpu_user_main_thread": "0.803386"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.049Z",
+      "stats": {
+        "total_commands_processed": "3988",
+        "instantaneous_ops_per_sec": "32",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5228,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.240963",
+        "used_cpu_user": "0.808948",
+        "used_cpu_sys_main_thread": "0.231186",
+        "used_cpu_user_main_thread": "0.804871"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.158Z",
+      "stats": {
+        "total_commands_processed": "3994",
+        "instantaneous_ops_per_sec": "36",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5230,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.241502",
+        "used_cpu_user": "0.810758",
+        "used_cpu_sys_main_thread": "0.231710",
+        "used_cpu_user_main_thread": "0.806696"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.262Z",
+      "stats": {
+        "total_commands_processed": "4000",
+        "instantaneous_ops_per_sec": "39",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5231,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.241846",
+        "used_cpu_user": "0.811914",
+        "used_cpu_sys_main_thread": "0.232045",
+        "used_cpu_user_main_thread": "0.807861"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.370Z",
+      "stats": {
+        "total_commands_processed": "4006",
+        "instantaneous_ops_per_sec": "43",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5231,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.243522",
+        "used_cpu_user": "0.811914",
+        "used_cpu_sys_main_thread": "0.233721",
+        "used_cpu_user_main_thread": "0.807861"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.479Z",
+      "stats": {
+        "total_commands_processed": "4012",
+        "instantaneous_ops_per_sec": "47",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5231,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.244677",
+        "used_cpu_user": "0.811914",
+        "used_cpu_sys_main_thread": "0.234876",
+        "used_cpu_user_main_thread": "0.807861"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.586Z",
+      "stats": {
+        "total_commands_processed": "4018",
+        "instantaneous_ops_per_sec": "50",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5231,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.244677",
+        "used_cpu_user": "0.813135",
+        "used_cpu_sys_main_thread": "0.234876",
+        "used_cpu_user_main_thread": "0.809083"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.691Z",
+      "stats": {
+        "total_commands_processed": "4024",
+        "instantaneous_ops_per_sec": "54",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5231,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.244677",
+        "used_cpu_user": "0.814002",
+        "used_cpu_sys_main_thread": "0.234876",
+        "used_cpu_user_main_thread": "0.809949"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.798Z",
+      "stats": {
+        "total_commands_processed": "4030",
+        "instantaneous_ops_per_sec": "58",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5231,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.244677",
+        "used_cpu_user": "0.814975",
+        "used_cpu_sys_main_thread": "0.234876",
+        "used_cpu_user_main_thread": "0.810922"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:45.905Z",
+      "stats": {
+        "total_commands_processed": "4036",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5231,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.244677",
+        "used_cpu_user": "0.816336",
+        "used_cpu_sys_main_thread": "0.234876",
+        "used_cpu_user_main_thread": "0.812283"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.010Z",
+      "stats": {
+        "total_commands_processed": "4042",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5231,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.244677",
+        "used_cpu_user": "0.817316",
+        "used_cpu_sys_main_thread": "0.234876",
+        "used_cpu_user_main_thread": "0.813263"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.117Z",
+      "stats": {
+        "total_commands_processed": "4048",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5232,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.244677",
+        "used_cpu_user": "0.818408",
+        "used_cpu_sys_main_thread": "0.234876",
+        "used_cpu_user_main_thread": "0.814355"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.225Z",
+      "stats": {
+        "total_commands_processed": "4054",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5232,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.245861",
+        "used_cpu_user": "0.818408",
+        "used_cpu_sys_main_thread": "0.236060",
+        "used_cpu_user_main_thread": "0.814355"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": null,
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.329Z",
+      "stats": {
+        "total_commands_processed": "4068",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5406,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.245983",
+        "used_cpu_user": "0.820166",
+        "used_cpu_sys_main_thread": "0.236060",
+        "used_cpu_user_main_thread": "0.816235"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.435Z",
+      "stats": {
+        "total_commands_processed": "4074",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.245983",
+        "used_cpu_user": "0.821091",
+        "used_cpu_sys_main_thread": "0.236060",
+        "used_cpu_user_main_thread": "0.817161"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.543Z",
+      "stats": {
+        "total_commands_processed": "4080",
+        "instantaneous_ops_per_sec": "63",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.245983",
+        "used_cpu_user": "0.822027",
+        "used_cpu_sys_main_thread": "0.236131",
+        "used_cpu_user_main_thread": "0.818025"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.647Z",
+      "stats": {
+        "total_commands_processed": "4086",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.246170",
+        "used_cpu_user": "0.823397",
+        "used_cpu_sys_main_thread": "0.236480",
+        "used_cpu_user_main_thread": "0.819234"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.752Z",
+      "stats": {
+        "total_commands_processed": "4092",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.246384",
+        "used_cpu_user": "0.824112",
+        "used_cpu_sys_main_thread": "0.236687",
+        "used_cpu_user_main_thread": "0.819954"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.859Z",
+      "stats": {
+        "total_commands_processed": "4098",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.246613",
+        "used_cpu_user": "0.824879",
+        "used_cpu_sys_main_thread": "0.236911",
+        "used_cpu_user_main_thread": "0.820728"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=388,usec=151,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:46.965Z",
+      "stats": {
+        "total_commands_processed": "4105",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.246752",
+        "used_cpu_user": "0.826034",
+        "used_cpu_sys_main_thread": "0.236911",
+        "used_cpu_user_main_thread": "0.822021"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.070Z",
+      "stats": {
+        "total_commands_processed": "4111",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.246752",
+        "used_cpu_user": "0.826928",
+        "used_cpu_sys_main_thread": "0.236911",
+        "used_cpu_user_main_thread": "0.822915"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.177Z",
+      "stats": {
+        "total_commands_processed": "4117",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.248333",
+        "used_cpu_user": "0.826928",
+        "used_cpu_sys_main_thread": "0.238492",
+        "used_cpu_user_main_thread": "0.822915"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.286Z",
+      "stats": {
+        "total_commands_processed": "4123",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5408,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.249265",
+        "used_cpu_user": "0.826928",
+        "used_cpu_sys_main_thread": "0.239424",
+        "used_cpu_user_main_thread": "0.822915"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.398Z",
+      "stats": {
+        "total_commands_processed": "4129",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.249454",
+        "used_cpu_user": "0.828224",
+        "used_cpu_sys_main_thread": "0.239676",
+        "used_cpu_user_main_thread": "0.824149"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.514Z",
+      "stats": {
+        "total_commands_processed": "4135",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.249454",
+        "used_cpu_user": "0.830336",
+        "used_cpu_sys_main_thread": "0.239676",
+        "used_cpu_user_main_thread": "0.826261"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.623Z",
+      "stats": {
+        "total_commands_processed": "4141",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.249454",
+        "used_cpu_user": "0.832657",
+        "used_cpu_sys_main_thread": "0.239676",
+        "used_cpu_user_main_thread": "0.828581"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.737Z",
+      "stats": {
+        "total_commands_processed": "4147",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.249454",
+        "used_cpu_user": "0.834472",
+        "used_cpu_sys_main_thread": "0.239676",
+        "used_cpu_user_main_thread": "0.830397"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.845Z",
+      "stats": {
+        "total_commands_processed": "4153",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.249454",
+        "used_cpu_user": "0.835486",
+        "used_cpu_sys_main_thread": "0.239676",
+        "used_cpu_user_main_thread": "0.831410"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:47.962Z",
+      "stats": {
+        "total_commands_processed": "4159",
+        "instantaneous_ops_per_sec": "60",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.250844",
+        "used_cpu_user": "0.836147",
+        "used_cpu_sys_main_thread": "0.241247",
+        "used_cpu_user_main_thread": "0.831889"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.075Z",
+      "stats": {
+        "total_commands_processed": "4165",
+        "instantaneous_ops_per_sec": "51",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.250844",
+        "used_cpu_user": "0.838695",
+        "used_cpu_sys_main_thread": "0.241247",
+        "used_cpu_user_main_thread": "0.834437"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.183Z",
+      "stats": {
+        "total_commands_processed": "4171",
+        "instantaneous_ops_per_sec": "51",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.250915",
+        "used_cpu_user": "0.840567",
+        "used_cpu_sys_main_thread": "0.241322",
+        "used_cpu_user_main_thread": "0.836306"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.289Z",
+      "stats": {
+        "total_commands_processed": "4177",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.251010",
+        "used_cpu_user": "0.841922",
+        "used_cpu_sys_main_thread": "0.241322",
+        "used_cpu_user_main_thread": "0.837757"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.397Z",
+      "stats": {
+        "total_commands_processed": "4183",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.251010",
+        "used_cpu_user": "0.842933",
+        "used_cpu_sys_main_thread": "0.241322",
+        "used_cpu_user_main_thread": "0.838767"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.503Z",
+      "stats": {
+        "total_commands_processed": "4189",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.251010",
+        "used_cpu_user": "0.844027",
+        "used_cpu_sys_main_thread": "0.241322",
+        "used_cpu_user_main_thread": "0.839861"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.611Z",
+      "stats": {
+        "total_commands_processed": "4195",
+        "instantaneous_ops_per_sec": "54",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.252431",
+        "used_cpu_user": "0.844027",
+        "used_cpu_sys_main_thread": "0.242742",
+        "used_cpu_user_main_thread": "0.839861"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.715Z",
+      "stats": {
+        "total_commands_processed": "4201",
+        "instantaneous_ops_per_sec": "54",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.253536",
+        "used_cpu_user": "0.844027",
+        "used_cpu_sys_main_thread": "0.243848",
+        "used_cpu_user_main_thread": "0.839861"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.820Z",
+      "stats": {
+        "total_commands_processed": "4207",
+        "instantaneous_ops_per_sec": "54",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.253903",
+        "used_cpu_user": "0.844958",
+        "used_cpu_sys_main_thread": "0.244333",
+        "used_cpu_user_main_thread": "0.840674"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:48.924Z",
+      "stats": {
+        "total_commands_processed": "4213",
+        "instantaneous_ops_per_sec": "54",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.254169",
+        "used_cpu_user": "0.845843",
+        "used_cpu_sys_main_thread": "0.244593",
+        "used_cpu_user_main_thread": "0.841565"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=389,usec=153,usec_per_call=0.39,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.050Z",
+      "stats": {
+        "total_commands_processed": "4220",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.254586",
+        "used_cpu_user": "0.847230",
+        "used_cpu_sys_main_thread": "0.244999",
+        "used_cpu_user_main_thread": "0.842963"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.163Z",
+      "stats": {
+        "total_commands_processed": "4226",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.254647",
+        "used_cpu_user": "0.848392",
+        "used_cpu_sys_main_thread": "0.244999",
+        "used_cpu_user_main_thread": "0.844186"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.269Z",
+      "stats": {
+        "total_commands_processed": "4232",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.254647",
+        "used_cpu_user": "0.849696",
+        "used_cpu_sys_main_thread": "0.244999",
+        "used_cpu_user_main_thread": "0.845490"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1052,usec=1762,usec_per_call=1.67,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.373Z",
+      "stats": {
+        "total_commands_processed": "4262",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5409,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.256440",
+        "used_cpu_user": "0.849992",
+        "used_cpu_sys_main_thread": "0.247089",
+        "used_cpu_user_main_thread": "0.845490"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1076,usec=1894,usec_per_call=1.76,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.494Z",
+      "stats": {
+        "total_commands_processed": "4396",
+        "instantaneous_ops_per_sec": "146",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5740,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.261706",
+        "used_cpu_user": "0.853685",
+        "used_cpu_sys_main_thread": "0.251662",
+        "used_cpu_user_main_thread": "0.849875"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1160,usec=2122,usec_per_call=1.83,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.610Z",
+      "stats": {
+        "total_commands_processed": "4498",
+        "instantaneous_ops_per_sec": "205",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5828,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.262463",
+        "used_cpu_user": "0.858215",
+        "used_cpu_sys_main_thread": "0.252870",
+        "used_cpu_user_main_thread": "0.853954"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1185,usec=2185,usec_per_call=1.84,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.727Z",
+      "stats": {
+        "total_commands_processed": "4609",
+        "instantaneous_ops_per_sec": "208",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5828,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.262547",
+        "used_cpu_user": "0.861079",
+        "used_cpu_sys_main_thread": "0.252870",
+        "used_cpu_user_main_thread": "0.856902"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1276,usec=2385,usec_per_call=1.87,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.831Z",
+      "stats": {
+        "total_commands_processed": "4692",
+        "instantaneous_ops_per_sec": "321",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5829,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.262684",
+        "used_cpu_user": "0.863104",
+        "used_cpu_sys_main_thread": "0.253089",
+        "used_cpu_user_main_thread": "0.858845"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1277,usec=2392,usec_per_call=1.87,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:49.938Z",
+      "stats": {
+        "total_commands_processed": "4712",
+        "instantaneous_ops_per_sec": "322",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5831,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.263025",
+        "used_cpu_user": "0.864225",
+        "used_cpu_sys_main_thread": "0.253422",
+        "used_cpu_user_main_thread": "0.859974"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1288,usec=2401,usec_per_call=1.86,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.047Z",
+      "stats": {
+        "total_commands_processed": "4727",
+        "instantaneous_ops_per_sec": "335",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5831,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.264778",
+        "used_cpu_user": "0.864225",
+        "used_cpu_sys_main_thread": "0.255176",
+        "used_cpu_user_main_thread": "0.859974"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1291,usec=2406,usec_per_call=1.86,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.157Z",
+      "stats": {
+        "total_commands_processed": "4736",
+        "instantaneous_ops_per_sec": "335",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5832,
+        "maxQueryBufferBytes": 524013
+      },
+      "cpu": {
+        "used_cpu_sys": "0.267435",
+        "used_cpu_user": "0.864985",
+        "used_cpu_sys_main_thread": "0.257810",
+        "used_cpu_user_main_thread": "0.860755"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1292,usec=2407,usec_per_call=1.86,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.266Z",
+      "stats": {
+        "total_commands_processed": "4766",
+        "instantaneous_ops_per_sec": "351",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5836,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.296015",
+        "used_cpu_user": "0.864985",
+        "used_cpu_sys_main_thread": "0.286391",
+        "used_cpu_user_main_thread": "0.860755"
+      },
+      "commandstats": {
+        "eval": "calls=356,usec=23567,usec_per_call=66.20,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1300,usec=6629,usec_per_call=5.10,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.371Z",
+      "stats": {
+        "total_commands_processed": "4779",
+        "instantaneous_ops_per_sec": "351",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5836,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.297978",
+        "used_cpu_user": "0.864985",
+        "used_cpu_sys_main_thread": "0.288353",
+        "used_cpu_user_main_thread": "0.860755"
+      },
+      "commandstats": {
+        "eval": "calls=357,usec=24092,usec_per_call=67.48,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1302,usec=6637,usec_per_call=5.10,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.479Z",
+      "stats": {
+        "total_commands_processed": "4845",
+        "instantaneous_ops_per_sec": "357",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5921,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.304166",
+        "used_cpu_user": "0.864985",
+        "used_cpu_sys_main_thread": "0.294542",
+        "used_cpu_user_main_thread": "0.860755"
+      },
+      "commandstats": {
+        "eval": "calls=364,usec=25747,usec_per_call=70.73,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1316,usec=6728,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.599Z",
+      "stats": {
+        "total_commands_processed": "4859",
+        "instantaneous_ops_per_sec": "392",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5921,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.306346",
+        "used_cpu_user": "0.865221",
+        "used_cpu_sys_main_thread": "0.296638",
+        "used_cpu_user_main_thread": "0.861075"
+      },
+      "commandstats": {
+        "eval": "calls=365,usec=25872,usec_per_call=70.88,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1318,usec=6739,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.713Z",
+      "stats": {
+        "total_commands_processed": "4872",
+        "instantaneous_ops_per_sec": "397",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5922,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.307137",
+        "used_cpu_user": "0.868290",
+        "used_cpu_sys_main_thread": "0.296638",
+        "used_cpu_user_main_thread": "0.864935"
+      },
+      "commandstats": {
+        "eval": "calls=365,usec=25872,usec_per_call=70.88,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1318,usec=6739,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.819Z",
+      "stats": {
+        "total_commands_processed": "4879",
+        "instantaneous_ops_per_sec": "398",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5922,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.307188",
+        "used_cpu_user": "0.871749",
+        "used_cpu_sys_main_thread": "0.297468",
+        "used_cpu_user_main_thread": "0.867615"
+      },
+      "commandstats": {
+        "eval": "calls=365,usec=25872,usec_per_call=70.88,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1318,usec=6739,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:50.928Z",
+      "stats": {
+        "total_commands_processed": "4885",
+        "instantaneous_ops_per_sec": "398",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5922,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.307650",
+        "used_cpu_user": "0.873062",
+        "used_cpu_sys_main_thread": "0.297921",
+        "used_cpu_user_main_thread": "0.868937"
+      },
+      "commandstats": {
+        "eval": "calls=365,usec=25872,usec_per_call=70.88,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1318,usec=6739,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.046Z",
+      "stats": {
+        "total_commands_processed": "4891",
+        "instantaneous_ops_per_sec": "364",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5922,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.309755",
+        "used_cpu_user": "0.873062",
+        "used_cpu_sys_main_thread": "0.300026",
+        "used_cpu_user_main_thread": "0.868937"
+      },
+      "commandstats": {
+        "eval": "calls=365,usec=25872,usec_per_call=70.88,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1318,usec=6739,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=390,usec=156,usec_per_call=0.40,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.166Z",
+      "stats": {
+        "total_commands_processed": "4906",
+        "instantaneous_ops_per_sec": "308",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5922,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.311021",
+        "used_cpu_user": "0.875006",
+        "used_cpu_sys_main_thread": "0.301297",
+        "used_cpu_user_main_thread": "0.870875"
+      },
+      "commandstats": {
+        "eval": "calls=366,usec=25996,usec_per_call=71.03,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1320,usec=6749,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.272Z",
+      "stats": {
+        "total_commands_processed": "4912",
+        "instantaneous_ops_per_sec": "254",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5922,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.312020",
+        "used_cpu_user": "0.875237",
+        "used_cpu_sys_main_thread": "0.302529",
+        "used_cpu_user_main_thread": "0.870875"
+      },
+      "commandstats": {
+        "eval": "calls=366,usec=25996,usec_per_call=71.03,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1320,usec=6749,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.397Z",
+      "stats": {
+        "total_commands_processed": "4921",
+        "instantaneous_ops_per_sec": "256",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 0,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5922,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.316821",
+        "used_cpu_user": "0.875237",
+        "used_cpu_sys_main_thread": "0.307329",
+        "used_cpu_user_main_thread": "0.870875"
+      },
+      "commandstats": {
+        "eval": "calls=366,usec=25996,usec_per_call=71.03,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=1,usec=112,usec_per_call=112.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1320,usec=6749,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.513Z",
+      "stats": {
+        "total_commands_processed": "4937",
+        "instantaneous_ops_per_sec": "143",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5923,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.322440",
+        "used_cpu_user": "0.880510",
+        "used_cpu_sys_main_thread": "0.312703",
+        "used_cpu_user_main_thread": "0.876392"
+      },
+      "commandstats": {
+        "eval": "calls=366,usec=25996,usec_per_call=71.03,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=2,usec=422,usec_per_call=211.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1320,usec=6749,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.634Z",
+      "stats": {
+        "total_commands_processed": "4946",
+        "instantaneous_ops_per_sec": "133",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5924,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.331734",
+        "used_cpu_user": "0.883242",
+        "used_cpu_sys_main_thread": "0.321950",
+        "used_cpu_user_main_thread": "0.879172"
+      },
+      "commandstats": {
+        "eval": "calls=366,usec=25996,usec_per_call=71.03,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=2,usec=422,usec_per_call=211.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1320,usec=6749,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.747Z",
+      "stats": {
+        "total_commands_processed": "4957",
+        "instantaneous_ops_per_sec": "137",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 5925,
+        "maxQueryBufferBytes": 229176
+      },
+      "cpu": {
+        "used_cpu_sys": "0.339925",
+        "used_cpu_user": "0.887122",
+        "used_cpu_sys_main_thread": "0.330120",
+        "used_cpu_user_main_thread": "0.883072"
+      },
+      "commandstats": {
+        "eval": "calls=366,usec=25996,usec_per_call=71.03,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=2,usec=422,usec_per_call=211.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1320,usec=6749,usec_per_call=5.11,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.858Z",
+      "stats": {
+        "total_commands_processed": "5107",
+        "instantaneous_ops_per_sec": "161",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6093,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.347017",
+        "used_cpu_user": "0.890752",
+        "used_cpu_sys_main_thread": "0.337916",
+        "used_cpu_user_main_thread": "0.886000"
+      },
+      "commandstats": {
+        "eval": "calls=377,usec=27424,usec_per_call=72.74,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=2,usec=422,usec_per_call=211.00,rejected_calls=0,failed_calls=0",
+        "get": "calls=1342,usec=6816,usec_per_call=5.08,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:51.979Z",
+      "stats": {
+        "total_commands_processed": "5257",
+        "instantaneous_ops_per_sec": "255",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 0,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6277,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.349115",
+        "used_cpu_user": "0.897724",
+        "used_cpu_sys_main_thread": "0.339270",
+        "used_cpu_user_main_thread": "0.893689"
+      },
+      "commandstats": {
+        "eval": "calls=381,usec=30144,usec_per_call=79.12,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=10,usec=1892,usec_per_call=189.20,rejected_calls=0,failed_calls=0",
+        "get": "calls=1348,usec=6835,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.094Z",
+      "stats": {
+        "total_commands_processed": "5570",
+        "instantaneous_ops_per_sec": "334",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.350332",
+        "used_cpu_user": "0.905024",
+        "used_cpu_sys_main_thread": "0.340471",
+        "used_cpu_user_main_thread": "0.901004"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.201Z",
+      "stats": {
+        "total_commands_processed": "5576",
+        "instantaneous_ops_per_sec": "445",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.350734",
+        "used_cpu_user": "0.906064",
+        "used_cpu_sys_main_thread": "0.340867",
+        "used_cpu_user_main_thread": "0.902051"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.307Z",
+      "stats": {
+        "total_commands_processed": "5582",
+        "instantaneous_ops_per_sec": "440",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.351159",
+        "used_cpu_user": "0.907162",
+        "used_cpu_sys_main_thread": "0.341285",
+        "used_cpu_user_main_thread": "0.903157"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.417Z",
+      "stats": {
+        "total_commands_processed": "5588",
+        "instantaneous_ops_per_sec": "440",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.351224",
+        "used_cpu_user": "0.908387",
+        "used_cpu_sys_main_thread": "0.341285",
+        "used_cpu_user_main_thread": "0.904446"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.525Z",
+      "stats": {
+        "total_commands_processed": "5594",
+        "instantaneous_ops_per_sec": "439",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.351224",
+        "used_cpu_user": "0.909924",
+        "used_cpu_sys_main_thread": "0.341285",
+        "used_cpu_user_main_thread": "0.905984"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.636Z",
+      "stats": {
+        "total_commands_processed": "5600",
+        "instantaneous_ops_per_sec": "439",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.351224",
+        "used_cpu_user": "0.911830",
+        "used_cpu_sys_main_thread": "0.341285",
+        "used_cpu_user_main_thread": "0.907890"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.745Z",
+      "stats": {
+        "total_commands_processed": "5606",
+        "instantaneous_ops_per_sec": "435",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.353484",
+        "used_cpu_user": "0.912124",
+        "used_cpu_sys_main_thread": "0.343838",
+        "used_cpu_user_main_thread": "0.907890"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.853Z",
+      "stats": {
+        "total_commands_processed": "5612",
+        "instantaneous_ops_per_sec": "430",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.354541",
+        "used_cpu_user": "0.913465",
+        "used_cpu_sys_main_thread": "0.344582",
+        "used_cpu_user_main_thread": "0.909198"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:52.961Z",
+      "stats": {
+        "total_commands_processed": "5618",
+        "instantaneous_ops_per_sec": "429",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.354541",
+        "used_cpu_user": "0.915318",
+        "used_cpu_sys_main_thread": "0.344582",
+        "used_cpu_user_main_thread": "0.911051"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.070Z",
+      "stats": {
+        "total_commands_processed": "5624",
+        "instantaneous_ops_per_sec": "428",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.354541",
+        "used_cpu_user": "0.917545",
+        "used_cpu_sys_main_thread": "0.344582",
+        "used_cpu_user_main_thread": "0.913278"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.178Z",
+      "stats": {
+        "total_commands_processed": "5630",
+        "instantaneous_ops_per_sec": "422",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.354616",
+        "used_cpu_user": "0.919861",
+        "used_cpu_sys_main_thread": "0.344582",
+        "used_cpu_user_main_thread": "0.915669"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=391,usec=159,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.299Z",
+      "stats": {
+        "total_commands_processed": "5637",
+        "instantaneous_ops_per_sec": "425",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6284,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.354616",
+        "used_cpu_user": "0.923618",
+        "used_cpu_sys_main_thread": "0.344582",
+        "used_cpu_user_main_thread": "0.919426"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.408Z",
+      "stats": {
+        "total_commands_processed": "5643",
+        "instantaneous_ops_per_sec": "421",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6282,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.354616",
+        "used_cpu_user": "0.925700",
+        "used_cpu_sys_main_thread": "0.344582",
+        "used_cpu_user_main_thread": "0.921508"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.529Z",
+      "stats": {
+        "total_commands_processed": "5649",
+        "instantaneous_ops_per_sec": "381",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6281,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.355284",
+        "used_cpu_user": "0.927918",
+        "used_cpu_sys_main_thread": "0.345328",
+        "used_cpu_user_main_thread": "0.923648"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.639Z",
+      "stats": {
+        "total_commands_processed": "5655",
+        "instantaneous_ops_per_sec": "286",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6281,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356043",
+        "used_cpu_user": "0.929901",
+        "used_cpu_sys_main_thread": "0.346074",
+        "used_cpu_user_main_thread": "0.925644"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.762Z",
+      "stats": {
+        "total_commands_processed": "5661",
+        "instantaneous_ops_per_sec": "203",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6281,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356164",
+        "used_cpu_user": "0.932411",
+        "used_cpu_sys_main_thread": "0.346074",
+        "used_cpu_user_main_thread": "0.928275"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.866Z",
+      "stats": {
+        "total_commands_processed": "5667",
+        "instantaneous_ops_per_sec": "51",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356330",
+        "used_cpu_user": "0.934843",
+        "used_cpu_sys_main_thread": "0.346361",
+        "used_cpu_user_main_thread": "0.930585"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:53.984Z",
+      "stats": {
+        "total_commands_processed": "5673",
+        "instantaneous_ops_per_sec": "51",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356433",
+        "used_cpu_user": "0.936043",
+        "used_cpu_sys_main_thread": "0.346361",
+        "used_cpu_user_main_thread": "0.931889"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.094Z",
+      "stats": {
+        "total_commands_processed": "5679",
+        "instantaneous_ops_per_sec": "51",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356433",
+        "used_cpu_user": "0.938120",
+        "used_cpu_sys_main_thread": "0.346361",
+        "used_cpu_user_main_thread": "0.933966"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.214Z",
+      "stats": {
+        "total_commands_processed": "5685",
+        "instantaneous_ops_per_sec": "51",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356516",
+        "used_cpu_user": "0.939524",
+        "used_cpu_sys_main_thread": "0.346549",
+        "used_cpu_user_main_thread": "0.935265"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.320Z",
+      "stats": {
+        "total_commands_processed": "5691",
+        "instantaneous_ops_per_sec": "51",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356623",
+        "used_cpu_user": "0.941777",
+        "used_cpu_sys_main_thread": "0.346549",
+        "used_cpu_user_main_thread": "0.937625"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.426Z",
+      "stats": {
+        "total_commands_processed": "5697",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356623",
+        "used_cpu_user": "0.943517",
+        "used_cpu_sys_main_thread": "0.346549",
+        "used_cpu_user_main_thread": "0.939365"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.530Z",
+      "stats": {
+        "total_commands_processed": "5703",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356842",
+        "used_cpu_user": "0.944583",
+        "used_cpu_sys_main_thread": "0.346875",
+        "used_cpu_user_main_thread": "0.940324"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.638Z",
+      "stats": {
+        "total_commands_processed": "5709",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356842",
+        "used_cpu_user": "0.945867",
+        "used_cpu_sys_main_thread": "0.346875",
+        "used_cpu_user_main_thread": "0.941609"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.743Z",
+      "stats": {
+        "total_commands_processed": "5715",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6280,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356842",
+        "used_cpu_user": "0.947424",
+        "used_cpu_sys_main_thread": "0.346875",
+        "used_cpu_user_main_thread": "0.943166"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.849Z",
+      "stats": {
+        "total_commands_processed": "5721",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6279,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356842",
+        "used_cpu_user": "0.948518",
+        "used_cpu_sys_main_thread": "0.346875",
+        "used_cpu_user_main_thread": "0.944259"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:54.953Z",
+      "stats": {
+        "total_commands_processed": "5727",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6279,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356842",
+        "used_cpu_user": "0.949728",
+        "used_cpu_sys_main_thread": "0.346875",
+        "used_cpu_user_main_thread": "0.945469"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.064Z",
+      "stats": {
+        "total_commands_processed": "5733",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6281,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356842",
+        "used_cpu_user": "0.951102",
+        "used_cpu_sys_main_thread": "0.346875",
+        "used_cpu_user_main_thread": "0.946844"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.173Z",
+      "stats": {
+        "total_commands_processed": "5739",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6282,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.356949",
+        "used_cpu_user": "0.953266",
+        "used_cpu_sys_main_thread": "0.346990",
+        "used_cpu_user_main_thread": "0.948999"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.290Z",
+      "stats": {
+        "total_commands_processed": "5745",
+        "instantaneous_ops_per_sec": "51",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.357693",
+        "used_cpu_user": "0.955250",
+        "used_cpu_sys_main_thread": "0.347721",
+        "used_cpu_user_main_thread": "0.950996"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=392,usec=162,usec_per_call=0.41,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.396Z",
+      "stats": {
+        "total_commands_processed": "5752",
+        "instantaneous_ops_per_sec": "52",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.359356",
+        "used_cpu_user": "0.955250",
+        "used_cpu_sys_main_thread": "0.349385",
+        "used_cpu_user_main_thread": "0.950996"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=393,usec=164,usec_per_call=0.42,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.516Z",
+      "stats": {
+        "total_commands_processed": "5758",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.360645",
+        "used_cpu_user": "0.956131",
+        "used_cpu_sys_main_thread": "0.350686",
+        "used_cpu_user_main_thread": "0.951864"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=393,usec=164,usec_per_call=0.42,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.638Z",
+      "stats": {
+        "total_commands_processed": "5764",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.361281",
+        "used_cpu_user": "0.957816",
+        "used_cpu_sys_main_thread": "0.351311",
+        "used_cpu_user_main_thread": "0.953560"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=393,usec=164,usec_per_call=0.42,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.756Z",
+      "stats": {
+        "total_commands_processed": "5770",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.361635",
+        "used_cpu_user": "0.958755",
+        "used_cpu_sys_main_thread": "0.351660",
+        "used_cpu_user_main_thread": "0.954505"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=393,usec=164,usec_per_call=0.42,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.862Z",
+      "stats": {
+        "total_commands_processed": "5776",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.361901",
+        "used_cpu_user": "0.959461",
+        "used_cpu_sys_main_thread": "0.351921",
+        "used_cpu_user_main_thread": "0.955215"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=393,usec=164,usec_per_call=0.42,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:55.969Z",
+      "stats": {
+        "total_commands_processed": "5782",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.361965",
+        "used_cpu_user": "0.960790",
+        "used_cpu_sys_main_thread": "0.351921",
+        "used_cpu_user_main_thread": "0.956607"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=393,usec=164,usec_per_call=0.42,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    },
+    {
+      "at": "2026-08-18T09:29:56.080Z",
+      "stats": {
+        "total_commands_processed": "5788",
+        "instantaneous_ops_per_sec": "55",
+        "total_error_replies": "0"
+      },
+      "clients": {
+        "total": 5,
+        "blocked": 1,
+        "pubsub": 1,
+        "database0": 1,
+        "database2": 4,
+        "maxOutputBufferBytes": 6283,
+        "maxQueryBufferBytes": 162
+      },
+      "cpu": {
+        "used_cpu_sys": "0.361965",
+        "used_cpu_user": "0.961974",
+        "used_cpu_sys_main_thread": "0.351921",
+        "used_cpu_user_main_thread": "0.957791"
+      },
+      "commandstats": {
+        "eval": "calls=382,usec=30318,usec_per_call=79.37,rejected_calls=0,failed_calls=0",
+        "evalsha": "calls=26,usec=3740,usec_per_call=143.85,rejected_calls=0,failed_calls=0",
+        "get": "calls=1350,usec=6843,usec_per_call=5.07,rejected_calls=0,failed_calls=0",
+        "ping": "calls=393,usec=164,usec_per_call=0.42,rejected_calls=0,failed_calls=0"
+      },
+      "slowlogLength": 0,
+      "latencyLatest": []
+    }
+  ],
+  "initialSlowlog": [],
+  "finalSlowlog": []
+}

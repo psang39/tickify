@@ -1,0 +1,72 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: perf/booking-preauthenticated.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 50 max VUs, 5m30s max duration (incl. graceful stop):
+              * booking_preauthenticated: 1 iterations for each of 50 VUs (maxDuration: 5m0s, gracefulStop: 30s)
+
+
+running (0m00.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m00.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m01.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m01.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m02.9s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m02.9s/5m0s  00/50 iters, 1 per VU
+
+running (0m03.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m03.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m04.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m04.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m05.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m05.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m06.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m06.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m07.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m07.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m08.9s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m08.9s/5m0s  00/50 iters, 1 per VU
+
+
+  █ TOTAL RESULTS 
+
+    CUSTOM
+    expected_business_conflicts....: 0.00%  0 out of 50
+    hold_latency_ms................: min=844.05ms avg=2.15s med=1.67s p(90)=3.94s p(95)=3.97s p(99)=5.33s max=6.1s 
+    unexpected_failures............: 0.00%  0 out of 50
+
+    HTTP
+    http_req_duration..............: min=104.19ms avg=2.21s med=1.31s p(90)=5.55s p(95)=5.84s p(99)=6.08s max=6.68s
+      { expected_response:true }...: min=104.19ms avg=2.21s med=1.31s p(90)=5.55s p(95)=5.84s p(99)=6.08s max=6.68s
+    http_req_failed................: 0.00%  0 out of 250
+    http_reqs......................: 250    26.974673/s
+
+    EXECUTION
+    iteration_duration.............: min=9.17s    avg=9.21s med=9.2s  p(90)=9.24s p(95)=9.25s p(99)=9.26s max=9.26s
+    iterations.....................: 50     5.394935/s
+    vus............................: 50     min=50       max=50
+    vus_max........................: 50     min=50       max=50
+
+    NETWORK
+    data_received..................: 30 MB  3.2 MB/s
+    data_sent......................: 150 kB 16 kB/s
+
+
+
+
+running (0m09.3s), 00/50 VUs, 50 complete and 0 interrupted iterations
+booking_preauthenticated ✓ [ 100% ] 50 VUs  0m09.3s/5m0s  50/50 iters, 1 per VU

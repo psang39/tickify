@@ -1,0 +1,54 @@
+{
+  "runId": "redis-attribution-control-100",
+  "concurrency": 100,
+  "topology": "one node-redis client; default Redis database 0; direct EVAL only",
+  "eval": {
+    "latency": {
+      "p50Ms": 17.84,
+      "p95Ms": 25.58,
+      "p99Ms": 25.6,
+      "maxMs": 25.6
+    },
+    "maxInFlight": 100,
+    "inFlightAtSubmit": {
+      "p50Ms": 49,
+      "p95Ms": 94,
+      "p99Ms": 98,
+      "maxMs": 99
+    }
+  },
+  "get": {
+    "latency": {
+      "p50Ms": 2.96,
+      "p95Ms": 3.24,
+      "p99Ms": 3.26,
+      "maxMs": 3.41
+    },
+    "maxInFlight": 100,
+    "inFlightAtSubmit": {
+      "p50Ms": 49,
+      "p95Ms": 94,
+      "p99Ms": 98,
+      "maxMs": 99
+    }
+  },
+  "ping": {
+    "latency": {
+      "p50Ms": 5.07,
+      "p95Ms": 5.36,
+      "p99Ms": 5.38,
+      "maxMs": 5.56
+    },
+    "maxInFlight": 100,
+    "inFlightAtSubmit": {
+      "p50Ms": 49,
+      "p95Ms": 94,
+      "p99Ms": 98,
+      "maxMs": 99
+    }
+  },
+  "eventLoop": {
+    "p99DelayMs": 24.2,
+    "maxDelayMs": 24.2
+  }
+}

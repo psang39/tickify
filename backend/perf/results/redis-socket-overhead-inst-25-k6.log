@@ -1,0 +1,51 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: perf/booking-preauthenticated.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 25 max VUs, 5m30s max duration (incl. graceful stop):
+              * booking_preauthenticated: 1 iterations for each of 25 VUs (maxDuration: 5m0s, gracefulStop: 30s)
+
+
+running (0m00.9s), 25/25 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 25 VUs  0m00.9s/5m0s  00/25 iters, 1 per VU
+
+running (0m01.9s), 00/25 VUs, 25 complete and 0 interrupted iterations
+booking_preauthenticated ✓ [ 100% ] 25 VUs  0m01.9s/5m0s  25/25 iters, 1 per VU
+
+
+  █ TOTAL RESULTS 
+
+    CUSTOM
+    expected_business_conflicts....: 0.00% 0 out of 25
+    hold_latency_ms................: min=325.53ms avg=639.82ms med=677.37ms p(90)=838.84ms p(95)=848.17ms p(99)=1.09s    max=1.17s
+    unexpected_failures............: 0.00% 0 out of 25
+
+    HTTP
+    http_req_duration..............: min=21.78ms  avg=462.91ms med=407.88ms p(90)=688.51ms p(95)=822.67ms p(99)=847.74ms max=1.17s
+      { expected_response:true }...: min=21.78ms  avg=462.91ms med=407.88ms p(90)=688.51ms p(95)=822.67ms p(99)=847.74ms max=1.17s
+    http_req_failed................: 0.00% 0 out of 125
+    http_reqs......................: 125   66.093147/s
+
+    EXECUTION
+    iteration_duration.............: min=1.8s     avg=1.87s    med=1.87s    p(90)=1.88s    p(95)=1.89s    p(99)=1.89s    max=1.89s
+    iterations.....................: 25    13.218629/s
+    vus............................: 25    min=25       max=25
+    vus_max........................: 25    min=25       max=25
+
+    NETWORK
+    data_received..................: 15 MB 7.9 MB/s
+    data_sent......................: 75 kB 40 kB/s
+
+
+
+
+running (0m01.9s), 00/25 VUs, 25 complete and 0 interrupted iterations
+booking_preauthenticated ✓ [ 100% ] 25 VUs  0m01.9s/5m0s  25/25 iters, 1 per VU

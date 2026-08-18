@@ -1,0 +1,94 @@
+{
+  "runtime": {
+    "startedAt": "2026-08-16T09:44:28.096Z",
+    "uptimeSeconds": 1.65,
+    "process": {
+      "pid": 9800,
+      "cpuUtilizationPercent": 6.78,
+      "memory": {
+        "rss": 208445440,
+        "heapTotal": 185470976,
+        "heapUsed": 90177360,
+        "external": 26165478,
+        "arrayBuffers": 21988065
+      }
+    },
+    "eventLoop": {
+      "meanDelayMs": 37.92,
+      "maxDelayMs": 180.88,
+      "p99DelayMs": 180.88
+    },
+    "routes": [
+      {
+        "route": "GET /",
+        "requests": 1,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 10.75,
+        "p95Ms": 10.75,
+        "p99Ms": 10.75,
+        "sampleCount": 1
+      }
+    ],
+    "authLoginPhases": null,
+    "holdPhases": {}
+  },
+  "dependencies": {
+    "redis": {
+      "ok": true,
+      "latencyMs": 24.46,
+      "value": {
+        "ping": "PONG",
+        "stats": {
+          "total_commands_processed": "389945",
+          "instantaneous_ops_per_sec": "24",
+          "total_error_replies": "130",
+          "keyspace_hits": "114264",
+          "keyspace_misses": "25757"
+        }
+      }
+    },
+    "mongo": {
+      "ok": true,
+      "latencyMs": 64.61,
+      "value": {
+        "transactions": {
+          "currentActive": 0,
+          "currentInactive": 0,
+          "totalCommitted": 252,
+          "totalAborted": 702
+        },
+        "opcounters": {
+          "insert": 311750,
+          "query": 96254,
+          "update": 22191,
+          "delete": 4454,
+          "getmore": 703,
+          "command": 122850
+        }
+      }
+    },
+    "expirationQueue": {
+      "ok": true,
+      "latencyMs": 19.16,
+      "value": {
+        "counts": {
+          "waiting": 0,
+          "active": 0,
+          "delayed": 0,
+          "failed": 0,
+          "paused": 0
+        },
+        "oldestDelayedJobLagMs": null
+      }
+    },
+    "outbox": {
+      "ok": true,
+      "latencyMs": 21.5,
+      "value": {
+        "oldestUnpublished": null,
+        "oldestUnpublishedAgeMs": null
+      }
+    }
+  }
+}

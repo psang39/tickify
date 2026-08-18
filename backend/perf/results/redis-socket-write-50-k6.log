@@ -1,0 +1,54 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: perf/booking-preauthenticated.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 50 max VUs, 5m30s max duration (incl. graceful stop):
+              * booking_preauthenticated: 1 iterations for each of 50 VUs (maxDuration: 5m0s, gracefulStop: 30s)
+
+
+running (0m00.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m00.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m01.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m01.8s/5m0s  00/50 iters, 1 per VU
+
+running (0m02.8s), 50/50 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 50 VUs  0m02.8s/5m0s  00/50 iters, 1 per VU
+
+
+  █ TOTAL RESULTS 
+
+    CUSTOM
+    expected_business_conflicts....: 0.00%  0 out of 50
+    hold_latency_ms................: min=800.94ms avg=1.25s    med=991.45ms p(90)=1.8s  p(95)=2.18s p(99)=2.22s max=2.23s
+    unexpected_failures............: 0.00%  0 out of 50
+
+    HTTP
+    http_req_duration..............: min=50.52ms  avg=872.23ms med=810.26ms p(90)=1.33s p(95)=1.46s p(99)=2.18s max=2.23s
+      { expected_response:true }...: min=50.52ms  avg=872.23ms med=810.26ms p(90)=1.33s p(95)=1.46s p(99)=2.18s max=2.23s
+    http_req_failed................: 0.00%  0 out of 250
+    http_reqs......................: 250    68.439007/s
+
+    EXECUTION
+    iteration_duration.............: min=3.23s    avg=3.59s    med=3.61s    p(90)=3.63s p(95)=3.64s p(99)=3.64s max=3.65s
+    iterations.....................: 50     13.687801/s
+    vus............................: 50     min=50       max=50
+    vus_max........................: 50     min=50       max=50
+
+    NETWORK
+    data_received..................: 30 MB  8.2 MB/s
+    data_sent......................: 150 kB 41 kB/s
+
+
+
+
+running (0m03.7s), 00/50 VUs, 50 complete and 0 interrupted iterations
+booking_preauthenticated ✓ [ 100% ] 50 VUs  0m03.7s/5m0s  50/50 iters, 1 per VU

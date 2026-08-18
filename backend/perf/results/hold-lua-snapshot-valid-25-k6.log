@@ -1,0 +1,51 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: perf/booking-preauthenticated.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 25 max VUs, 5m30s max duration (incl. graceful stop):
+              * booking_preauthenticated: 1 iterations for each of 25 VUs (maxDuration: 5m0s, gracefulStop: 30s)
+
+
+running (0m00.9s), 25/25 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 25 VUs  0m00.9s/5m0s  00/25 iters, 1 per VU
+
+running (0m01.9s), 25/25 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 25 VUs  0m01.9s/5m0s  00/25 iters, 1 per VU
+
+
+  █ TOTAL RESULTS 
+
+    CUSTOM
+    expected_business_conflicts....: 0.00% 0 out of 25
+    hold_latency_ms................: min=476.19ms avg=950.87ms med=996.95ms p(90)=1.22s p(95)=1.32s p(99)=1.35s max=1.36s
+    unexpected_failures............: 0.00% 0 out of 25
+
+    HTTP
+    http_req_duration..............: min=22.15ms  avg=584.78ms med=476.19ms p(90)=1.01s p(95)=1.06s p(99)=1.31s max=1.36s
+      { expected_response:true }...: min=22.15ms  avg=584.78ms med=476.19ms p(90)=1.01s p(95)=1.06s p(99)=1.31s max=1.36s
+    http_req_failed................: 0.00% 0 out of 125
+    http_reqs......................: 125   49.501343/s
+
+    EXECUTION
+    iteration_duration.............: min=2.18s    avg=2.47s    med=2.47s    p(90)=2.51s p(95)=2.51s p(99)=2.52s max=2.52s
+    iterations.....................: 25    9.900269/s
+    vus............................: 25    min=25       max=25
+    vus_max........................: 25    min=25       max=25
+
+    NETWORK
+    data_received..................: 15 MB 5.9 MB/s
+    data_sent......................: 75 kB 30 kB/s
+
+
+
+
+running (0m02.5s), 00/25 VUs, 25 complete and 0 interrupted iterations
+booking_preauthenticated ✓ [ 100% ] 25 VUs  0m02.5s/5m0s  25/25 iters, 1 per VU

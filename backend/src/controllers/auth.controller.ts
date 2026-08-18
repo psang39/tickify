@@ -6,6 +6,11 @@ import Attendee from '../models/attendee.model';
 import { IUser } from '../types/user.types';
 import Blacklist from '../models/blacklist.model';
 import bcrypt from 'bcrypt';
+import { performance } from 'node:perf_hooks';
+import {
+    loginPhaseMetricsEnabled,
+    recordLoginPhaseMetric,
+} from '../services/runtime-metrics.service';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -103,6 +108,11 @@ const buildAuthUserPayload = async (user: IUser) => {
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
+        const collectPhaseMetrics = loginPhaseMetricsEnabled();
+        const controllerStartedAt = collectPhaseMetrics ? performance.now() : 0;
+        let mongoLookupMs = 0;
+        let bcryptCompareMs = 0;
+        let jwtGenerationMs = 0;
         const { email, password } = req.body;
 
         if (!email || !password) {
@@ -111,14 +121,24 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         console.log("Email from request:", email);
+        const lookupStartedAt = collectPhaseMetrics ? performance.now() : 0;
         const user: IUser | null = await User.findOne({ email: email.toLowerCase() });
+        if (collectPhaseMetrics) {
+            mongoLookupMs = performance.now() - lookupStartedAt;
+            recordLoginPhaseMetric('mongoLookup', mongoLookupMs);
+        }
 
         if (!user) {
             res.status(400).json({ error: 'Invalid credentials' });
             return;
         }
 
+        const bcryptStartedAt = collectPhaseMetrics ? performance.now() : 0;
         const isMatch = await bcrypt.compare(password, user.password);
+        if (collectPhaseMetrics) {
+            bcryptCompareMs = performance.now() - bcryptStartedAt;
+            recordLoginPhaseMetric('bcryptCompare', bcryptCompareMs);
+        }
         if (!isMatch) {
             res.status(400).json({ error: 'Wrong password' });
             return;
@@ -131,7 +151,18 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             sameSite: process.env.NODE_ENV === 'production' ? "none" as const : "lax" as const,
         };
 
+        const jwtStartedAt = collectPhaseMetrics ? performance.now() : 0;
         const token = user.generateAccessJWT();
+        if (collectPhaseMetrics) {
+            jwtGenerationMs = performance.now() - jwtStartedAt;
+            recordLoginPhaseMetric('jwtGeneration', jwtGenerationMs);
+            res.once('finish', () => {
+                recordLoginPhaseMetric(
+                    'remainingRouteWork',
+                    Math.max(0, performance.now() - controllerStartedAt - mongoLookupMs - bcryptCompareMs - jwtGenerationMs),
+                );
+            });
+        }
 
         res.cookie("SessionID", token, options);
         const authUser = await buildAuthUserPayload(user);

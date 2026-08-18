@@ -13,11 +13,18 @@ import { finalizeReleasedSeatMetadata, updateZoneSummaryAfterHold } from '../ser
 import Attendee from '../models/attendee.model';
 import { calculateReservationExpiry } from '../domain/reservation';
 import { isRedisUnavailableError } from '../utils/redisErrors';
+import type { IOrder } from '../types/order.types';
+import { performance } from 'node:perf_hooks';
+import {
+    holdPhaseMetricsEnabled,
+    recordHoldPhaseMetric,
+} from '../services/runtime-metrics.service';
+import { measureRedisCommandAttribution } from '../services/redis-attribution.service';
 
 
 const HOLD_DURATION_SECONDS = 600;
 
-const holdSeatsLuaScript = `
+export const holdSeatsLuaScript = `
     local rowKey = KEYS[1]
     local userCountKey = KEYS[2]
     local lockTTL = tonumber(ARGV[1])
@@ -76,7 +83,10 @@ const holdSeatsLuaScript = `
     -- Đặt TTL cho key đếm này bằng với lockTTL để nó tự reset nếu không thanh toán
     redis.call('EXPIRE', userCountKey, lockTTL)
 
-    return "OK"
+    -- Return the exact value observed before this successful mutation. The
+    -- controller retains it for a later multi-row rollback, avoiding a
+    -- separate, race-prone round trip to read the row.
+    return rowStr
 `;
 
 const holdStandingSeatsLuaScript = `
@@ -118,7 +128,7 @@ const holdStandingSeatsLuaScript = `
     redis.call('INCRBY', userCountKey, numSeats)
     redis.call('EXPIRE', userCountKey, lockTTL)
 
-    return "OK"
+    return rowStr
 `;
 
 const rollbackLuaScript = `
@@ -296,10 +306,52 @@ export const rollbackLocksAndRows = async (
 };
 
 export const holdSeats = async (req: Request, res: Response): Promise<void> => {
-    const user_id = req.user!.id;
-    const { items } = req.body;
-    const { event_id, show_id } = req.checkoutData;
-    const currentUser = await User.findById(user_id);
+    const collectPhaseMetrics = holdPhaseMetricsEnabled();
+    const controllerStartedAt = collectPhaseMetrics ? performance.now() : 0;
+    const phaseDurations: Record<string, number> = {
+        validationDataLookup: 0,
+        redisLuaHold: 0,
+        mongoOrderCreation: 0,
+        summaryStatusUpdates: 0,
+        bullExpirationEnqueue: 0,
+        requestItemNormalization: 0,
+        availabilityBusinessRules: 0,
+        ticketPriceConstruction: 0,
+        redisKeyArgumentConstruction: 0,
+        postHoldStatePreparation: 0,
+        logging: 0,
+        responseObjectConstruction: 0,
+        responseSerializationDispatch: 0,
+    };
+    const syncCpuDurations: Record<string, number> = {};
+    const measure = async <T>(phase: keyof typeof phaseDurations, operation: () => Promise<T>): Promise<T> => {
+        if (!collectPhaseMetrics) return operation();
+        const startedAt = performance.now();
+        try {
+            return await operation();
+        } finally {
+            phaseDurations[phase] += performance.now() - startedAt;
+        }
+    };
+    const measureSync = <T>(phase: keyof typeof phaseDurations, operation: () => T): T => {
+        if (!collectPhaseMetrics) return operation();
+        const startedAt = performance.now();
+        const startedCpu = process.cpuUsage();
+        try {
+            return operation();
+        } finally {
+            phaseDurations[phase] += performance.now() - startedAt;
+            const cpu = process.cpuUsage(startedCpu);
+            syncCpuDurations[phase] = (syncCpuDurations[phase] || 0) + (cpu.user + cpu.system) / 1_000;
+        }
+    };
+    const { user_id, items, event_id, show_id } = measureSync('requestItemNormalization', () => ({
+        user_id: req.user!.id,
+        items: req.body.items,
+        event_id: req.checkoutData.event_id,
+        show_id: req.checkoutData.show_id,
+    }));
+    const currentUser = await measure('validationDataLookup', () => User.findById(user_id));
     if (!currentUser) throw new Error('Không tìm thấy thông tin người dùng hợp lệ.');
 
     if (!event_id || !show_id || !Array.isArray(items) || items.length === 0) {
@@ -307,83 +359,106 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 
-    const targetShow = await Show.findById(show_id)
+    const targetShow = await measure('validationDataLookup', () => Show.findById(show_id)
         .select('event_id status sale_start sale_end start_time end_time')
-        .lean();
+        .lean());
 
     if (!targetShow) {
         res.status(404).json({ message: 'Show diễn không tồn tại.' });
         return;
     }
 
-    if (String((targetShow as any).event_id) !== String(event_id)) {
+    const checkoutMatchesShow = measureSync(
+        'availabilityBusinessRules',
+        () => String((targetShow as any).event_id) === String(event_id),
+    );
+    if (!checkoutMatchesShow) {
         res.status(400).json({ message: 'Checkout token không khớp với show hiện tại.' });
         return;
     }
 
-    const availability = computeShowAvailability(targetShow);
+    const availability = measureSync('availabilityBusinessRules', () => computeShowAvailability(targetShow));
     if (!availability.is_bookable) {
         res.status(403).json({ message: availability.booking_message, availability });
         return;
     }
 
-    const seat_ids = items.map(item => item.seat_id);
-    const ticket_type_ids = items.map(item => item.ticket_type_id);
+    const { seat_ids, ticket_type_ids } = measureSync('requestItemNormalization', () => ({
+        seat_ids: items.map(item => item.seat_id),
+        ticket_type_ids: items.map(item => item.ticket_type_id),
+    }));
     const successfullyLockedSeats: string[] = [];
     const modifiedRowsForRollback: { rowLabel: string, prevString: string }[] = [];
     let zone_id = '';
     let createdOrderId: string | null = null;
 
     try {
-        const targetSeats = await Seat.find({ _id: { $in: seat_ids } });
+        const targetSeats = await measure('validationDataLookup', () => Seat.find({ _id: { $in: seat_ids } }));
         if (targetSeats.length !== seat_ids.length) {
             res.status(400).json({ message: 'Một số ghế không tồn tại.' });
             return;
         }
 
-        zone_id = targetSeats[0].zone_id.toString();
-        const hasMixedZone = targetSeats.some(seat => seat.zone_id.toString() !== zone_id);
+        zone_id = measureSync('availabilityBusinessRules', () => targetSeats[0].zone_id.toString());
+        const hasMixedZone = measureSync(
+            'availabilityBusinessRules',
+            () => targetSeats.some(seat => seat.zone_id.toString() !== zone_id),
+        );
         if (hasMixedZone) {
             res.status(400).json({ message: 'Mỗi lần giữ chỗ chỉ được chọn vé trong cùng một khu vực.' });
             return;
         }
 
-        const selectedZone = await Zone.findById(zone_id).lean();
+        const selectedZone = await measure('validationDataLookup', () => Zone.findById(zone_id).lean());
         if (!selectedZone) {
             res.status(404).json({ message: 'Không tìm thấy khu vực của vé.' });
             return;
         }
 
-        const seatsByRow: { [key: string]: typeof targetSeats } = {};
-        const lockedByTier: Record<string, number> = {};
-        items.forEach(item => { lockedByTier[item.ticket_type_id] = (lockedByTier[item.ticket_type_id] || 0) + 1; });
-        console.log("Số lượng vé theo từng loại đang giữ trong request này:", lockedByTier);
-        targetSeats.forEach(seat => {
-
-            if (!seatsByRow[seat.row]) seatsByRow[seat.row] = [];
-            seatsByRow[seat.row].push(seat);
+        const { seatsByRow, lockedByTier } = measureSync('requestItemNormalization', () => {
+            const groupedSeats: { [key: string]: typeof targetSeats } = {};
+            const ticketsByTier: Record<string, number> = {};
+            items.forEach(item => {
+                ticketsByTier[item.ticket_type_id] = (ticketsByTier[item.ticket_type_id] || 0) + 1;
+            });
+            targetSeats.forEach(seat => {
+                if (!groupedSeats[seat.row]) groupedSeats[seat.row] = [];
+                groupedSeats[seat.row].push(seat);
+            });
+            return { seatsByRow: groupedSeats, lockedByTier: ticketsByTier };
         });
+        measureSync('logging', () => console.log("Số lượng vé theo từng loại đang giữ trong request này:", lockedByTier));
 
         for (const rowLabel in seatsByRow) {
             const seatsInRow = seatsByRow[rowLabel];
             const rowKey = `event:${event_id}:show:${show_id}:zone:${zone_id}:row:${rowLabel}`;
 
-            const prevRowString = await redisClient.get(rowKey);
-            const keys = [rowKey, `event:${event_id}:show:${show_id}:user:${user_id}:held_count`];
-            const args = [String(HOLD_DURATION_SECONDS), user_id!];
-
-            seatsInRow.forEach(seat => {
-                keys.push(`event:${event_id}:show:${show_id}:seat:${seat._id}:lock`);
-                args.push(String(seat.col_index));
+            const { keys, args } = measureSync('redisKeyArgumentConstruction', () => {
+                const redisKeys = [rowKey, `event:${event_id}:show:${show_id}:user:${user_id}:held_count`];
+                const redisArgs = [String(HOLD_DURATION_SECONDS), user_id!];
+                seatsInRow.forEach(seat => {
+                    redisKeys.push(`event:${event_id}:show:${show_id}:seat:${seat._id}:lock`);
+                    redisArgs.push(String(seat.col_index));
+                });
+                return { keys: redisKeys, args: redisArgs };
             });
 
             try {
-                await redisClient.eval(selectedZone.is_standing ? holdStandingSeatsLuaScript : holdSeatsLuaScript, { keys, arguments: args });
+                const previousRowString = await measure('redisLuaHold', () => measureRedisCommandAttribution(
+                    'hold-eval',
+                    () => redisClient.eval(
+                        selectedZone.is_standing ? holdStandingSeatsLuaScript : holdSeatsLuaScript,
+                        { keys, arguments: args },
+                    ),
+                ));
 
-                seatsInRow.forEach(s => successfullyLockedSeats.push(s._id.toString()));
-                if (typeof prevRowString === 'string') {
-                    modifiedRowsForRollback.push({ rowLabel, prevString: prevRowString });
-                }
+                measureSync('postHoldStatePreparation', () => {
+                    seatsInRow.forEach(s => successfullyLockedSeats.push(s._id.toString()));
+                    if (typeof previousRowString !== 'string') {
+                        throw new Error('Redis hold did not return a rollback row snapshot.');
+                    }
+                    modifiedRowsForRollback.push({ rowLabel, prevString: previousRowString });
+                });
             } catch (error: any) {
                 const errMsg = error.message;
                 await rollbackLocksAndRows(event_id, show_id, zone_id, user_id, successfullyLockedSeats, modifiedRowsForRollback);
@@ -408,94 +483,129 @@ export const holdSeats = async (req: Request, res: Response): Promise<void> => {
 
         const statusHashKey = `show:${show_id}:seat_status`;
 
-        for (const seat_id of successfullyLockedSeats) {
-            const stringShowId = show_id.toString();
+        await measure('summaryStatusUpdates', async () => {
+            for (const seat_id of successfullyLockedSeats) {
+                const stringShowId = show_id.toString();
+                await redisClient.hSet(statusHashKey, seat_id.toString(), 'holding');
+                measureSync('logging', () => console.log(
+                    `📢 [Trạm 1] Đang publish cho ghế ${seat_id} của Show ${stringShowId}`,
+                ));
+                await redisClient.publish('SEAT_UPDATES', JSON.stringify({
+                    show_id: stringShowId,
+                    seat_id: seat_id.toString(),
+                    status: 'holding'
+                }));
+            }
+        });
+        const { uniqueSeatIds, uniqueTicketTypeIds } = measureSync('postHoldStatePreparation', () => ({
+            uniqueSeatIds: [...new Set(seat_ids.map(String))],
+            uniqueTicketTypeIds: [...new Set(ticket_type_ids.map(String))],
+        }));
 
 
-            await redisClient.hSet(statusHashKey, seat_id.toString(), 'holding');
-
-            console.log(`📢 [Trạm 1] Đang publish cho ghế ${seat_id} của Show ${stringShowId}`);
-            await redisClient.publish('SEAT_UPDATES', JSON.stringify({
-                show_id: stringShowId,
-                seat_id: seat_id.toString(),
-                status: 'holding'
-            }));
-        }
-        const uniqueSeatIds = [...new Set(seat_ids.map(String))];
-        const uniqueTicketTypeIds = [...new Set(ticket_type_ids.map(String))];
-
-
-        const seatsFromDb = await Seat.find({ _id: { $in: uniqueSeatIds } });
-        const ticketTypesFromDb = await TicketType.find({ _id: { $in: uniqueTicketTypeIds } }) as any[];
+        const seatsFromDb = await measure('validationDataLookup', () => Seat.find({ _id: { $in: uniqueSeatIds } }));
+        const ticketTypesFromDb = await measure('validationDataLookup', () => TicketType.find({ _id: { $in: uniqueTicketTypeIds } })) as any[];
 
         if (seatsFromDb.length !== uniqueSeatIds.length || ticketTypesFromDb.length !== uniqueTicketTypeIds.length) {
             throw new Error('Có ghế hoặc loại vé không tồn tại trong hệ thống.');
         }
 
-        let totalPrice = 0;
-        const orderTicketsData = [];
-
-        for (const item of items) {
-            const seat = seatsFromDb.find(s => s._id.toString() === item.seat_id);
-            const selectedTicketType = ticketTypesFromDb.find(t => t._id.toString() === item.ticket_type_id);
-            if (!selectedTicketType) throw new Error('Loại vé bạn chọn không tồn tại.');
-            const seatTier = String(seat!.tier || '').toUpperCase();
-            const ticketTier = String(selectedTicketType.target_tier || '').toUpperCase();
-            if (!selectedZone.is_standing && seatTier !== ticketTier) {
-                throw new Error(`Ghế hạng ${seat!.tier} không khớp với vé.`);
+        const { totalPrice, orderTicketsData } = measureSync('ticketPriceConstruction', () => {
+            let calculatedTotalPrice = 0;
+            const tickets: IOrder['items'] = [];
+            for (const item of items) {
+                const seat = seatsFromDb.find(s => s._id.toString() === item.seat_id);
+                const selectedTicketType = ticketTypesFromDb.find(t => t._id.toString() === item.ticket_type_id);
+                if (!selectedTicketType) throw new Error('Loại vé bạn chọn không tồn tại.');
+                const seatTier = String(seat!.tier || '').toUpperCase();
+                const ticketTier = String(selectedTicketType.target_tier || '').toUpperCase();
+                if (!selectedZone.is_standing && seatTier !== ticketTier) {
+                    throw new Error(`Ghế hạng ${seat!.tier} không khớp với vé.`);
+                }
+                if (selectedZone.is_standing && seat!.ticket_type_id?.toString() !== selectedTicketType._id.toString()) {
+                    throw new Error('Vé GA không khớp với khu vực standing đã chọn.');
+                }
+                calculatedTotalPrice += selectedTicketType.price;
+                tickets.push({
+                    seat_id: seat!._id,
+                    ticket_type_id: selectedTicketType._id,
+                    price: selectedTicketType.price,
+                });
             }
-            if (selectedZone.is_standing && seat!.ticket_type_id?.toString() !== selectedTicketType._id.toString()) {
-                throw new Error('Vé GA không khớp với khu vực standing đã chọn.');
-            }
-
-            totalPrice += selectedTicketType.price;
-            orderTicketsData.push({
-                seat_id: seat!._id,
-                ticket_type_id: selectedTicketType._id,
-                price: selectedTicketType.price
-            });
-        }
-
-        const cancellation_deadline = calculateReservationExpiry(new Date(), HOLD_DURATION_SECONDS);
-        const newOrder = await Order.create({
-            order_number: `TKF-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`,
-            user_id: user_id,
-            event_id: event_id,
-            show_id: show_id,
-            zone_id: zone_id,
-            items: orderTicketsData,
-            total_price: totalPrice,
-            status: 'pending',
-            cancellation_deadline: cancellation_deadline,
-            purchaser_name: `${currentUser.first_name} ${currentUser.last_name}`,
-            purchaser_email: currentUser.email,
-            purchaser_phone: currentUser.phone
+            return { totalPrice: calculatedTotalPrice, orderTicketsData: tickets };
         });
+
+        const { cancellation_deadline, orderPayload } = measureSync('postHoldStatePreparation', () => {
+            const deadline = calculateReservationExpiry(new Date(), HOLD_DURATION_SECONDS);
+            return {
+                cancellation_deadline: deadline,
+                orderPayload: {
+                    order_number: `TKF-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`,
+                    user_id: user_id,
+                    event_id: event_id,
+                    show_id: show_id,
+                    zone_id: zone_id,
+                    items: orderTicketsData,
+                    total_price: totalPrice,
+                    status: 'pending' as const,
+                    cancellation_deadline: deadline,
+                    purchaser_name: `${currentUser.first_name} ${currentUser.last_name}`,
+                    purchaser_email: currentUser.email,
+                    purchaser_phone: currentUser.phone,
+                },
+            };
+        });
+        // The current hold path does not open a Mongo transaction; this phase
+        // intentionally measures its durable Order.create operation.
+        const newOrder = await measure('mongoOrderCreation', () => Order.create(orderPayload));
         createdOrderId = newOrder._id.toString();
 
-        await updateZoneSummaryAfterHold({
+        await measure('summaryStatusUpdates', () => updateZoneSummaryAfterHold({
             eventId: event_id,
             showId: show_id,
             zoneId: zone_id,
             modifiedRows: modifiedRowsForRollback,
             lockedByTicketType: lockedByTier,
             seatIds: seat_ids
-        });
+        }));
 
-        await orderExpirationQueue.add(
+        await measure('bullExpirationEnqueue', () => orderExpirationQueue.add(
             `expire-${newOrder._id}`,
             { order_id: newOrder._id, event_id, show_id, zone_id, seat_ids },
             { delay: HOLD_DURATION_SECONDS * 1000 }
-        );
+        ));
 
-        res.status(201).json({
+        if (collectPhaseMetrics) {
+            res.once('finish', () => {
+                for (const [phase, durationMs] of Object.entries(phaseDurations)) {
+                    recordHoldPhaseMetric(phase, durationMs);
+                }
+                for (const [phase, durationMs] of Object.entries(syncCpuDurations)) {
+                    recordHoldPhaseMetric(`syncCpu.${phase}`, durationMs);
+                }
+                recordHoldPhaseMetric(
+                    'syncCpu.accountedTotal',
+                    Object.values(syncCpuDurations).reduce((total, duration) => total + duration, 0),
+                );
+                const measuredDuration = Object.values(phaseDurations)
+                    .reduce((total, duration) => total + duration, 0);
+                recordHoldPhaseMetric(
+                    'remainingControllerOverhead',
+                    Math.max(0, performance.now() - controllerStartedAt - measuredDuration),
+                );
+            });
+        }
+
+        const responseBody = measureSync('responseObjectConstruction', () => ({
             message: 'Giữ chỗ thành công!',
             data: {
                 order_id: newOrder._id, total_price: newOrder.total_price, lockedSeats: seat_ids,
                 cancellation_deadline: newOrder.cancellation_deadline,
                 server_now: new Date()
-            }
-        });
+            },
+        }));
+
+        measureSync('responseSerializationDispatch', () => res.status(201).json(responseBody));
 
 
     } catch (error: any) {

@@ -1,0 +1,12 @@
+{
+  "runId": "preauth-100-1",
+  "checkedAt": "2026-08-16T07:55:32.233Z",
+  "counts": {
+    "orders": 100,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

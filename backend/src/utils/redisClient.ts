@@ -31,6 +31,7 @@ export const connectRedis = async () => {
             await redisClient.set('connection_test', 'OK');
             const res = await redisClient.get('connection_test');
             console.log("Redis Test:", res);
+
         }
     } catch (err) {
         console.error("Lỗi kết nối Redis Labs:", err);

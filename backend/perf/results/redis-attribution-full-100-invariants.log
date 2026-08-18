@@ -1,0 +1,17 @@
+◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+MongoDB connected
+Redis Labs đã sẵn sàng!
+Redis Test: OK
+{
+  "runId": "redis-attribution-full-100",
+  "checkedAt": "2026-08-18T09:55:03.508Z",
+  "counts": {
+    "orders": 100,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": [],
+  "output": "C:\\Users\\Nguyen Phuoc Sang\\Documents\\UIT\\IE213\\Tickify\\backend\\perf\\results\\invariants-redis-attribution-full-100-1787046903512.json"
+}

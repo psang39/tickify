@@ -1,0 +1,12 @@
+{
+  "runId": "baseline-20260816-soak",
+  "checkedAt": "2026-08-15T18:48:35.927Z",
+  "counts": {
+    "orders": 1687,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

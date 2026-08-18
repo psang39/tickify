@@ -1,0 +1,12 @@
+{
+  "runId": "opt-50",
+  "checkedAt": "2026-08-16T05:44:14.582Z",
+  "counts": {
+    "orders": 50,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

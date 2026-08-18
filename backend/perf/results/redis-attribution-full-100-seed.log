@@ -1,0 +1,10 @@
+◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+MongoDB connected
+Redis Labs đã sẵn sàng!
+Redis Test: OK
+{
+  "outputFile": "C:\\Users\\Nguyen Phuoc Sang\\Documents\\UIT\\IE213\\Tickify\\backend\\perf\\generated\\redis-attribution-full-100.json",
+  "users": 600,
+  "seats": 5000,
+  "runId": "redis-attribution-full-100"
+}

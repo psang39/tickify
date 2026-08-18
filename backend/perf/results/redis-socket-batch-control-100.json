@@ -1,0 +1,94 @@
+{
+  "runId": "redis-socket-batch-control-100",
+  "concurrency": 100,
+  "topology": "one node-redis client; default Redis database 0; direct EVAL only",
+  "eval": {
+    "latency": {
+      "p50Ms": 12.85,
+      "p95Ms": 20.32,
+      "p99Ms": 20.33,
+      "maxMs": 20.33
+    },
+    "maxInFlight": 100,
+    "inFlightAtSubmit": {
+      "p50Ms": 49,
+      "p95Ms": 94,
+      "p99Ms": 98,
+      "maxMs": 99
+    }
+  },
+  "redisAttribution": {
+    "socketWriteBoundary": {
+      "socketWritesObserved": 1
+    },
+    "commands": {
+      "hold-eval": {
+        "sampleCount": 100,
+        "inFlightNow": 0,
+        "maxInFlight": 100,
+        "wallMs": {
+          "p50": 12.83,
+          "p95": 20.31,
+          "p99": 20.32
+        },
+        "submitToSocketWriteMs": {
+          "observedSamples": 100,
+          "p50": 0.38,
+          "p95": 0.74,
+          "p99": 0.83
+        },
+        "socketWriteToParsedReplyMs": {
+          "observedSamples": 100,
+          "p50": 12.4,
+          "p95": 20.2,
+          "p99": 20.22
+        },
+        "replyToPromiseResumeMs": {
+          "observedSamples": 100,
+          "p50": 0.05,
+          "p95": 0.15,
+          "p99": 0.2
+        },
+        "inFlightAtSubmit": {
+          "p50": 49,
+          "p95": 94,
+          "p99": 98
+        }
+      }
+    }
+  },
+  "get": {
+    "latency": {
+      "p50Ms": 5.39,
+      "p95Ms": 5.67,
+      "p99Ms": 5.69,
+      "maxMs": 5.86
+    },
+    "maxInFlight": 100,
+    "inFlightAtSubmit": {
+      "p50Ms": 49,
+      "p95Ms": 94,
+      "p99Ms": 98,
+      "maxMs": 99
+    }
+  },
+  "ping": {
+    "latency": {
+      "p50Ms": 4.92,
+      "p95Ms": 5.17,
+      "p99Ms": 5.2,
+      "maxMs": 5.42
+    },
+    "maxInFlight": 100,
+    "inFlightAtSubmit": {
+      "p50Ms": 49,
+      "p95Ms": 94,
+      "p99Ms": 98,
+      "maxMs": 99
+    }
+  },
+  "eventLoop": {
+    "p99DelayMs": 21.22,
+    "maxDelayMs": 21.22
+  }
+}

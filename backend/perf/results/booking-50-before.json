@@ -1,0 +1,152 @@
+{
+  "runtime": {
+    "startedAt": "2026-08-15T18:27:30.625Z",
+    "uptimeSeconds": 358.33,
+    "process": {
+      "pid": 12464,
+      "cpuUtilizationPercent": 0.25,
+      "memory": {
+        "rss": 223449088,
+        "heapTotal": 134029312,
+        "heapUsed": 69049200,
+        "external": 54251715,
+        "arrayBuffers": 25760559
+      }
+    },
+    "eventLoop": {
+      "meanDelayMs": 30.92,
+      "maxDelayMs": 99.94,
+      "p99DelayMs": 33.85
+    },
+    "routes": [
+      {
+        "route": "GET /",
+        "requests": 1,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 5.41,
+        "p95Ms": 5.41,
+        "p99Ms": 5.41,
+        "sampleCount": 1
+      },
+      {
+        "route": "GET /diagnostics",
+        "requests": 7,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 22.87,
+        "p95Ms": 47.03,
+        "p99Ms": 47.03,
+        "sampleCount": 7
+      },
+      {
+        "route": "POST /login",
+        "requests": 50,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 344.39,
+        "p95Ms": 557.2,
+        "p99Ms": 602.92,
+        "sampleCount": 50
+      },
+      {
+        "route": "POST /:show_id/waiting-room/join",
+        "requests": 50,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 114.22,
+        "p95Ms": 269.46,
+        "p99Ms": 281.48,
+        "sampleCount": 50
+      },
+      {
+        "route": "GET /:show_id/waiting-room/status",
+        "requests": 50,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 189.96,
+        "p95Ms": 565.63,
+        "p99Ms": 573.3,
+        "sampleCount": 50
+      },
+      {
+        "route": "GET /:show_id/seats",
+        "requests": 50,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 118.12,
+        "p95Ms": 370.59,
+        "p99Ms": 373.61,
+        "sampleCount": 50
+      },
+      {
+        "route": "POST /hold",
+        "requests": 50,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 281.56,
+        "p95Ms": 867.87,
+        "p99Ms": 892.1,
+        "sampleCount": 50
+      }
+    ]
+  },
+  "dependencies": {
+    "redis": {
+      "ok": true,
+      "latencyMs": 6.44,
+      "value": {
+        "ping": "PONG",
+        "stats": {
+          "total_commands_processed": "20676",
+          "instantaneous_ops_per_sec": "3414",
+          "total_error_replies": "26",
+          "keyspace_hits": "2180",
+          "keyspace_misses": "1263"
+        }
+      }
+    },
+    "mongo": {
+      "ok": true,
+      "latencyMs": 22.09,
+      "value": {
+        "transactions": {
+          "currentActive": 0,
+          "currentInactive": 0,
+          "totalCommitted": 83,
+          "totalAborted": 33
+        },
+        "opcounters": {
+          "insert": 14721,
+          "query": 2637,
+          "update": 10392,
+          "delete": 1811,
+          "getmore": 5,
+          "command": 58172
+        }
+      }
+    },
+    "expirationQueue": {
+      "ok": true,
+      "latencyMs": 7.19,
+      "value": {
+        "counts": {
+          "waiting": 0,
+          "active": 0,
+          "delayed": 40,
+          "failed": 0,
+          "paused": 0
+        },
+        "oldestDelayedJobLagMs": 0
+      }
+    },
+    "outbox": {
+      "ok": true,
+      "latencyMs": 5.47,
+      "value": {
+        "oldestUnpublished": null,
+        "oldestUnpublishedAgeMs": null
+      }
+    }
+  }
+}

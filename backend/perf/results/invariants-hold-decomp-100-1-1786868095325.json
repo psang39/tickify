@@ -1,0 +1,12 @@
+{
+  "runId": "hold-decomp-100-1",
+  "checkedAt": "2026-08-16T08:14:55.324Z",
+  "counts": {
+    "orders": 100,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

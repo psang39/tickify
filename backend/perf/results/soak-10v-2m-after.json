@@ -1,0 +1,182 @@
+{
+  "runtime": {
+    "startedAt": "2026-08-15T18:27:30.625Z",
+    "uptimeSeconds": 1250.84,
+    "process": {
+      "pid": 12464,
+      "cpuUtilizationPercent": 2.72,
+      "memory": {
+        "rss": 356728832,
+        "heapTotal": 209383424,
+        "heapUsed": 81306824,
+        "external": 34217330,
+        "arrayBuffers": 28534190
+      }
+    },
+    "eventLoop": {
+      "meanDelayMs": 30.17,
+      "maxDelayMs": 523.76,
+      "p99DelayMs": 41.19
+    },
+    "routes": [
+      {
+        "route": "GET /",
+        "requests": 3,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 1.24,
+        "p95Ms": 5.41,
+        "p99Ms": 5.41,
+        "sampleCount": 3
+      },
+      {
+        "route": "GET /diagnostics",
+        "requests": 28,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 19.51,
+        "p95Ms": 44.9,
+        "p99Ms": 47.03,
+        "sampleCount": 28
+      },
+      {
+        "route": "POST /login",
+        "requests": 2807,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 116.66,
+        "p95Ms": 1157.45,
+        "p99Ms": 1702.29,
+        "sampleCount": 2000
+      },
+      {
+        "route": "POST /:show_id/waiting-room/join",
+        "requests": 3274,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 77.41,
+        "p95Ms": 444.04,
+        "p99Ms": 688.32,
+        "sampleCount": 2000
+      },
+      {
+        "route": "GET /:show_id/waiting-room/status",
+        "requests": 2774,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 40.88,
+        "p95Ms": 552.74,
+        "p99Ms": 1140.03,
+        "sampleCount": 2000
+      },
+      {
+        "route": "GET /:show_id/seats",
+        "requests": 2307,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 136.17,
+        "p95Ms": 873.14,
+        "p99Ms": 1522.57,
+        "sampleCount": 2000
+      },
+      {
+        "route": "POST /hold",
+        "requests": 2307,
+        "serverErrors": 0,
+        "businessConflicts": 95,
+        "p50Ms": 239.38,
+        "p95Ms": 1138.1,
+        "p99Ms": 2107.49,
+        "sampleCount": 2000
+      },
+      {
+        "route": "POST /create-url",
+        "requests": 40,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 92.27,
+        "p95Ms": 132.68,
+        "p99Ms": 146.04,
+        "sampleCount": 40
+      },
+      {
+        "route": "POST /release",
+        "requests": 1727,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 70.74,
+        "p95Ms": 201.6,
+        "p99Ms": 292.17,
+        "sampleCount": 1727
+      },
+      {
+        "route": "POST /payment-result",
+        "requests": 20,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 187.68,
+        "p95Ms": 370.24,
+        "p99Ms": 374.41,
+        "sampleCount": 20
+      }
+    ]
+  },
+  "dependencies": {
+    "redis": {
+      "ok": true,
+      "latencyMs": 5.73,
+      "value": {
+        "ping": "PONG",
+        "stats": {
+          "total_commands_processed": "184990",
+          "instantaneous_ops_per_sec": "572",
+          "total_error_replies": "121",
+          "keyspace_hits": "54673",
+          "keyspace_misses": "9857"
+        }
+      }
+    },
+    "mongo": {
+      "ok": true,
+      "latencyMs": 12.08,
+      "value": {
+        "transactions": {
+          "currentActive": 0,
+          "currentInactive": 0,
+          "totalCommitted": 223,
+          "totalAborted": 308
+        },
+        "opcounters": {
+          "insert": 72993,
+          "query": 47757,
+          "update": 11601,
+          "delete": 1868,
+          "getmore": 25,
+          "command": 66618
+        }
+      }
+    },
+    "expirationQueue": {
+      "ok": true,
+      "latencyMs": 6,
+      "value": {
+        "counts": {
+          "waiting": 0,
+          "active": 0,
+          "delayed": 1807,
+          "failed": 0,
+          "paused": 0
+        },
+        "oldestDelayedJobLagMs": 0
+      }
+    },
+    "outbox": {
+      "ok": true,
+      "latencyMs": 4.95,
+      "value": {
+        "oldestUnpublished": null,
+        "oldestUnpublishedAgeMs": null
+      }
+    }
+  }
+}

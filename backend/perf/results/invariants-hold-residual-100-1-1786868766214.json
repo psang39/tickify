@@ -1,0 +1,12 @@
+{
+  "runId": "hold-residual-100-1",
+  "checkedAt": "2026-08-16T08:26:06.213Z",
+  "counts": {
+    "orders": 100,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

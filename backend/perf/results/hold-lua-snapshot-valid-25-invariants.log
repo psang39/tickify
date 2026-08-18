@@ -1,0 +1,17 @@
+◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+MongoDB connected
+Redis Labs đã sẵn sàng!
+Redis Test: OK
+{
+  "runId": "hold-lua-snapshot-valid-25",
+  "checkedAt": "2026-08-16T09:44:43.134Z",
+  "counts": {
+    "orders": 25,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": [],
+  "output": "C:\\Users\\Nguyen Phuoc Sang\\Documents\\UIT\\IE213\\Tickify\\backend\\perf\\results\\invariants-hold-lua-snapshot-valid-25-1786873483136.json"
+}

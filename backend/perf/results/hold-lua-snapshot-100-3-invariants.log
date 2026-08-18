@@ -1,0 +1,17 @@
+◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+MongoDB connected
+Redis Labs đã sẵn sàng!
+Redis Test: OK
+{
+  "runId": "hold-lua-snapshot-100-3",
+  "checkedAt": "2026-08-16T09:41:47.379Z",
+  "counts": {
+    "orders": 100,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": [],
+  "output": "C:\\Users\\Nguyen Phuoc Sang\\Documents\\UIT\\IE213\\Tickify\\backend\\perf\\results\\invariants-hold-lua-snapshot-100-3-1786873307382.json"
+}

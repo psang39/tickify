@@ -1,0 +1,92 @@
+{
+  "runtime": {
+    "startedAt": "2026-08-16T07:38:46.517Z",
+    "uptimeSeconds": 0.57,
+    "process": {
+      "pid": 15608,
+      "cpuUtilizationPercent": 3.22,
+      "memory": {
+        "rss": 213270528,
+        "heapTotal": 184946688,
+        "heapUsed": 90318208,
+        "external": 26190202,
+        "arrayBuffers": 22013939
+      }
+    },
+    "eventLoop": {
+      "meanDelayMs": 27.41,
+      "maxDelayMs": 33.21,
+      "p99DelayMs": 33.21
+    },
+    "routes": [
+      {
+        "route": "GET /",
+        "requests": 1,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 5,
+        "p95Ms": 5,
+        "p99Ms": 5,
+        "sampleCount": 1
+      }
+    ]
+  },
+  "dependencies": {
+    "redis": {
+      "ok": true,
+      "latencyMs": 11.38,
+      "value": {
+        "ping": "PONG",
+        "stats": {
+          "total_commands_processed": "229911",
+          "instantaneous_ops_per_sec": "23",
+          "total_error_replies": "125",
+          "keyspace_hits": "70834",
+          "keyspace_misses": "15246"
+        }
+      }
+    },
+    "mongo": {
+      "ok": true,
+      "latencyMs": 18.36,
+      "value": {
+        "transactions": {
+          "currentActive": 0,
+          "currentInactive": 0,
+          "totalCommitted": 238,
+          "totalAborted": 695
+        },
+        "opcounters": {
+          "insert": 107339,
+          "query": 55385,
+          "update": 16205,
+          "delete": 2558,
+          "getmore": 51,
+          "command": 93009
+        }
+      }
+    },
+    "expirationQueue": {
+      "ok": true,
+      "latencyMs": 9.62,
+      "value": {
+        "counts": {
+          "waiting": 0,
+          "active": 0,
+          "delayed": 0,
+          "failed": 0,
+          "paused": 0
+        },
+        "oldestDelayedJobLagMs": null
+      }
+    },
+    "outbox": {
+      "ok": true,
+      "latencyMs": 18.59,
+      "value": {
+        "oldestUnpublished": null,
+        "oldestUnpublishedAgeMs": null
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { getShowById } from "../controllers/show.controller";
 import { joinWaitingRoom, checkMyTurn } from '../controllers/waiting-room.controller';
-import { getSeatsByShow } from "../controllers/seat.controller";
+import { getSeatMapStatus, getSeatsByShow } from "../controllers/seat.controller";
 import express from 'express';
 import { body } from 'express-validator';
 import { Validate } from '../middleware/validation.middleware';
@@ -24,6 +24,8 @@ showRouter.post('/:show_id/zones', Verify, verifyRoles(['Admin', 'admin', 'Organ
 showRouter.post('/:show_id/waiting-room/join', Verify, joinWaitingRoom);
 showRouter.get('/:show_id/waiting-room/status', Verify, checkMyTurn);
 showRouter.get('/:show_id/seats', Verify, verifyCheckoutToken, getSeatsByShow);
+showRouter.get('/:show_id/seat-map/layout', Verify, verifyCheckoutToken, getSeatsByShow);
+showRouter.get('/:show_id/seat-map/status', Verify, verifyCheckoutToken, getSeatMapStatus);
 showRouter.get('/:show_id/stream', (req, res) => {
     const show_id = req.params.show_id as string;
     addClient(res, show_id);

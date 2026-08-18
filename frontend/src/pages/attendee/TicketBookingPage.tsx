@@ -180,10 +180,18 @@ export default function TicketBookingPage() {
     queryKey: ["show-seats", showId],
     queryFn: async () => {
       const checkoutToken = localStorage.getItem(`checkoutToken_${showId}`);
-      const res = await api.get(`/shows/${showId}/seats`, {
-        headers: { "x-checkout-token": checkoutToken },
-      });
-      return res.data?.data || res.data;
+      const headers = { "x-checkout-token": checkoutToken };
+      const [layoutRes, statusRes] = await Promise.all([
+        api.get(`/shows/${showId}/seat-map/layout`, { headers }),
+        api.get(`/shows/${showId}/seat-map/status`, { headers }),
+      ]);
+      const layout = layoutRes.data?.data || layoutRes.data;
+      const statuses = (statusRes.data?.data || statusRes.data)?.statuses || {};
+      return (layout.seats || []).map((seat: any[]) => ({
+        _id: seat[0], seat_number: seat[1], zone_id: seat[2], row: seat[3],
+        col_index: seat[4], tier: seat[5], x: seat[6], y: seat[7],
+        ticket_type_id: seat[8], status: statuses[seat[0]] || 'available',
+      }));
     },
     enabled: !!showId,
   });

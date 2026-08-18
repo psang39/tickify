@@ -6,6 +6,7 @@ import path from 'path';
 import { setServers } from 'node:dns/promises';
 
 import router from './routes/index';
+import { runtimeMetricsMiddleware } from './middleware/runtime-metrics.middleware';
 
 const app = Express();
 
@@ -80,6 +81,8 @@ app.use(compression({
         return compression.filter(req, res);
     },
 }));
+
+app.use(runtimeMetricsMiddleware);
 
 app.use('/api/v1', router);
 

@@ -28,12 +28,33 @@ const globalInfrastructure = globalThis as typeof globalThis & {
     [infrastructureKey]?: OrderExpirationInfrastructure;
 };
 
+const performanceRunId = process.env.PERFORMANCE_RUN_ID;
+export const orderExpirationQueueName = performanceRunId
+    ? `order-expiration-perf-${performanceRunId}`
+    : 'order-expiration';
+
+const assertSafePerformanceQueueCleanup = () => {
+    const uri = process.env.URI || '';
+    const redisUrl = REDIS_URL || '';
+    if (
+        process.env.PERFORMANCE_QUEUE_ISOLATION !== 'true'
+        || !performanceRunId
+        || !/^[a-zA-Z0-9-]{3,48}$/.test(performanceRunId)
+        || !/\/tickify_perf(?:_|$|\?)/.test(uri)
+        || !/127\.0\.0\.1:6380\/2(?:$|\?)/.test(redisUrl)
+    ) {
+        throw new Error(
+            'Refusing queue cleanup: require PERFORMANCE_QUEUE_ISOLATION=true, a valid PERFORMANCE_RUN_ID, a tickify_perf Mongo URI, and local Redis DB 2.',
+        );
+    }
+};
+
 const infrastructure = globalInfrastructure[infrastructureKey] ?? (() => {
     const sharedConnection = new IORedis(
         REDIS_URL || 'redis://127.0.0.1:6379',
         { maxRetriesPerRequest: null },
     );
-    const sharedQueue = new Queue<OrderExpirationJobData>('order-expiration', {
+    const sharedQueue = new Queue<OrderExpirationJobData>(orderExpirationQueueName, {
         connection: sharedConnection,
         defaultJobOptions: {
             attempts: 3,
@@ -129,7 +150,7 @@ export const startOrderExpirationWorker = (): Worker<OrderExpirationJobData> => 
     }
 
     infrastructure.worker = new Worker<OrderExpirationJobData>(
-        'order-expiration',
+        orderExpirationQueueName,
         processOrderExpiration,
         {
             connection,
@@ -148,6 +169,11 @@ export const startOrderExpirationWorker = (): Worker<OrderExpirationJobData> => 
 };
 
 export const orderExpirationQueue = infrastructure.queue;
+
+export const clearIsolatedPerformanceExpirationQueue = async (): Promise<void> => {
+    assertSafePerformanceQueueCleanup();
+    await orderExpirationQueue.obliterate({ force: true });
+};
 
 export const processOrderExpiration = async (
     job: Pick<Job<OrderExpirationJobData>, 'data' | 'id'>,

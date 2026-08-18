@@ -1,0 +1,12 @@
+{
+  "runId": "hold-lua-snapshot-valid-100c",
+  "checkedAt": "2026-08-16T09:49:41.104Z",
+  "counts": {
+    "orders": 100,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

@@ -3,6 +3,35 @@ import Seat from "../models/seat.model";
 import Show from "../models/show.model";
 import { Request, Response } from "express";
 import redisClient from "../utils/redisClient";
+
+const COMPACT_LAYOUT_FIELDS = ['id', 'number', 'zoneId', 'row', 'column', 'tier', 'x', 'y', 'ticketTypeId'] as const;
+type CompactLayout = { version: string; fields: readonly string[]; seats: any[][] };
+
+const compactLayoutCacheKey = (showId: string) => `show:${showId}:seat_map_layout_v1`;
+
+const getCompactLayout = async (showId: string): Promise<CompactLayout | null> => {
+    const key = compactLayoutCacheKey(showId);
+    const cached = await redisClient.get(key);
+    if (cached) return JSON.parse(cached) as CompactLayout;
+
+    const seats = await Seat.find({ show_id: showId })
+        .select('_id seat_number zone_id row col_index tier x y ticket_type_id')
+        .lean() as any[];
+    if (seats.length === 0) return null;
+
+    const layout: CompactLayout = {
+        // Layout cache invalidation deletes this key, causing a new version to be minted.
+        version: `v1-${Date.now().toString(36)}`,
+        fields: COMPACT_LAYOUT_FIELDS,
+        seats: seats.map(seat => [
+            seat._id.toString(), seat.seat_number, seat.zone_id?.toString(), seat.row,
+            seat.col_index, seat.tier, seat.x ?? null, seat.y ?? null,
+            seat.ticket_type_id?.toString() ?? null,
+        ]),
+    };
+    await redisClient.set(key, JSON.stringify(layout), { EX: 86400 });
+    return layout;
+};
 export const getSeatsByZone = async (req: Request, res: Response) => {
     try {
         const { zone_id } = req.params;
@@ -37,38 +66,43 @@ export const getSeatsByShow = async (req: Request, res: Response) => {
         if (show.status !== "published") {
             return res.status(400).json({ message: "Show is not active" });
         }
-        const layoutCacheKey = `show:${show_id}:seats_static_layout`;
-        const statusHashKey = `show:${show_id}:seat_status`;
-        let seatsLayout: any[] = [];
-        const cachedLayout = await redisClient.get(layoutCacheKey);
-        if (cachedLayout) {
-            seatsLayout = JSON.parse(cachedLayout);
-        } else {
-            seatsLayout = await Seat.find({ show_id })
-                .select('_id seat_number zone_id row col_index tier x y status ticket_type_id')
-                .lean();
-            if (seatsLayout.length === 0) {
-                return res.status(404).json({ message: "Không tìm thấy dữ liệu ghế cho show này" });
-            }
-            await redisClient.set(layoutCacheKey, JSON.stringify(seatsLayout), {
-                EX: 86400
-            });
+        const layout = await getCompactLayout(String(show_id));
+        if (!layout) {
+            res.status(404).json({ message: "Không tìm thấy dữ liệu ghế cho show này" });
+            return;
         }
-        const dynamicStatus = await redisClient.hGetAll(statusHashKey);
-        const finalSeats = seatsLayout.map((seat: any) => {
-            const seatIdStr = seat._id.toString();
-            if (dynamicStatus[seatIdStr]) {
-                return {
-                    ...seat,
-                    status: dynamicStatus[seatIdStr]
-                };
-            }
-            return seat;
-        });
-        res.status(200).json(finalSeats);
+        const etag = `"${layout.version}"`;
+        res.setHeader('ETag', etag);
+        res.setHeader('Cache-Control', 'private, max-age=300, must-revalidate');
+        if (req.headers['if-none-match'] === etag) {
+            res.status(304).end();
+            return;
+        }
+        res.status(200).json(layout);
     } catch (error) {
         console.error("Lỗi lấy dữ liệu Seatmap:", error);
         res.status(500).json({ message: "Lỗi hệ thống khi lấy sơ đồ ghế", error });
+    }
+};
+
+export const getSeatMapStatus = async (req: Request, res: Response) => {
+    try {
+        const { show_id } = req.params;
+        const show = await Show.findById(show_id).select('status').lean();
+        if (!show) {
+            res.status(404).json({ message: 'Show not found' });
+            return;
+        }
+        if (show.status !== 'published') {
+            res.status(400).json({ message: 'Show is not active' });
+            return;
+        }
+        const statuses = await redisClient.hGetAll(`show:${show_id}:seat_status`);
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({ statuses });
+    } catch (error) {
+        console.error('Lỗi lấy trạng thái động Seatmap:', error);
+        res.status(500).json({ message: 'Lỗi hệ thống khi lấy trạng thái ghế', error });
     }
 };
 export const getDetailedSeatsByZone = async (req: Request, res: Response) => {

@@ -1,0 +1,12 @@
+{
+  "runId": "redis-socket-write-50",
+  "checkedAt": "2026-08-18T10:17:04.366Z",
+  "counts": {
+    "orders": 50,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

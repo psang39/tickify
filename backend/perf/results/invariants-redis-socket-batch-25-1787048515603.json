@@ -1,0 +1,12 @@
+{
+  "runId": "redis-socket-batch-25",
+  "checkedAt": "2026-08-18T10:21:55.597Z",
+  "counts": {
+    "orders": 25,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

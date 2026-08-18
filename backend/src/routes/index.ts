@@ -16,6 +16,7 @@ import webhookRouter from './webhook.routes';
 import zoneRouter from './zone.routes';
 import staffRouter from './staff.routes';
 import seatRouter from './seat.routes';
+import performanceRouter from './performance.routes';
 import { Verify, verifyRoles } from '../middleware/auth.middleware';
 
 const router = Express.Router();
@@ -44,5 +45,6 @@ router.use('/seats', seatRouter);
 router.use('/payments', paymentRouter);
 router.use('/webhooks', webhookRouter);
 router.use('/staff', staffRouter);
+router.use('/performance', performanceRouter);
 
 export default router;

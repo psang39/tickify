@@ -1,0 +1,12 @@
+{
+  "runId": "baseline-20260816-mixed",
+  "checkedAt": "2026-08-15T18:44:32.915Z",
+  "counts": {
+    "orders": 60,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

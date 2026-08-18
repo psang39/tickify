@@ -154,6 +154,88 @@ test('a partial multi-row hold keeps its row unavailable until the atomic rollba
     );
 });
 
+test('successful hold Lua calls return per-row snapshots used to restore earlier rows after a later-row failure', async (t) => {
+    const fixture = await seedBookingFixture();
+    const [{ default: Seat }, { default: redisClient }] = await Promise.all([
+        import('../../src/models/seat.model'),
+        import('../../src/utils/redisClient'),
+    ]);
+    const [secondSeat, failingSeat] = await Seat.create([
+        {
+            seat_number: 'B1',
+            zone_id: fixture.zoneId,
+            event_id: fixture.eventId,
+            show_id: fixture.showId,
+            status: 'available',
+            row: 'B',
+            col_index: 1,
+            tier: 'VIP',
+            ticket_type_id: fixture.ticketTypeId,
+        },
+        {
+            seat_number: 'C1',
+            zone_id: fixture.zoneId,
+            event_id: fixture.eventId,
+            show_id: fixture.showId,
+            status: 'available',
+            row: 'C',
+            col_index: 1,
+            tier: 'VIP',
+            ticket_type_id: fixture.ticketTypeId,
+        },
+    ]);
+    const secondRowKey = `event:${fixture.eventId}:show:${fixture.showId}:zone:${fixture.zoneId}:row:B`;
+    const failingRowKey = `event:${fixture.eventId}:show:${fixture.showId}:zone:${fixture.zoneId}:row:C`;
+    await Promise.all([
+        // Holding the first of three seats is a valid non-orphaning mutation
+        // (HOO), while retaining a row snapshot distinct from row A's "O".
+        redisClient.set(secondRowKey, 'OOO'),
+        redisClient.set(failingRowKey, 'OOOO'),
+    ]);
+
+    const originalEval = redisClient.eval.bind(redisClient);
+    const returnedSnapshots = new Map<string, string>();
+    (redisClient as any).eval = async (...args: any[]) => {
+        const options = args[1] as { keys: string[] };
+        const rowKey = options.keys[0];
+        if (rowKey === failingRowKey) throw new Error('SEAT_UNAVAILABLE');
+        const result = await originalEval(...args);
+        if (rowKey === fixture.rowKey || rowKey === secondRowKey) {
+            returnedSnapshots.set(rowKey, String(result));
+        }
+        return result;
+    };
+    t.after(() => {
+        (redisClient as any).eval = originalEval;
+    });
+
+    const response = await postJson(
+        httpServer.baseUrl,
+        '/api/v1/orders/hold',
+        {
+            items: [
+                { seat_id: fixture.seatId, ticket_type_id: fixture.ticketTypeId },
+                { seat_id: secondSeat._id.toString(), ticket_type_id: fixture.ticketTypeId },
+                { seat_id: failingSeat._id.toString(), ticket_type_id: fixture.ticketTypeId },
+            ],
+        },
+        authHeaders(fixture.attendeeAToken, fixture.checkoutToken),
+    );
+
+    assert.equal(response.status, 409, `response=${JSON.stringify(response.body)}`);
+    assert.deepEqual(
+        Object.fromEntries(returnedSnapshots),
+        { [fixture.rowKey]: 'O', [secondRowKey]: 'OOO' },
+        'each successful Lua hold must return its own unmodified row string',
+    );
+    assert.deepEqual(await Promise.all([
+        redisClient.get(fixture.rowKey),
+        redisClient.get(secondRowKey),
+        redisClient.get(failingRowKey),
+        redisClient.get(fixture.heldCountKeyForA),
+    ]), ['O', 'OOO', 'OOOO', null], 'rollback must restore every exact returned snapshot');
+});
+
 test('rollback restores every saved row snapshot in argument order', async () => {
     const fixture = await seedBookingFixture();
     const [{ default: Seat }, { default: redisClient }, { rollbackLocksAndRows }] = await Promise.all([

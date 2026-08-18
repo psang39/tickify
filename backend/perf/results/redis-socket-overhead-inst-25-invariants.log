@@ -1,0 +1,17 @@
+◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+MongoDB connected
+Redis Labs đã sẵn sàng!
+Redis Test: OK
+{
+  "runId": "redis-socket-overhead-inst-25",
+  "checkedAt": "2026-08-18T10:11:02.675Z",
+  "counts": {
+    "orders": 25,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": [],
+  "output": "C:\\Users\\Nguyen Phuoc Sang\\Documents\\UIT\\IE213\\Tickify\\backend\\perf\\results\\invariants-redis-socket-overhead-inst-25-1787047862679.json"
+}

@@ -1,0 +1,172 @@
+{
+  "runtime": {
+    "startedAt": "2026-08-15T18:27:30.625Z",
+    "uptimeSeconds": 1073.82,
+    "process": {
+      "pid": 12464,
+      "cpuUtilizationPercent": 1.05,
+      "memory": {
+        "rss": 288075776,
+        "heapTotal": 152903680,
+        "heapUsed": 78744824,
+        "external": 29586359,
+        "arrayBuffers": 23903219
+      }
+    },
+    "eventLoop": {
+      "meanDelayMs": 31.01,
+      "maxDelayMs": 523.76,
+      "p99DelayMs": 35.23
+    },
+    "routes": [
+      {
+        "route": "GET /",
+        "requests": 2,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 1.24,
+        "p95Ms": 5.41,
+        "p99Ms": 5.41,
+        "sampleCount": 2
+      },
+      {
+        "route": "GET /diagnostics",
+        "requests": 25,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 19.51,
+        "p95Ms": 44.9,
+        "p99Ms": 47.03,
+        "sampleCount": 25
+      },
+      {
+        "route": "POST /login",
+        "requests": 1060,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 1207.14,
+        "p95Ms": 4694.05,
+        "p99Ms": 5474.34,
+        "sampleCount": 1060
+      },
+      {
+        "route": "POST /:show_id/waiting-room/join",
+        "requests": 1527,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 328.06,
+        "p95Ms": 2122.42,
+        "p99Ms": 2423.42,
+        "sampleCount": 1527
+      },
+      {
+        "route": "GET /:show_id/waiting-room/status",
+        "requests": 1027,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 612.31,
+        "p95Ms": 1680.2,
+        "p99Ms": 2361.73,
+        "sampleCount": 1027
+      },
+      {
+        "route": "GET /:show_id/seats",
+        "requests": 560,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 667.6,
+        "p95Ms": 1690.04,
+        "p99Ms": 1750.67,
+        "sampleCount": 560
+      },
+      {
+        "route": "POST /hold",
+        "requests": 560,
+        "serverErrors": 0,
+        "businessConflicts": 95,
+        "p50Ms": 957.8,
+        "p95Ms": 2775.89,
+        "p99Ms": 3312.63,
+        "sampleCount": 560
+      },
+      {
+        "route": "POST /create-url",
+        "requests": 20,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 87.98,
+        "p95Ms": 144.26,
+        "p99Ms": 146.04,
+        "sampleCount": 20
+      },
+      {
+        "route": "POST /release",
+        "requests": 20,
+        "serverErrors": 0,
+        "businessConflicts": 0,
+        "p50Ms": 214.82,
+        "p95Ms": 1016.75,
+        "p99Ms": 1287.41,
+        "sampleCount": 20
+      }
+    ]
+  },
+  "dependencies": {
+    "redis": {
+      "ok": true,
+      "latencyMs": 4.19,
+      "value": {
+        "ping": "PONG",
+        "stats": {
+          "total_commands_processed": "79307",
+          "instantaneous_ops_per_sec": "240",
+          "total_error_replies": "121",
+          "keyspace_hits": "16046",
+          "keyspace_misses": "7103"
+        }
+      }
+    },
+    "mongo": {
+      "ok": true,
+      "latencyMs": 8.85,
+      "value": {
+        "transactions": {
+          "currentActive": 0,
+          "currentInactive": 0,
+          "totalCommitted": 98,
+          "totalAborted": 227
+        },
+        "opcounters": {
+          "insert": 65599,
+          "query": 15900,
+          "update": 11066,
+          "delete": 1865,
+          "getmore": 23,
+          "command": 63545
+        }
+      }
+    },
+    "expirationQueue": {
+      "ok": true,
+      "latencyMs": 9.17,
+      "value": {
+        "counts": {
+          "waiting": 0,
+          "active": 0,
+          "delayed": 246,
+          "failed": 0,
+          "paused": 0
+        },
+        "oldestDelayedJobLagMs": 0
+      }
+    },
+    "outbox": {
+      "ok": true,
+      "latencyMs": 3.1,
+      "value": {
+        "oldestUnpublished": null,
+        "oldestUnpublishedAgeMs": null
+      }
+    }
+  }
+}

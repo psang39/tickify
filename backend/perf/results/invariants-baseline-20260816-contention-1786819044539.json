@@ -1,0 +1,12 @@
+{
+  "runId": "baseline-20260816-contention",
+  "checkedAt": "2026-08-15T18:37:24.537Z",
+  "counts": {
+    "orders": 5,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

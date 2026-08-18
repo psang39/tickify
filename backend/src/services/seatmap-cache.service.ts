@@ -153,6 +153,7 @@ export const purgeShowRedisCache = async (showId: string) => {
 
     pipeline.del(`show:${showId}:ticket_types`);
     pipeline.del(`show:${showId}:seats_static_layout`);
+    pipeline.del(`show:${showId}:seat_map_layout_v1`);
     pipeline.del(`show:${showId}:seat_status`);
     pipeline.del(`event:${eventId}:show:${showId}:sale_start`);
     pipeline.del(`event:${eventId}:show:${showId}:sale_end`);
@@ -188,6 +189,7 @@ export const rebuildShowRedisCache = async (showId: string) => {
     );
 
     pipeline.set(`show:${showId}:seats_static_layout`, JSON.stringify(seats), { EX: SHOW_CACHE_TTL_SECONDS });
+    pipeline.del(`show:${showId}:seat_map_layout_v1`);
     pipeline.del(`show:${showId}:seat_status`);
 
     for (const seat of seats as any[]) {
