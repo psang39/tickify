@@ -1,0 +1,12 @@
+{
+  "runId": "refactor-hold-100-20260819",
+  "checkedAt": "2026-08-19T12:03:28.282Z",
+  "counts": {
+    "orders": 100,
+    "seats": 5000,
+    "payments": 0,
+    "tickets": 0,
+    "zones": 1
+  },
+  "violations": []
+}

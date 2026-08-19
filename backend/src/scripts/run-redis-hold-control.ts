@@ -1,4 +1,4 @@
-import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { monitorEventLoopDelay, performance } from 'node:perf_hooks';
 import { createClient } from 'redis';
@@ -6,6 +6,7 @@ import {
     getRedisAttributionMetrics,
     measureRedisCommandAttribution,
 } from '../services/redis-attribution.service';
+import { holdSeatsLuaScript } from '../services/booking/reservation-redis.service';
 
 const option = (name: string, fallback: string) => {
     const index = process.argv.indexOf(name);
@@ -94,16 +95,11 @@ const main = async () => {
     eventLoop.enable();
     await client.connect();
     try {
-        const sourcePath = path.resolve(process.cwd(), 'src/controllers/order.controller.ts');
-        const scriptSource = await readFile(sourcePath, 'utf8');
-        const scriptMatch = scriptSource.match(/export const holdSeatsLuaScript = `([\s\S]*?)`;/);
-        if (!scriptMatch) throw new Error('Could not locate the production seated hold Lua script.');
-        const holdLua = scriptMatch[1];
         const setup = client.multi();
         rows.forEach(row => setup.set(row, 'OOO'));
         await setup.exec();
 
-        const evalResult = await runBurst(index => measureRedisCommandAttribution('hold-eval', () => client.eval(holdLua, {
+        const evalResult = await runBurst(index => measureRedisCommandAttribution('hold-eval', () => client.eval(holdSeatsLuaScript, {
             keys: [rows[index], users[index], locks[index]],
             arguments: ['600', `control-user-${index}`, '1'],
         })));

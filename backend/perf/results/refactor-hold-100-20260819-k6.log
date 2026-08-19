@@ -1,0 +1,57 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: perf/booking-preauthenticated.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 100 max VUs, 5m30s max duration (incl. graceful stop):
+              * booking_preauthenticated: 1 iterations for each of 100 VUs (maxDuration: 5m0s, gracefulStop: 30s)
+
+
+running (0m00.9s), 100/100 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 100 VUs  0m00.9s/5m0s  000/100 iters, 1 per VU
+
+running (0m01.9s), 100/100 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 100 VUs  0m01.9s/5m0s  000/100 iters, 1 per VU
+
+running (0m02.9s), 100/100 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 100 VUs  0m02.9s/5m0s  000/100 iters, 1 per VU
+
+running (0m03.9s), 100/100 VUs, 0 complete and 0 interrupted iterations
+booking_preauthenticated   [   0% ] 100 VUs  0m03.9s/5m0s  000/100 iters, 1 per VU
+
+
+  █ TOTAL RESULTS 
+
+    CUSTOM
+    expected_business_conflicts....: 0.00%  0 out of 100
+    hold_latency_ms................: min=313.32ms avg=1.63s    med=2.29s    p(90)=2.62s p(95)=2.79s p(99)=3.05s max=3.1s 
+    unexpected_failures............: 0.00%  0 out of 100
+
+    HTTP
+    http_req_duration..............: min=169.3ms  avg=975.46ms med=592.85ms p(90)=2.78s p(95)=3.1s  p(99)=3.31s max=3.4s 
+      { expected_response:true }...: min=169.3ms  avg=975.46ms med=592.85ms p(90)=2.78s p(95)=3.1s  p(99)=3.31s max=3.4s 
+    http_req_failed................: 0.00%  0 out of 500
+    http_reqs......................: 500    111.521023/s
+
+    EXECUTION
+    iteration_duration.............: min=4.28s    avg=4.41s    med=4.45s    p(90)=4.46s p(95)=4.46s p(99)=4.47s max=4.47s
+    iterations.....................: 100    22.304205/s
+    vus............................: 100    min=100      max=100
+    vus_max........................: 100    min=100      max=100
+
+    NETWORK
+    data_received..................: 60 MB  13 MB/s
+    data_sent......................: 299 kB 67 kB/s
+
+
+
+
+running (0m04.5s), 000/100 VUs, 100 complete and 0 interrupted iterations
+booking_preauthenticated ✓ [ 100% ] 100 VUs  0m04.5s/5m0s  100/100 iters, 1 per VU
