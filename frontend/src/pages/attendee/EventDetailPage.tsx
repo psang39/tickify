@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, ImageIcon, MapPin, Music2, Ticket } from 'lucide-react';
 import { usePublicEventDetail, usePublicEventShows, usePublicEvents } from '@/hooks/usePublicEventQueries';
 import PublicEventCard from '@/components/public/PublicEventCard';
+import { estimatedServerNowMs } from '@/lib/serverClock';
 
 const fallbackBanner = 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1400&q=80';
 
@@ -36,7 +37,7 @@ export default function EventDetailPage() {
     const { eventId } = useParams();
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
-    const [now, setNow] = useState(() => new Date());
+    const [, setClockTick] = useState(0);
     const { data: event, isLoading } = usePublicEventDetail(eventId);
     const { data: showsResponse, isLoading: isShowsLoading } = usePublicEventShows(eventId, page, 4);
     const { data: suggestions = [] } = usePublicEvents({ limit: 4, sort: 'upcoming' });
@@ -47,13 +48,14 @@ export default function EventDetailPage() {
     }, [eventId]);
 
     useEffect(() => {
-        const timer = window.setInterval(() => setNow(new Date()), 10_000);
+        const timer = window.setInterval(() => setClockTick((tick) => tick + 1), 1_000);
         return () => window.clearInterval(timer);
     }, []);
 
     const shows = showsResponse?.docs || showsResponse?.data || [];
     const totalPages = showsResponse?.totalPages || showsResponse?.pagination?.totalPages || 1;
     const banner = event?.banner_url || event?.poster_url || fallbackBanner;
+    const now = new Date(estimatedServerNowMs(showsResponse?.serverClockAnchor));
 
     if (isLoading) {
         return <div className="mx-auto max-w-7xl px-6 py-14"><div className="h-96 animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/80" /></div>;

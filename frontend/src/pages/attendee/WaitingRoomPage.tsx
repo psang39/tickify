@@ -3,6 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/axiosClient';
+import {
+    createMonotonicDeadline,
+    remainingUntilDeadlineMs,
+} from '../../lib/serverClock';
 
 type RoomPhase = 'LOADING' | 'COUNTDOWN' | 'WAITING_ROOM' | 'IN_QUEUE' | 'REDIRECTING' | 'ERROR';
 
@@ -14,11 +18,13 @@ type WaitingRoomResponse = {
     checkoutToken?: string;
     sale_started?: boolean;
     sale_start_in_ms?: number;
+    sale_start_at?: string;
+    server_time?: string;
 };
 
 const formatTime = (ms: number) => {
     const safeMs = Math.max(0, ms);
-    const totalSeconds = Math.floor(safeMs / 1000);
+    const totalSeconds = Math.ceil(safeMs / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
@@ -39,9 +45,25 @@ export const WaitingRoomPage = () => {
     const [estimatedWait, setEstimatedWait] = useState<string>('Đang tính toán...');
 
     const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const countdownDeadlineRef = useRef<number | null>(null);
+    const countdownTransitionTriggeredRef = useRef(false);
     const redirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    const syncCountdown = (remainingMs: number) => {
+        const safeRemainingMs = Math.max(0, remainingMs);
+        countdownDeadlineRef.current = createMonotonicDeadline(safeRemainingMs);
+        countdownTransitionTriggeredRef.current = false;
+        setTimeLeftMs(safeRemainingMs);
+    };
+
+    const stopCountdown = () => {
+        countdownDeadlineRef.current = null;
+        countdownTransitionTriggeredRef.current = false;
+        setTimeLeftMs(0);
+    };
+
     const redirectToBooking = (checkoutToken?: string) => {
+        stopCountdown();
         setPhase('REDIRECTING');
         if (checkoutToken) {
             localStorage.setItem(`checkoutToken_${showId}`, checkoutToken);
@@ -80,7 +102,7 @@ export const WaitingRoomPage = () => {
             }
 
             if (data.status === 'WAITING_ROOM' || data.sale_started === false) {
-                setTimeLeftMs(data.sale_start_in_ms || 0);
+                syncCountdown(data.sale_start_in_ms || 0);
                 setCurrentPosition(0);
                 setInitialPosition(0);
                 setEstimatedWait(data.sale_start_in_ms ? `Mở bán sau ${formatTime(data.sale_start_in_ms)}` : 'Đang chờ mở bán');
@@ -88,6 +110,7 @@ export const WaitingRoomPage = () => {
                 return;
             }
 
+            stopCountdown();
             setCurrentPosition(data.position || 0);
             setInitialPosition(data.position || 0);
             setEstimatedWait('Đang tính toán...');
@@ -97,10 +120,11 @@ export const WaitingRoomPage = () => {
             const status = error.response?.status;
             const data = error.response?.data;
 
-            if (status === 403 && data?.time_remaining_ms) {
-                setTimeLeftMs(data.time_remaining_ms);
+            if (status === 403 && typeof data?.time_remaining_ms === 'number') {
+                syncCountdown(data.time_remaining_ms);
                 setPhase('COUNTDOWN');
             } else {
+                stopCountdown();
                 setPhase('ERROR');
                 setErrorMessage(data?.error || data?.message || 'Không thể tham gia phòng chờ');
             }
@@ -128,29 +152,20 @@ export const WaitingRoomPage = () => {
         if (statusData.status === 'WAITING_ROOM') {
             const nextTimeLeft = statusData.sale_start_in_ms || 0;
 
-            // Khi countdown vừa về 0, có thể request đầu tiên vẫn nhận snapshot WAITING_ROOM.
-            // Không đứng yên ở màn hình phòng chờ; refetch lại để backend finalize/random sang queue.
-            if (nextTimeLeft <= 0) {
-                setPhase('LOADING');
-                setTimeout(() => statusQuery.refetch(), 700);
-                return;
-            }
-
             setPhase('WAITING_ROOM');
             setCurrentPosition(0);
             setInitialPosition(0);
-            setTimeLeftMs(nextTimeLeft);
+            syncCountdown(nextTimeLeft);
             setEstimatedWait(`Mở bán sau ${formatTime(nextTimeLeft)}`);
             return;
         }
 
         if (statusData.status === 'WAITING') {
             const nextPosition = statusData.position || 0;
+            stopCountdown();
             setPhase('IN_QUEUE');
             setCurrentPosition(nextPosition);
             setInitialPosition((prev) => prev || nextPosition);
-            setTimeLeftMs(0);
-
             if (statusData.estimatedWaitTime) {
                 setEstimatedWait(`Khoảng ${statusData.estimatedWaitTime} phút`);
             } else {
@@ -160,31 +175,33 @@ export const WaitingRoomPage = () => {
     }, [statusQuery.data, showId]);
 
     useEffect(() => {
-        if (!['COUNTDOWN', 'WAITING_ROOM'].includes(phase) || timeLeftMs <= 0) return;
+        if (!['COUNTDOWN', 'WAITING_ROOM'].includes(phase)) return;
 
-        countdownIntervalRef.current = setInterval(() => {
-            setTimeLeftMs((prev) => {
-                if (prev <= 1000) {
-                    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+        const updateCountdown = () => {
+            const deadline = countdownDeadlineRef.current;
+            if (deadline === null) return;
 
-                    if (phase === 'COUNTDOWN') {
-                        joinMutation.mutate();
-                    } else if (phase === 'WAITING_ROOM') {
-                        statusQuery.refetch();
-                    }
+            const remainingMs = remainingUntilDeadlineMs(deadline);
+            setTimeLeftMs(remainingMs);
 
-                    return 0;
-                }
+            if (remainingMs > 0 || countdownTransitionTriggeredRef.current) return;
 
-                return prev - 1000;
-            });
-        }, 1000);
+            countdownTransitionTriggeredRef.current = true;
+            if (phase === 'COUNTDOWN') {
+                joinMutation.mutate();
+            } else {
+                statusQuery.refetch();
+            }
+        };
+
+        updateCountdown();
+        countdownIntervalRef.current = setInterval(updateCountdown, 250);
 
         return () => {
             if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [phase, timeLeftMs]);
+    }, [phase]);
 
     const progressPercent = initialPosition > 0
         ? Math.max(5, 100 - (currentPosition / initialPosition) * 100)

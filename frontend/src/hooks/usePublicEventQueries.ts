@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/axiosClient';
+import { createServerClockAnchor, monotonicNow } from '@/lib/serverClock';
 
 const unwrapApiPayload = (payload: any) => {
     const value = payload?.data || payload?.docs || payload;
@@ -39,10 +40,20 @@ export const usePublicEventShows = (eventId?: string, page = 1, limit = 4) => {
         queryKey: ['public-event-shows', eventId, page, limit],
         enabled: Boolean(eventId),
         queryFn: async () => {
+            const requestStartedAtMs = monotonicNow();
             const response = await api.get(`/events/${eventId}/shows`, {
                 params: { page, limit }
             });
-            return response.data;
+            const responseReceivedAtMs = monotonicNow();
+
+            return {
+                ...response.data,
+                serverClockAnchor: createServerClockAnchor(
+                    response.data?.server_time,
+                    requestStartedAtMs,
+                    responseReceivedAtMs,
+                ),
+            };
         }
     });
 };

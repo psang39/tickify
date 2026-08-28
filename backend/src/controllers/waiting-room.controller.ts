@@ -111,15 +111,19 @@ export const joinWaitingRoom = async (req: Request, res: Response) => {
         }
 
         const user_id = user.id;
-        const nowMs = Date.now();
         const times = await getShowSaleTimes(event._id.toString(), show);
+        const nowMs = Date.now();
         const gateError = validateWaitingRoomGate(show, times, nowMs);
         if (gateError) {
-            return res.status(gateError.statusCode).json(gateError.payload);
+            return res.status(gateError.statusCode).json({
+                ...gateError.payload,
+                server_time: new Date(nowMs).toISOString(),
+            });
         }
 
         const saleStartTimeMs = times.saleStartMs!;
         const result = await WaitingRoomService.joinWaitingRoom(show_id, user_id, saleStartTimeMs);
+        const responseNowMs = Date.now();
 
         res.status(200).json({
             message: result.status === 'WAITING_ROOM'
@@ -128,8 +132,9 @@ export const joinWaitingRoom = async (req: Request, res: Response) => {
             status: result.status,
             position: result.position,
             sale_started: result.saleStarted,
-            sale_start_in_ms: Math.max(0, saleStartTimeMs - nowMs),
+            sale_start_in_ms: Math.max(0, saleStartTimeMs - responseNowMs),
             sale_start_at: new Date(saleStartTimeMs).toISOString(),
+            server_time: new Date(responseNowMs).toISOString(),
         });
     } catch (error) {
         console.error('Lỗi khi tham gia phòng chờ:', error);
@@ -152,12 +157,15 @@ export const checkMyTurn = async (req: Request, res: Response) => {
             return res.status(404).json({ message: 'Sự kiện hoặc buổi diễn không tồn tại' });
         }
 
-        const nowMs = Date.now();
         const times = await getShowSaleTimes(event._id.toString(), show);
+        const nowMs = Date.now();
         const gateError = validateWaitingRoomGate(show, times, nowMs);
         if (gateError) {
             await WaitingRoomService.leaveQueue(show_id, user_id);
-            return res.status(gateError.statusCode).json(gateError.payload);
+            return res.status(gateError.statusCode).json({
+                ...gateError.payload,
+                server_time: new Date(nowMs).toISOString(),
+            });
         }
 
         const eventId = event._id.toString();
@@ -167,10 +175,12 @@ export const checkMyTurn = async (req: Request, res: Response) => {
         // Idempotency: sau khi đã tới lượt, frontend có thể gọi /status thêm 1 lần
         // trong lúc đang redirect. Không báo lỗi "không có mặt trong hàng đợi" nữa.
         if (hasActiveCheckoutToken) {
+            const responseNowMs = Date.now();
             return res.status(200).json({
                 message: 'Đã đến lượt của bạn!',
                 status: 'YOUR_TURN',
                 checkoutToken: createCheckoutToken(eventId, show_id, user_id),
+                server_time: new Date(responseNowMs).toISOString(),
             });
         }
 
@@ -186,13 +196,16 @@ export const checkMyTurn = async (req: Request, res: Response) => {
             );
 
             await WaitingRoomService.leaveQueue(show_id, user_id);
+            const responseNowMs = Date.now();
             return res.status(200).json({
                 message: 'Đã đến lượt của bạn!',
                 status: 'YOUR_TURN',
                 checkoutToken,
+                server_time: new Date(responseNowMs).toISOString(),
             });
         }
 
+        const responseNowMs = Date.now();
         res.status(200).json({
             message: result.status === 'WAITING_ROOM'
                 ? 'Bạn đang ở trong phòng chờ. Khi mở bán, hệ thống sẽ random số thứ tự và chuyển bạn sang hàng đợi.'
@@ -200,8 +213,9 @@ export const checkMyTurn = async (req: Request, res: Response) => {
             status: result.status,
             position: result.position,
             estimatedWaitTime: result.estimatedWaitTime,
-            sale_start_in_ms: Math.max(0, times.saleStartMs! - nowMs),
+            sale_start_in_ms: Math.max(0, times.saleStartMs! - responseNowMs),
             sale_start_at: new Date(times.saleStartMs!).toISOString(),
+            server_time: new Date(responseNowMs).toISOString(),
         });
     } catch (error: any) {
         console.error('LỖI API CHECK STATUS:', error.message);
