@@ -1,24 +1,30 @@
 import { createClient } from 'redis';
-import { REDIS_PASSWORD, REDIS_HOST, REDIS_PORT } from '../config/index';
+import { REDIS_URL } from '../config/index';
 
 const redisClientKey = Symbol.for('tickify.redisClient');
 const globalRedisClient = globalThis as typeof globalThis & {
     [redisClientKey]?: ReturnType<typeof createClient>;
 };
-
+const redisUrl = REDIS_URL || 'redis://127.0.0.1:6379';
 const redisClient = globalRedisClient[redisClientKey] ?? (() => {
     const client = createClient({
-        username: 'default',
-        password: REDIS_PASSWORD,
+        url: redisUrl,
         socket: {
-            host: REDIS_HOST,
-            port: Number(REDIS_PORT),
             connectTimeout: 10000,
-        }
+            ...(redisUrl.startsWith('rediss://')
+                ? { rejectUnauthorized: false }
+                : {}),
+        },
     });
 
-    client.on('error', err => console.log('Redis Client Error:', err.message));
-    client.on('ready', () => console.log('Redis Labs đã sẵn sàng!'));
+    client.on('error', err =>
+        console.log('Redis Client Error:', err.message)
+    );
+
+    client.on('ready', () =>
+        console.log('Redis is ready!')
+    );
+
     globalRedisClient[redisClientKey] = client;
     return client;
 })();

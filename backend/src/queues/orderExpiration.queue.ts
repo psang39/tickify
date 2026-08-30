@@ -50,9 +50,19 @@ const assertSafePerformanceQueueCleanup = () => {
 };
 
 const infrastructure = globalInfrastructure[infrastructureKey] ?? (() => {
+    const redisUrl = REDIS_URL || 'redis://127.0.0.1:6379';
     const sharedConnection = new IORedis(
-        REDIS_URL || 'redis://127.0.0.1:6379',
-        { maxRetriesPerRequest: null },
+        redisUrl,
+        {
+            maxRetriesPerRequest: null,
+            ...(redisUrl.startsWith('rediss://')
+                ? {
+                    tls: {
+                        rejectUnauthorized: false,
+                    },
+                }
+                : {}),
+        },
     );
     const sharedQueue = new Queue<OrderExpirationJobData>(orderExpirationQueueName, {
         connection: sharedConnection,
