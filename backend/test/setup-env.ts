@@ -1,8 +1,6 @@
 process.env.NODE_ENV = 'test';
 process.env.URI = process.env.TEST_MONGODB_URI
     || 'mongodb://127.0.0.1:27018/tickify_test?replicaSet=rs0&retryWrites=true&w=majority';
-process.env.REDIS_HOST = process.env.TEST_REDIS_HOST || '127.0.0.1';
-process.env.REDIS_PORT = process.env.TEST_REDIS_PORT || '6380';
 process.env.REDIS_URL = process.env.TEST_REDIS_URL || 'redis://127.0.0.1:6380/1';
 process.env.SECRET_ACCESS_TOKEN = process.env.SECRET_ACCESS_TOKEN || 'tickify-test-access-secret';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'tickify-test-checkout-secret';

@@ -38,7 +38,9 @@ jobs:
         run: npm run build
 
       - name: Start MongoDB, Redis and Kafka test services
-        run: docker compose -f docker-compose.test.yml up -d --wait --wait-timeout 120
+        run: |
+          docker compose -f docker-compose.test.yml up -d --wait --wait-timeout 120 mongo-test redis-test kafka-test
+          docker compose -f docker-compose.test.yml run --rm mongo-init
 
       - name: Run backend tests
         run: npm test

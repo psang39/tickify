@@ -16,15 +16,15 @@ const option = (name: string, fallback: string) => {
 const concurrency = Number(option('--concurrency', '25'));
 const output = option('--output', `perf/results/redis-only-${concurrency}.json`);
 const runId = process.env.PERFORMANCE_RUN_ID || '';
+const redisUrl = process.env.REDIS_URL || '';
 
 if (
     !Number.isInteger(concurrency) || concurrency < 1 || concurrency > 1_000
     || process.env.PERFORMANCE_QUEUE_ISOLATION !== 'true'
     || !/^[a-zA-Z0-9-]{3,48}$/.test(runId)
-    || process.env.REDIS_HOST !== '127.0.0.1'
-    || process.env.REDIS_PORT !== '6380'
+    || !/^redis:\/\/127\.0\.0\.1:6380\/2(?:$|\?)/.test(redisUrl)
 ) {
-    throw new Error('Redis-only control requires a bounded concurrency, local performance Redis (127.0.0.1:6380), and a PERFORMANCE_RUN_ID.');
+    throw new Error('Redis-only control requires a bounded concurrency, local performance Redis DB 2, and a PERFORMANCE_RUN_ID.');
 }
 
 const percentile = (values: number[], p: number) => {
@@ -41,14 +41,8 @@ const summarize = (samples: number[]) => ({
 });
 
 // This deliberately mirrors the production request client: one node-redis
-// connection using REDIS_HOST/REDIS_PORT and the default database (0). It does
-// not use the isolated BullMQ URL/database, because that is not the booking
-// client's topology.
-const client = createClient({
-    username: 'default',
-    password: process.env.REDIS_PASSWORD,
-    socket: { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) },
-});
+// connection configured entirely through REDIS_URL.
+const client = createClient({ url: redisUrl });
 client.on('error', error => console.error('[redis-only control]', error.message));
 
 const namespace = `perf:redis-attribution:${runId}`;
@@ -116,7 +110,7 @@ const main = async () => {
         await writeFile(output, `${JSON.stringify({
             runId,
             concurrency,
-            topology: 'one node-redis client; default Redis database 0; direct EVAL only',
+            topology: 'one node-redis client; REDIS_URL database; direct EVAL only',
             eval: evalResult,
             redisAttribution,
             get: getResult,
