@@ -1,8 +1,10 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { channel } from 'node:diagnostics_channel';
+import { Socket } from 'node:net';
 import { performance } from 'node:perf_hooks';
 
 type RedisCommandContext = {
+    replyDataArrivalAtMs?: number;
     replyAtMs?: number;
     socketWriteAtMs?: number;
 };
@@ -10,6 +12,8 @@ type RedisCommandContext = {
 type RedisCommandSample = {
     wallMs: number;
     submitToSocketWriteMs: number | null;
+    socketWriteToReplyDataArrivalMs: number | null;
+    replyDataArrivalToParsedReplyMs: number | null;
     socketWriteToParsedReplyMs: number | null;
     replyToPromiseResumeMs: number | null;
     inFlightAtSubmit: number;
@@ -28,6 +32,10 @@ const pendingSocketWrites = new Set<RedisCommandContext>();
 const attributionEnabledAtStartup = process.env.PERFORMANCE_DIAGNOSTICS_ENABLED === 'true'
     && process.env.PERFORMANCE_REDIS_ATTRIBUTION_ENABLED === 'true';
 let socketWritesObserved = 0;
+let replyDataEventsObserved = 0;
+let redisSocketConnectDepth = 0;
+let mostRecentReplyDataArrivalAtMs: number | undefined;
+const nodeRedisSockets = new WeakSet<Socket>();
 
 // node-redis emits this after it has parsed a command reply but before the
 // caller's awaited promise continuation can run. It is an opt-in, benchmark
@@ -35,7 +43,12 @@ let socketWritesObserved = 0;
 if (attributionEnabledAtStartup) {
     channel('node-redis:command:reply').subscribe(() => {
         const context = redisCommandContext.getStore();
-        if (context) context.replyAtMs = performance.now();
+        if (context) {
+            context.replyAtMs = performance.now();
+            if (mostRecentReplyDataArrivalAtMs !== undefined) {
+                context.replyDataArrivalAtMs = mostRecentReplyDataArrivalAtMs;
+            }
+        }
     });
 
     // node-redis has no public per-command write event. Its internal
@@ -46,11 +59,60 @@ if (attributionEnabledAtStartup) {
     const redisSocketModule = require('@redis/client/dist/lib/client/socket') as {
         default: {
             prototype: {
-        write: (...args: unknown[]) => boolean;
+                connect: (...args: unknown[]) => Promise<void>;
+                write: (...args: unknown[]) => boolean;
             };
         };
     };
     const redisSocketPrototype = redisSocketModule.default.prototype;
+    const originalRedisSocketConnect = redisSocketPrototype.connect;
+    redisSocketPrototype.connect = function benchmarkRedisSocketConnect(...args: unknown[]): Promise<void> {
+        // RedisSocket.connect() creates its net.Socket synchronously before
+        // awaiting connection readiness. This short scope tags only sockets
+        // created by node-redis, never the ioredis BullMQ/SSE connections.
+        redisSocketConnectDepth += 1;
+        try {
+            return originalRedisSocketConnect.apply(this, args);
+        } finally {
+            redisSocketConnectDepth -= 1;
+        }
+    };
+
+    // Use CommonJS require here: TypeScript's namespace-import helper creates
+    // a copied facade for node:net, whereas node-redis retains the real module
+    // object that its createConnection call resolves from.
+    const netModule = require('node:net') as {
+        createConnection: (...args: unknown[]) => Socket;
+    };
+    const originalCreateConnection = netModule.createConnection;
+    netModule.createConnection = function benchmarkRedisCreateConnection(...args: unknown[]): Socket {
+        const socket = originalCreateConnection.apply(this, args);
+        if (redisSocketConnectDepth > 0) nodeRedisSockets.add(socket);
+        return socket;
+    };
+
+    const socketPrototype = Socket.prototype as unknown as {
+        emit: (event: string | symbol, ...args: unknown[]) => boolean;
+    };
+    const originalSocketEmit = socketPrototype.emit;
+    socketPrototype.emit = function benchmarkRedisSocketEmit(
+        this: Socket,
+        event: string | symbol,
+        ...args: unknown[]
+    ): boolean {
+        if (event !== 'data' || !nodeRedisSockets.has(this)) {
+            return originalSocketEmit.call(this, event, ...args);
+        }
+
+        // This runs before node-redis's registered data listener invokes the
+        // RESP decoder. node-redis publishes a command reply after its internal
+        // await resumes, so retain the most recent tagged data-arrival time for
+        // that command-reply microtask rather than clearing it on return.
+        mostRecentReplyDataArrivalAtMs = performance.now();
+        replyDataEventsObserved += 1;
+        return originalSocketEmit.call(this, event, ...args);
+    };
+
     const originalRedisSocketWrite = redisSocketPrototype.write;
     redisSocketPrototype.write = function benchmarkRedisSocketWrite(...args: unknown[]): boolean {
         if (pendingSocketWrites.size > 0) {
@@ -96,6 +158,12 @@ export const measureRedisCommandAttribution = async <T>(
             submitToSocketWriteMs: context.socketWriteAtMs === undefined
                 ? null
                 : Math.max(0, context.socketWriteAtMs - startedAt),
+            socketWriteToReplyDataArrivalMs: context.socketWriteAtMs === undefined || context.replyDataArrivalAtMs === undefined
+                ? null
+                : Math.max(0, context.replyDataArrivalAtMs - context.socketWriteAtMs),
+            replyDataArrivalToParsedReplyMs: context.replyDataArrivalAtMs === undefined || context.replyAtMs === undefined
+                ? null
+                : Math.max(0, context.replyAtMs - context.replyDataArrivalAtMs),
             socketWriteToParsedReplyMs: context.socketWriteAtMs === undefined || context.replyAtMs === undefined
                 ? null
                 : Math.max(0, context.replyAtMs - context.socketWriteAtMs),
@@ -121,6 +189,7 @@ export const getRedisAttributionMetrics = () => {
     return {
         socketWriteBoundary: {
             socketWritesObserved,
+            replyDataEventsObserved,
         },
         commands: Object.fromEntries(Array.from(commandMetrics.entries()).map(([command, metric]) => [
             command,
@@ -144,6 +213,18 @@ export const getRedisAttributionMetrics = () => {
                 p50: percentile(metric.samples.flatMap(sample => sample.socketWriteToParsedReplyMs ?? []), 50),
                 p95: percentile(metric.samples.flatMap(sample => sample.socketWriteToParsedReplyMs ?? []), 95),
                 p99: percentile(metric.samples.flatMap(sample => sample.socketWriteToParsedReplyMs ?? []), 99),
+            },
+            socketWriteToReplyDataArrivalMs: {
+                observedSamples: metric.samples.filter(sample => sample.socketWriteToReplyDataArrivalMs !== null).length,
+                p50: percentile(metric.samples.flatMap(sample => sample.socketWriteToReplyDataArrivalMs ?? []), 50),
+                p95: percentile(metric.samples.flatMap(sample => sample.socketWriteToReplyDataArrivalMs ?? []), 95),
+                p99: percentile(metric.samples.flatMap(sample => sample.socketWriteToReplyDataArrivalMs ?? []), 99),
+            },
+            replyDataArrivalToParsedReplyMs: {
+                observedSamples: metric.samples.filter(sample => sample.replyDataArrivalToParsedReplyMs !== null).length,
+                p50: percentile(metric.samples.flatMap(sample => sample.replyDataArrivalToParsedReplyMs ?? []), 50),
+                p95: percentile(metric.samples.flatMap(sample => sample.replyDataArrivalToParsedReplyMs ?? []), 95),
+                p99: percentile(metric.samples.flatMap(sample => sample.replyDataArrivalToParsedReplyMs ?? []), 99),
             },
             replyToPromiseResumeMs: {
                 observedSamples: metric.samples.filter(sample => sample.replyToPromiseResumeMs !== null).length,

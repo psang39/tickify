@@ -41,7 +41,11 @@ async function bootstrap() {
         await connectDB();
         await connectRedis();
 
-        startOrderExpirationWorker();
+        // Clustered performance API workers share one separately started
+        // expiration worker. Normal deployments keep the existing behavior.
+        if (process.env.PERFORMANCE_API_ONLY !== 'true') {
+            startOrderExpirationWorker();
+        }
         app.listen(PORT, () =>
             console.log(`Server running on http://localhost:${PORT}`)
         )
