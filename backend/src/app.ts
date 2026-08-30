@@ -27,7 +27,7 @@ const allowedOrigins = Array.from(new Set([
     'http://127.0.0.1:5173',
     'http://127.0.0.1:4173',
     'http://127.0.0.1:3000',
-    'jolly-kataifi-d4ad9a.netlify.app',
+    'https://jolly-kataifi-d4ad9a.netlify.app',
 
     ...(process.env.FRONTEND_URL || '')
         .split(',')
