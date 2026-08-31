@@ -1,29 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+import { randomUUID } from 'crypto';
+import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import multer from 'multer';
-import { Request } from 'express';
-
-const uploadRoot = path.resolve(process.cwd(), 'uploads');
-const eventUploadDir = path.join(uploadRoot, 'events');
-
-fs.mkdirSync(eventUploadDir, { recursive: true });
-
-const safeFilename = (name: string) =>
-  name
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9._-]/g, '')
-    .replace(/-+/g, '-')
-    .slice(-80);
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, eventUploadDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname || '').toLowerCase();
-    const base = path.basename(file.originalname || 'event-image', ext);
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}-${safeFilename(base)}${ext}`);
-  },
-});
+import { getR2Client, getR2Config } from '../config/r2Client';
 
 const allowedMimeTypes = new Set([
   'image/jpeg',
@@ -33,8 +11,21 @@ const allowedMimeTypes = new Set([
   'image/svg+xml',
 ]);
 
+const extensionByMimeType: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+  'image/svg+xml': 'svg',
+};
+
+export type UploadedEventImage = {
+  key: string;
+  url: string;
+};
+
 export const eventImageUpload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024,
     files: 2,
@@ -47,28 +38,89 @@ export const eventImageUpload = multer({
   },
 });
 
-export const getUploadedEventImageUrl = (req: Request, file?: Express.Multer.File) => {
-  if (!file) return undefined;
+const buildEventImageKey = (mimeType: string) => {
+  const extension = extensionByMimeType[mimeType];
+  if (!extension) {
+    throw new Error(`Unsupported event image type: ${mimeType}`);
+  }
 
-  const configuredBaseUrl = process.env.BACKEND_PUBLIC_URL?.replace(/\/$/, '');
-  const forwardedProto = req.get('x-forwarded-proto');
-  const protocol = forwardedProto || req.protocol;
-  const host = req.get('host');
-  const baseUrl = configuredBaseUrl || `${protocol}://${host}`;
-
-  return `${baseUrl}/api/v1/uploads/events/${file.filename}`;
+  const now = new Date();
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  return `events/${now.getUTCFullYear()}/${month}/${randomUUID()}.${extension}`;
 };
 
-export const deleteLocalUploadedImage = (imageUrl?: string | null) => {
-  if (!imageUrl) return;
+const buildPublicUrl = (key: string) => {
+  const { publicBaseUrl } = getR2Config();
+  const encodedKey = key.split('/').map(encodeURIComponent).join('/');
+  return `${publicBaseUrl}/${encodedKey}`;
+};
 
-  const marker = '/api/v1/uploads/events/';
-  const markerIndex = imageUrl.indexOf(marker);
-  if (markerIndex === -1) return;
+export const uploadEventImageBuffer = async (
+  buffer: Buffer,
+  mimeType: string,
+): Promise<UploadedEventImage> => {
+  if (!allowedMimeTypes.has(mimeType)) {
+    throw new Error(`Unsupported event image type: ${mimeType}`);
+  }
 
-  const filename = imageUrl.slice(markerIndex + marker.length).split(/[?#]/)[0];
-  if (!filename || filename.includes('/') || filename.includes('..')) return;
+  const { bucketName } = getR2Config();
+  const key = buildEventImageKey(mimeType);
 
-  const filePath = path.join(eventUploadDir, filename);
-  fs.promises.unlink(filePath).catch(() => undefined);
+  await getR2Client().send(new PutObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    Body: buffer,
+    ContentType: mimeType,
+    CacheControl: 'public, max-age=31536000, immutable',
+  }));
+
+  return { key, url: buildPublicUrl(key) };
+};
+
+export const uploadEventImage = async (file?: Express.Multer.File) => {
+  if (!file) return undefined;
+  return uploadEventImageBuffer(file.buffer, file.mimetype);
+};
+
+export const deleteEventImageByKey = async (key?: string | null) => {
+  if (!key || !key.startsWith('events/') || key.includes('..')) return;
+
+  const { bucketName } = getR2Config();
+  await getR2Client().send(new DeleteObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+  }));
+};
+
+export const getEventImageKeyFromUrl = (imageUrl?: string | null) => {
+  if (!imageUrl) return undefined;
+
+  let publicUrl: URL;
+  let candidateUrl: URL;
+  try {
+    publicUrl = new URL(getR2Config().publicBaseUrl);
+    candidateUrl = new URL(imageUrl);
+  } catch {
+    return undefined;
+  }
+
+  if (candidateUrl.origin !== publicUrl.origin) return undefined;
+
+  const basePath = publicUrl.pathname.replace(/\/+$/, '');
+  const keyPrefix = `${basePath}/`;
+  if (!candidateUrl.pathname.startsWith(keyPrefix)) return undefined;
+
+  let key: string;
+  try {
+    key = decodeURIComponent(candidateUrl.pathname.slice(keyPrefix.length));
+  } catch {
+    return undefined;
+  }
+
+  return key.startsWith('events/') && !key.includes('..') ? key : undefined;
+};
+
+export const deleteEventImage = async (imageUrl?: string | null) => {
+  const key = getEventImageKeyFromUrl(imageUrl);
+  if (key) await deleteEventImageByKey(key);
 };

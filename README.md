@@ -415,7 +415,20 @@ Configure the backend environment:
 ```env
 KAFKA_BROKERS=localhost:9092
 KAFKA_CLIENT_ID=tickify
+
+# Cloudflare R2 (S3 API credentials and the bucket's public/custom domain)
+R2_ACCOUNT_ID=your-cloudflare-account-id
+R2_ACCESS_KEY_ID=your-r2-access-key-id
+R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
+R2_BUCKET_NAME=tickify-images
+R2_PUBLIC_BASE_URL=https://images.example.com
 ```
+
+The R2 API token needs object read/write access to the configured bucket. Enable
+public access through an R2 custom domain (recommended) or an `r2.dev` domain and
+use that origin as `R2_PUBLIC_BASE_URL`. Event uploads are stored under the
+`events/<year>/<month>/` prefix and are served directly from R2 rather than the
+Heroku filesystem.
 
 ### Backend API
 

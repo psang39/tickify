@@ -7,13 +7,58 @@ import Order from "../models/order.model";
 import Zone from "../models/zone.model";
 import Venue from "../models/venue.model";
 import redisClient from "../utils/redisClient";
-import { deleteLocalUploadedImage, getUploadedEventImageUrl } from '../utils/eventImageUpload';
+import {
+    deleteEventImage,
+    deleteEventImageByKey,
+    uploadEventImage,
+    UploadedEventImage,
+} from '../utils/eventImageUpload';
 
 const getEventImageFiles = (req: Request) => {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
     return {
         posterFile: files?.poster?.[0],
         bannerFile: files?.banner?.[0],
+    };
+};
+
+const cleanupUploadedEventImages = async (images: UploadedEventImage[]) => {
+    const results = await Promise.allSettled(images.map(image => deleteEventImageByKey(image.key)));
+    results.forEach(result => {
+        if (result.status === 'rejected') console.error('[R2 image cleanup error]', result.reason);
+    });
+};
+
+const cleanupEventImageUrls = async (urls: Array<string | null | undefined>) => {
+    const results = await Promise.allSettled(urls.map(url => deleteEventImage(url)));
+    results.forEach(result => {
+        if (result.status === 'rejected') console.error('[R2 image cleanup error]', result.reason);
+    });
+};
+
+const uploadEventImages = async (posterFile?: Express.Multer.File, bannerFile?: Express.Multer.File) => {
+    const [posterResult, bannerResult] = await Promise.allSettled([
+        uploadEventImage(posterFile),
+        uploadEventImage(bannerFile),
+    ]);
+
+    const uploadedImages = [posterResult, bannerResult]
+        .filter((result): result is PromiseFulfilledResult<UploadedEventImage | undefined> => result.status === 'fulfilled')
+        .map(result => result.value)
+        .filter((image): image is UploadedEventImage => Boolean(image));
+
+    const failedUpload = [posterResult, bannerResult]
+        .find((result): result is PromiseRejectedResult => result.status === 'rejected');
+
+    if (failedUpload) {
+        await cleanupUploadedEventImages(uploadedImages);
+        throw failedUpload.reason;
+    }
+
+    return {
+        posterImage: posterResult.status === 'fulfilled' ? posterResult.value : undefined,
+        bannerImage: bannerResult.status === 'fulfilled' ? bannerResult.value : undefined,
+        uploadedImages,
     };
 };
 
@@ -38,6 +83,7 @@ const isBase64Image = (value?: string) => Boolean(value?.startsWith('data:image'
 const toSafeListImage = (value?: string) => isBase64Image(value) ? undefined : value;
 
 export const createEvent = async (req: Request, res: Response) => {
+    let uploadedImages: UploadedEventImage[] = [];
     try {
         const { name, description, genre, start_date, end_date, status, banner_offset_y } = req.body;
         const organizer_id = req.user!.id;
@@ -60,8 +106,10 @@ export const createEvent = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Vui lòng upload ảnh bằng file, không gửi ảnh base64 trong JSON." });
         }
 
-        const poster_url = getUploadedEventImageUrl(req, posterFile) || req.body.poster_url || '';
-        const banner_url = getUploadedEventImageUrl(req, bannerFile) || req.body.banner_url || '';
+        const uploaded = await uploadEventImages(posterFile, bannerFile);
+        uploadedImages = uploaded.uploadedImages;
+        const poster_url = uploaded.posterImage?.url || req.body.poster_url || '';
+        const banner_url = uploaded.bannerImage?.url || req.body.banner_url || '';
 
         const event = new Event({
             name,
@@ -78,8 +126,10 @@ export const createEvent = async (req: Request, res: Response) => {
         });
 
         await event.save();
+        uploadedImages = [];
         res.status(201).json(event);
     } catch (error: any) {
+        await cleanupUploadedEventImages(uploadedImages);
         res.status(500).json({ message: error.message || "Error creating event", error });
     }
 };
@@ -122,6 +172,7 @@ export const getEventById = async (req: Request, res: Response) => {
     }
 };
 export const updateEvent = async (req: Request, res: Response) => {
+    let uploadedImages: UploadedEventImage[] = [];
     try {
         const { event_id } = req.params;
         const organizer_id = req.user!.id;
@@ -146,8 +197,10 @@ export const updateEvent = async (req: Request, res: Response) => {
 
         const oldPosterUrl = event.poster_url;
         const oldBannerUrl = event.banner_url;
-        const nextPosterUrl = getUploadedEventImageUrl(req, posterFile);
-        const nextBannerUrl = getUploadedEventImageUrl(req, bannerFile);
+        const uploaded = await uploadEventImages(posterFile, bannerFile);
+        uploadedImages = uploaded.uploadedImages;
+        const nextPosterUrl = uploaded.posterImage?.url;
+        const nextBannerUrl = uploaded.bannerImage?.url;
 
         event.name = name ?? event.name;
         event.description = description ?? event.description;
@@ -164,12 +217,16 @@ export const updateEvent = async (req: Request, res: Response) => {
         else if (req.body.banner_url !== undefined && !isBase64Image(req.body.banner_url)) event.banner_url = req.body.banner_url;
 
         const updatedEvent = await event.save();
+        uploadedImages = [];
 
-        if (nextPosterUrl && oldPosterUrl && oldPosterUrl !== nextPosterUrl) deleteLocalUploadedImage(oldPosterUrl);
-        if (nextBannerUrl && oldBannerUrl && oldBannerUrl !== nextBannerUrl) deleteLocalUploadedImage(oldBannerUrl);
+        await cleanupEventImageUrls([
+            oldPosterUrl && oldPosterUrl !== updatedEvent.poster_url ? oldPosterUrl : undefined,
+            oldBannerUrl && oldBannerUrl !== updatedEvent.banner_url ? oldBannerUrl : undefined,
+        ]);
 
         res.status(200).json({ message: "Cập nhật thông tin Sự kiện thành công", data: updatedEvent });
     } catch (error: any) {
+        await cleanupUploadedEventImages(uploadedImages);
         res.status(500).json({ message: error.message || "Error updating event", error });
     }
 };
@@ -305,7 +362,8 @@ export const cancelEvent = async (req: Request, res: Response) => {
 };
 export const deleteEvent = async (req: Request, res: Response) => {
     try {
-        const event = await Event.findById(req.params.id);
+        const eventId = req.params.event_id || req.params.id;
+        const event = await Event.findById(eventId);
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
@@ -319,7 +377,8 @@ export const deleteEvent = async (req: Request, res: Response) => {
         if (ordersExist) {
             return res.status(400).json({ message: "Cannot delete event with existing orders. Please contact support." });
         }
-        await Event.findByIdAndDelete(req.params.id);
+        await Event.findByIdAndDelete(eventId);
+        await cleanupEventImageUrls([event.poster_url, event.banner_url]);
         res.status(200).json({ message: "Event deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: "Error deleting event", error });

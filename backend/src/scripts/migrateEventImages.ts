@@ -1,22 +1,9 @@
 import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
 import mongoose from 'mongoose';
 import Event from '../models/event.model';
+import { uploadEventImageBuffer } from '../utils/eventImageUpload';
 
 dotenv.config();
-
-const uploadRoot = path.resolve(process.cwd(), 'uploads');
-const eventUploadDir = path.join(uploadRoot, 'events');
-fs.mkdirSync(eventUploadDir, { recursive: true });
-
-const mimeToExt: Record<string, string> = {
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-  'image/gif': '.gif',
-  'image/svg+xml': '.svg',
-};
 
 const parseDataUrl = (value?: string) => {
   if (!value?.startsWith('data:image')) return null;
@@ -28,17 +15,12 @@ const parseDataUrl = (value?: string) => {
   };
 };
 
-const saveImage = async (eventId: string, field: 'poster' | 'banner', value?: string) => {
+const saveImage = async (value?: string) => {
   const parsed = parseDataUrl(value);
   if (!parsed) return value;
 
-  const ext = mimeToExt[parsed.mime] || '.jpg';
-  const filename = `${Date.now()}-${eventId}-${field}${ext}`;
-  const filePath = path.join(eventUploadDir, filename);
-  await fs.promises.writeFile(filePath, parsed.buffer);
-
-  const baseUrl = (process.env.BACKEND_PUBLIC_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, '');
-  return `${baseUrl}/api/v1/uploads/events/${filename}`;
+  const uploadedImage = await uploadEventImageBuffer(parsed.buffer, parsed.mime);
+  return uploadedImage.url;
 };
 
 const main = async () => {
@@ -58,8 +40,8 @@ const main = async () => {
 
   for (const event of events) {
     const eventId = String(event._id);
-    const nextPosterUrl = await saveImage(eventId, 'poster', event.poster_url);
-    const nextBannerUrl = await saveImage(eventId, 'banner', event.banner_url);
+    const nextPosterUrl = await saveImage(event.poster_url);
+    const nextBannerUrl = await saveImage(event.banner_url);
 
     event.poster_url = nextPosterUrl || '';
     event.banner_url = nextBannerUrl || '';
