@@ -223,7 +223,8 @@ A few screenshots for the Mobile Scanner app:
 | **Realtime** | Redis Pub/Sub, Server-Sent Events |
 | **Authentication / security** | JWT / HTTP-only cookies, RBAC, bcrypt, HMAC; signed/time-based ticket data |
 | **Mobile** | Expo, React Native |
-| **Deployment** | Linux, Nginx, PM2, SSL |
+| **Hosting / deployment** | Vercel (frontend), Heroku (backend) |
+| **Image storage** | Cloudflare R2 (S3-compatible object storage with public/custom-domain delivery) |
 | **Testing** | Node.js test runner via `tsx`; unit, integration, and E2E backend test suites |
 
 ---
