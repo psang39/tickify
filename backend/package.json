@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/src/server.js",
     "migrate:event-images": "tsx src/scripts/migrateEventImages.ts",
+    "migrate:legacy-event-images": "tsx src/scripts/migrateLegacyEventImagesToR2.ts",
     "perf:seed": "tsx src/scripts/seed-performance.ts",
     "perf:prepare": "tsx src/scripts/seed-performance.ts",
     "perf:verify-queue": "tsx src/scripts/verify-performance-queue-isolation.ts",

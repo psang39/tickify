@@ -7,3 +7,4 @@ backend/perf/results/
 *.log
 *.tmp
 .cache/
+backend/uploads/

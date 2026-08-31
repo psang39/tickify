@@ -430,6 +430,19 @@ use that origin as `R2_PUBLIC_BASE_URL`. Event uploads are stored under the
 `events/<year>/<month>/` prefix and are served directly from R2 rather than the
 Heroku filesystem.
 
+To migrate event images from a legacy server, copy the backup files into
+`backend/uploads/events` and run:
+
+```bash
+cd backend
+npm run migrate:legacy-event-images -- --dry-run
+npm run migrate:legacy-event-images
+```
+
+The backup directory is ignored by Git. Set `LEGACY_EVENT_IMAGE_DIR` when the
+files are stored elsewhere. The migration is idempotent and only processes
+database URLs containing `/api/v1/uploads/events/`.
+
 ### Backend API
 
 ```bash
